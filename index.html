@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Requerimiento – JJC CC0154</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="/master.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:Arial,sans-serif;background:#e8e8e8;min-height:100vh;}
+.toolbar{background:#1a3a5c;color:#fff;padding:10px 20px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.3);}
+.toolbar-title{font-size:15px;font-weight:700;letter-spacing:1px;flex:1;}
+.btn{padding:7px 16px;border:none;border-radius:5px;font-size:13px;font-weight:700;cursor:pointer;transition:opacity .2s;}
+.btn:hover{opacity:.85;}
+.btn-panel{background:#8e44ad;color:#fff;}
+.btn-send{background:#27ae60;color:#fff;}
+.btn-pdf{background:#c0392b;color:#fff;}
+.btn-excel{background:#2980b9;color:#fff;}
+.btn-add{background:#f39c12;color:#fff;}
+.btn-clear{background:#555;color:#fff;}
+.page-wrap{max-width:1050px;margin:20px auto;padding:0 12px 40px;}
+.hoja{background:#fff;border:1px solid #999;padding:16px 20px;box-shadow:0 4px 20px rgba(0,0,0,.15);font-size:11px;}
+.titulo-bloque{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.titulo-rq{font-size:14px;font-weight:700;color:#1a3a5c;letter-spacing:2px;}
+.titulo-nro{background:#1a3a5c;color:#fff;padding:5px 14px;font-size:13px;font-weight:700;letter-spacing:1px;}
+.cab-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid #999;}
+.cab-izq{padding:8px 10px;border-right:1px solid #999;}
+.cab-der{padding:6px 8px;}
+.campo-row{display:flex;align-items:center;gap:6px;margin-bottom:5px;}
+.campo-label{font-weight:700;font-size:10px;white-space:nowrap;min-width:110px;}
+.campo-val{border:none;border-bottom:1px solid #aaa;font-size:11px;padding:2px 4px;outline:none;width:100%;background:transparent;font-family:Arial,sans-serif;}
+.campo-val:focus{border-bottom-color:#1a3a5c;background:#f0f4ff;}
+.tipo-row{display:flex;align-items:center;gap:6px;margin-bottom:3px;font-size:10px;}
+.fecha-row{display:flex;align-items:center;justify-content:flex-end;gap:6px;padding:4px 0;border-bottom:1px solid #ddd;}
+.fecha-row label{font-weight:700;font-size:10px;}
+.fecha-row input{border:1px solid #aaa;padding:2px 6px;font-size:11px;font-family:Arial,sans-serif;outline:none;}
+.tbl-proyecto{width:100%;border-collapse:collapse;font-size:10px;margin-top:4px;}
+.tbl-proyecto th{background:#1a3a5c;color:#fff;padding:3px 6px;text-align:center;border:1px solid #999;font-size:9px;}
+.tbl-proyecto td{border:1px solid #999;padding:2px 6px;text-align:center;}
+.tbl-proyecto td input{border:none;text-align:center;font-size:10px;width:100%;outline:none;background:transparent;font-family:Arial,sans-serif;}
+.sec-titulo{background:#d0d8e8;padding:2px 6px;font-weight:700;font-size:9px;border-bottom:1px solid #999;}
+.sec-box{border:1px solid #999;border-top:none;}
+.cats-grid{display:grid;grid-template-columns:1fr 1fr;}
+.cat-item{display:flex;align-items:center;gap:4px;padding:2px 8px;font-size:10px;border-bottom:1px solid #eee;}
+.cat-item:nth-child(odd){border-right:1px solid #ddd;}
+.cat-badge{background:#1a3a5c;color:#fff;font-size:8px;padding:1px 5px;min-width:30px;text-align:center;margin-left:auto;}
+.tbl-items{width:100%;border-collapse:collapse;font-size:10px;margin-top:12px;}
+.tbl-items th{background:#1a3a5c;color:#fff;padding:5px 4px;text-align:center;border:1px solid #777;font-size:9px;line-height:1.3;vertical-align:middle;}
+.tbl-items td{border:1px solid #bbb;padding:2px 3px;vertical-align:middle;}
+.tbl-items tbody tr:nth-child(even){background:#f7f9ff;}
+.tbl-items tbody tr:hover{background:#eef3ff;}
+.td-num{text-align:center;font-weight:700;font-size:10px;color:#1a3a5c;min-width:24px;}
+input.cel{border:none;width:100%;outline:none;background:transparent;font-size:10px;font-family:Arial,sans-serif;padding:1px 3px;}
+input.cel:focus{background:#fffbe6;}
+input.cel-c{text-align:center;}
+input.cel-stock{background:#e8f5e9!important;}
+input.cel-comprar{background:#fff3e0!important;}
+.ac-wrap{position:relative;}
+.ac-list{position:absolute;top:100%;left:0;z-index:200;background:#fff;border:1px solid #1a3a5c;border-radius:3px;min-width:360px;max-height:150px;overflow-y:auto;box-shadow:0 4px 16px rgba(0,0,0,.2);display:none;}
+.ac-item{padding:5px 8px;cursor:pointer;font-size:10px;border-bottom:1px solid #eee;display:flex;gap:8px;}
+.ac-item:hover{background:#e8f0fe;}
+.ac-code{color:#c0392b;font-weight:700;min-width:80px;font-family:monospace;}
+.ac-desc{flex:1;}
+.ac-um{color:#888;min-width:30px;text-align:right;}
+.firmas-bloque{border:1px solid #999;margin-top:16px;}
+.firma-col{padding:8px;border-right:1px solid #ddd;font-size:9px;}
+.firma-col:last-child{border-right:none;}
+.firma-col label{font-weight:700;display:block;margin-bottom:4px;color:#1a3a5c;font-size:9px;}
+.firma-col input{border:none;border-bottom:1px solid #bbb;width:100%;font-size:9px;outline:none;margin-bottom:3px;background:transparent;}
+.firma-linea{border-top:1px solid #333;margin-top:20px;padding-top:2px;text-align:center;font-size:8px;color:#666;}
+.btn-del{background:none;border:none;color:#c0392b;cursor:pointer;font-size:14px;padding:0 4px;}
+#toast{position:fixed;bottom:20px;right:20px;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:700;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;}
+#modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:500;align-items:center;justify-content:center;}
+#modal.show{display:flex;}
+.modal-box{background:#fff;border-radius:10px;padding:32px;max-width:420px;width:90%;text-align:center;}
+.modal-box h2{font-size:22px;color:#27ae60;margin-bottom:10px;}
+.modal-box p{font-size:14px;color:#555;margin-bottom:20px;}
+.modal-id{font-family:monospace;font-size:18px;font-weight:700;color:#1a3a5c;background:#f0f4ff;padding:8px 16px;border-radius:6px;display:inline-block;margin-bottom:20px;}
+@media print{.toolbar{display:none;}.page-wrap{margin:0;padding:0;max-width:100%;}.hoja{box-shadow:none;border:none;}.ac-list{display:none!important;}.btn-del{display:none;}input{border-color:transparent!important;background:transparent!important;}}
+</style>
+</head>
+<body>
+<div class="toolbar">
+  <div class="toolbar-title">📋 REQUERIMIENTO JJC – CC0154</div>
+  <button class="btn btn-panel" onclick="location.href='/panel'">📊 Ver Panel</button>
+  <button class="btn btn-add" onclick="addFila()">+ Ítem</button>
+  <button class="btn btn-send" onclick="enviarRequerimiento()">✔ Enviar Requerimiento</button>
+  <button class="btn btn-excel" onclick="exportExcel()">⬇ Excel</button>
+  <button class="btn btn-pdf" onclick="exportPDF()">⬇ PDF</button>
+  <button class="btn btn-clear" onclick="limpiar()">↺ Nuevo</button>
+</div>
+
+<div class="page-wrap">
+<div class="hoja" id="hoja">
+  <div class="titulo-bloque">
+    <span class="titulo-rq">REQUERIMIENTO</span>
+    <span class="titulo-nro" id="lbl-nro">P-0174</span>
+  </div>
+
+  <div class="cab-grid">
+    <div class="cab-izq">
+      <div class="campo-row"><span class="campo-label">CENTRO:</span><input class="campo-val" id="h_centro" value="0154" style="width:60px;">&nbsp;&nbsp;<span class="campo-label" style="min-width:90px;">COD. SOLPED:</span><input class="campo-val" id="h_solped"></div>
+      <div class="campo-row"><span class="campo-label">ALMACÉN:</span><input class="campo-val" id="h_almacen" value="1001" style="width:60px;">&nbsp;&nbsp;<span class="campo-label" style="min-width:90px;">COD. RESERVA:</span><input class="campo-val" id="h_reserva"></div>
+      <div class="campo-row"><span class="campo-label"></span><span style="min-width:60px;"></span>&nbsp;&nbsp;<span class="campo-label" style="min-width:90px;">PEP:</span><input class="campo-val" id="h_pep"></div>
+      <div class="campo-row" style="margin-top:6px;"><span class="campo-label">SOLICITANTE:</span><input class="campo-val" id="h_solicitante" placeholder="Nombre del solicitante"></div>
+      <div class="campo-row"><span class="campo-label">TIPO DE MATERIAL:</span><input class="campo-val" id="h_tipo_mat" placeholder="Ej: EQUIPOS Y MATERIALES"></div>
+      <div style="margin-top:8px;border:1px solid #ccc;padding:6px 8px;">
+        <div style="font-weight:700;font-size:9px;margin-bottom:5px;">MARCAR CON "X"</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px;">
+          <div><div class="tipo-row"><input type="checkbox" id="t_zmat"><label for="t_zmat">ZMAT</label></div><div class="tipo-row"><input type="checkbox" id="t_zrep"><label for="t_zrep">ZREP</label></div><div class="tipo-row"><input type="checkbox" id="t_zepp"><label for="t_zepp">ZEPP</label></div><div class="tipo-row"><input type="checkbox" id="t_zcom"><label for="t_zcom">ZCOM</label></div><div class="tipo-row"><input type="checkbox" id="t_zcon"><label for="t_zcon">ZCON</label></div></div>
+          <div><div class="tipo-row"><input type="checkbox" id="t_zsum"><label for="t_zsum">ZSUM</label></div><div class="tipo-row"><input type="checkbox" id="t_zact"><label for="t_zact">ZACT</label></div><div class="tipo-row"><input type="checkbox" id="t_zenc"><label for="t_zenc">ZENC</label></div><div class="tipo-row"><input type="checkbox" id="t_zequ"><label for="t_zequ">ZEQU</label></div><div class="tipo-row"><input type="checkbox" id="t_serv"><label for="t_serv">SERVICIO</label></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="cab-der">
+      <div class="fecha-row"><label>FECHA:</label><input type="date" id="h_fecha"></div>
+      <table class="tbl-proyecto" style="margin-top:6px;">
+        <thead><tr><th>PROYECTO RQ</th><th>No.</th><th>TIPO</th><th>SOLICITANTE</th></tr></thead>
+        <tbody><tr><td><input class="cel cel-c" id="p_proyecto" placeholder="JJC-N02-..."></td><td><input class="cel cel-c" id="p_no" style="width:40px;" placeholder="20"></td><td><input class="cel cel-c" id="p_tipo" style="width:50px;" placeholder="SERV"></td><td><input class="cel cel-c" id="p_solic" placeholder="KC"></td></tr></tbody>
+      </table>
+      <div style="border:1px solid #999;margin-top:4px;">
+        <div class="sec-titulo">REVISADO POR / ÁREA</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;"><div style="padding:3px 6px;border-right:1px solid #ddd;"><input class="campo-val" id="rev_nombre" placeholder="Nombre revisor" style="font-size:10px;"></div><div style="padding:3px 6px;"><input class="campo-val" id="rev_area" placeholder="Área" style="font-size:10px;"></div></div>
+      </div>
+      <div style="border:1px solid #999;border-top:none;">
+        <div class="sec-titulo">REVISIÓN STOCK EN OBRA</div>
+        <div style="padding:2px 6px;font-size:10px;border-bottom:1px solid #eee;">REVISIÓN STOCK EN OBRA &nbsp;<input class="campo-val" id="rev_stock1" placeholder="JC" style="width:40px;font-size:10px;display:inline;width:60px;"></div>
+        <div style="padding:2px 6px;font-size:10px;">INSTRUMENTACIÓN / FO</div>
+      </div>
+      <div style="border:1px solid #999;border-top:none;">
+        <div class="sec-titulo">CATEGORÍA</div>
+        <div class="cats-grid">
+          <div class="cat-item"><input type="checkbox" id="c_mat"><label for="c_mat">MATERIALES</label><span class="cat-badge">MAT</span></div>
+          <div class="cat-item"><input type="checkbox" id="c_seg"><label for="c_seg">SEGURIDAD</label><span class="cat-badge">SEG</span></div>
+          <div class="cat-item"><input type="checkbox" id="c_her"><label for="c_her">HERRAMIENTAS</label><span class="cat-badge">HER</span></div>
+          <div class="cat-item"><input type="checkbox" id="c_eqm"><label for="c_eqm">EQ. MENORES</label><span class="cat-badge">EQ M</span></div>
+          <div class="cat-item"><input type="checkbox" id="c_co"><label for="c_co">CONSTRUCCIÓN</label><span class="cat-badge">CO</span></div>
+          <div class="cat-item"><input type="checkbox" id="c_ot"><label for="c_ot">OFICINA TÉCNICA</label><span class="cat-badge">OT</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <table class="tbl-items" id="tbl-items">
+    <thead><tr>
+      <th style="width:28px;">ITEM</th><th style="width:90px;">PROYECTO</th><th style="width:28px;">RQ #</th>
+      <th style="width:40px;">TIPO</th><th style="width:32px;">SOLIC.</th><th style="width:50px;">PARTIDA</th>
+      <th style="width:90px;">CÓDIGO SAP</th><th>DESCRIPCIÓN</th><th style="width:50px;">CANT.</th>
+      <th style="width:36px;">UND.</th><th style="width:55px;">STOCK</th><th style="width:55px;">A COMPRAR</th>
+      <th style="width:70px;">FECHA REQ.</th><th style="width:70px;">SOLICITANTE</th><th style="width:80px;">OBS.</th>
+      <th style="width:20px;"></th>
+    </tr></thead>
+    <tbody id="items-body"></tbody>
+  </table>
+
+  <div class="firmas-bloque" style="margin-top:16px;">
+    <div class="sec-titulo" style="border:1px solid #999;background:#d0d8e8;">APROBACIONES</div>
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);">
+      <div class="firma-col"><label>CONTRATISTA</label><input placeholder="Nombre" id="f_cont"><div style="font-size:9px;color:#555;">FECHA:</div><input type="date" id="f_fecha_cont"><div class="firma-linea">Firma</div></div>
+      <div class="firma-col"><label>OFICINA TÉCNICA</label><input placeholder="Nombre" id="f_ot"><div style="font-size:9px;color:#555;">FECHA:</div><input type="date" id="f_fecha_ot"><div class="firma-linea">Firma</div></div>
+      <div class="firma-col"><label>CONSTRUCCIÓN</label><input placeholder="Nombre" id="f_const"><div style="font-size:9px;color:#555;">FECHA:</div><input type="date" id="f_fecha_const"><div class="firma-linea">Firma</div></div>
+      <div class="firma-col"><label>ALMACÉN</label><input placeholder="Nombre" id="f_alm"><div style="font-size:9px;color:#555;">FECHA:</div><input type="date" id="f_fecha_alm"><div class="firma-linea">Firma</div></div>
+      <div class="firma-col"><label>ADMINISTRACIÓN</label><input placeholder="Nombre" id="f_adm"><div style="font-size:9px;color:#555;">FECHA:</div><input type="date" id="f_fecha_adm"><div class="firma-linea">Firma</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid #ddd;">
+      <div class="firma-col"><label>PCR</label><input placeholder="Nombre"><div class="firma-linea">Firma</div></div>
+      <div class="firma-col"><label>JEFE DE CONSTRUCCIÓN</label><input placeholder="Nombre"><div class="firma-linea">Firma</div></div>
+      <div class="firma-col"><label>CONTROL DE PROYECTOS</label><input placeholder="Nombre"><div class="firma-linea">Firma</div></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- MODAL ÉXITO -->
+<div id="modal">
+  <div class="modal-box">
+    <h2>✅ Requerimiento Enviado</h2>
+    <p>Tu requerimiento fue registrado con el ID:</p>
+    <div class="modal-id" id="modal-id"></div>
+    <p style="margin-bottom:16px;">Ya es visible en el panel de seguimiento.</p>
+    <button class="btn btn-panel" onclick="location.href='/panel'" style="margin-right:8px;">📊 Ver Panel</button>
+    <button class="btn btn-clear" onclick="cerrarModal()">↺ Nuevo Requerimiento</button>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+let rowId = 0;
+
+document.getElementById('h_fecha').value = new Date().toISOString().slice(0,10);
+document.getElementById('f_fecha_cont').value = new Date().toISOString().slice(0,10);
+
+function norm(s){ return s.toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^A-Z0-9 ]/g,' ').replace(/\s+/g,' ').trim(); }
+
+function buscarSAP(q){
+  if(!q||q.length<3) return [];
+  const nq=norm(q);
+  const isCode=/^\d+$/.test(q.trim());
+  return MASTER.filter(m=>isCode?m.c.startsWith(q.trim()):norm(m.d).includes(nq)).slice(0,8);
+}
+
+function addFila(){
+  const id=rowId++;
+  const proyecto=document.getElementById('p_proyecto').value||'---';
+  const no=document.getElementById('p_no').value||'';
+  const tipo=document.getElementById('p_tipo').value||'';
+  const solic=document.getElementById('p_solic').value||'';
+  const fecha=document.getElementById('h_fecha').value||'';
+  const tr=document.createElement('tr');
+  tr.id='fila-'+id;
+  tr.innerHTML=`
+    <td class="td-num">${id+1}</td>
+    <td><input class="cel cel-c" value="${proyecto}" style="width:85px;" data-col="proyecto"></td>
+    <td><input class="cel cel-c" value="${no}" style="width:26px;" data-col="rq"></td>
+    <td><input class="cel cel-c" value="${tipo}" style="width:38px;" data-col="tipo"></td>
+    <td><input class="cel cel-c" value="${solic}" style="width:30px;" data-col="solic"></td>
+    <td><input class="cel cel-c" placeholder="---" style="width:48px;" data-col="partida"></td>
+    <td><div class="ac-wrap"><input class="cel" id="cod-${id}" placeholder="Código SAP..." style="width:86px;" data-col="codigo" oninput="onCI(this,${id})" onblur="hideAC(${id})" autocomplete="off"><div class="ac-list" id="ac-${id}"></div></div></td>
+    <td><input class="cel" id="desc-${id}" placeholder="Descripción del material" data-col="descripcion" oninput="onDI(this,${id})" onblur="hideAC(${id})" autocomplete="off" style="min-width:200px;"><div class="ac-list" id="acd-${id}"></div></td>
+    <td><input class="cel cel-c" placeholder="0" style="width:48px;" data-col="cantidad" type="number"></td>
+    <td><input class="cel cel-c" id="um-${id}" placeholder="UND" style="width:34px;" data-col="um"></td>
+    <td><input class="cel cel-c cel-stock" placeholder="0" style="width:53px;" data-col="stock"></td>
+    <td><input class="cel cel-c cel-comprar" placeholder="0" style="width:53px;" data-col="comprar"></td>
+    <td><input class="cel cel-c" type="date" value="${fecha}" style="width:68px;" data-col="fecha_req"></td>
+    <td><input class="cel cel-c" placeholder="Nombre" style="width:68px;" data-col="solicitante_item"></td>
+    <td><input class="cel" placeholder="Obs." style="width:78px;" data-col="obs"></td>
+    <td><button class="btn-del" onclick="delFila(${id})">✕</button></td>`;
+  document.getElementById('items-body').appendChild(tr);
+  document.getElementById('desc-'+id).focus();
+}
+
+function delFila(id){ const tr=document.getElementById('fila-'+id); if(tr) tr.remove(); renumber(); }
+function renumber(){ document.querySelectorAll('#items-body tr').forEach((tr,i)=>{ tr.querySelector('.td-num').textContent=i+1; }); }
+
+function onCI(input,id){ showAC('ac-'+id, buscarSAP(input.value.trim()), id, 'cod'); }
+function onDI(input,id){ showAC('acd-'+id, buscarSAP(input.value.trim()), id, 'desc'); }
+
+function showAC(listId,results,rowId,mode){
+  const el=document.getElementById(listId);
+  if(!results.length){el.style.display='none';return;}
+  el.innerHTML=results.map(r=>`<div class="ac-item" onmousedown="selItem(event,${rowId},'${r.c}','${r.d.replace(/'/g,"\\'")}','${r.u}')"><span class="ac-code">${r.c}</span><span class="ac-desc">${r.d.length>55?r.d.substring(0,55)+'…':r.d}</span><span class="ac-um">${r.u}</span></div>`).join('');
+  el.style.display='block';
+}
+
+function selItem(e,id,code,desc,um){
+  e.preventDefault();
+  document.getElementById('cod-'+id).value=code;
+  document.getElementById('desc-'+id).value=desc;
+  document.getElementById('um-'+id).value=um;
+  hideAC(id);
+}
+function hideAC(id){ setTimeout(()=>{ ['ac-','acd-'].forEach(p=>{ const el=document.getElementById(p+id); if(el) el.style.display='none'; }); },150); }
+document.addEventListener('click',()=>document.querySelectorAll('.ac-list').forEach(el=>el.style.display='none'));
+
+function getHeader(){
+  return {
+    nro: document.getElementById('lbl-nro').textContent,
+    fecha: document.getElementById('h_fecha').value,
+    centro: document.getElementById('h_centro').value,
+    almacen: document.getElementById('h_almacen').value,
+    solped: document.getElementById('h_solped').value,
+    reserva: document.getElementById('h_reserva').value,
+    pep: document.getElementById('h_pep').value,
+    solicitante: document.getElementById('h_solicitante').value,
+    tipo_mat: document.getElementById('h_tipo_mat').value,
+    proyecto: document.getElementById('p_proyecto').value,
+    no: document.getElementById('p_no').value,
+    tipo: document.getElementById('p_tipo').value,
+    p_solic: document.getElementById('p_solic').value,
+    rev_nombre: document.getElementById('rev_nombre').value,
+    rev_area: document.getElementById('rev_area').value,
+    tipos: ['zmat','zrep','zepp','zcom','zcon','zsum','zact','zenc','zequ','serv'].filter(t=>document.getElementById('t_'+t).checked),
+    categorias: ['mat','seg','her','eqm','co','ot'].filter(c=>document.getElementById('c_'+c).checked),
+  };
+}
+
+function getItems(){
+  const rows=[];
+  document.querySelectorAll('#items-body tr').forEach((tr,i)=>{
+    const inputs=tr.querySelectorAll('input[data-col]');
+    const row={num:i+1};
+    inputs.forEach(inp=>{ row[inp.dataset.col]=inp.value; });
+    rows.push(row);
+  });
+  return rows;
+}
+
+async function enviarRequerimiento(){
+  const items=getItems().filter(r=>r.descripcion&&r.descripcion.trim());
+  if(!items.length){ showToast('⚠ Agrega al menos un ítem con descripción','#e67e22'); return; }
+  const header=getHeader();
+  if(!header.solicitante.trim()){ showToast('⚠ Ingresa el nombre del solicitante','#e67e22'); return; }
+  const btn=document.querySelector('.btn-send');
+  btn.textContent='⏳ Enviando...'; btn.disabled=true;
+  try {
+    const resp=await fetch('/api/requerimientos',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({...header, items})
+    });
+    const data=await resp.json();
+    if(data.ok){
+      document.getElementById('modal-id').textContent=data.id;
+      document.getElementById('modal').classList.add('show');
+    } else { showToast('Error: '+data.error,'#c0392b'); }
+  } catch(err){ showToast('Error de conexión','#c0392b'); }
+  finally{ btn.textContent='✔ Enviar Requerimiento'; btn.disabled=false; }
+}
+
+function cerrarModal(){ document.getElementById('modal').classList.remove('show'); limpiar(); }
+
+function exportExcel(){
+  const h=getHeader(); const items=getItems();
+  const data=[
+    ['REQUERIMIENTO',h.nro],['FECHA:',h.fecha],['CENTRO:',h.centro,'COD. SOLPED:',h.solped],
+    ['ALMACÉN:',h.almacen,'COD. RESERVA:',h.reserva],['PEP:',h.pep],
+    ['SOLICITANTE:',h.solicitante],['TIPO MATERIAL:',h.tipo_mat],
+    ['PROYECTO RQ:',h.proyecto,'No.:',h.no,'TIPO:',h.tipo],[],
+    ['ITEM','PROYECTO','RQ #','TIPO','SOLIC.','PARTIDA','CÓDIGO SAP','DESCRIPCIÓN','CANTIDAD','UND.','STOCK','A COMPRAR','FECHA REQ.','SOLICITANTE','OBS.'],
+    ...items.map(r=>[r.num,r.proyecto,r.rq,r.tipo,r.solic,r.partida,r.codigo,r.descripcion,r.cantidad,r.um,r.stock,r.comprar,r.fecha_req,r.solicitante_item,r.obs])
+  ];
+  const wb=XLSX.utils.book_new();
+  const ws=XLSX.utils.aoa_to_sheet(data);
+  ws['!cols']=[{wch:6},{wch:18},{wch:6},{wch:8},{wch:8},{wch:10},{wch:12},{wch:50},{wch:10},{wch:6},{wch:10},{wch:12},{wch:14},{wch:16},{wch:20}];
+  XLSX.utils.book_append_sheet(wb,ws,'Requerimiento');
+  XLSX.writeFile(wb,`REQ_${h.nro}_${h.fecha}.xlsx`);
+  showToast('✓ Excel descargado','#27ae60');
+}
+
+async function exportPDF(){
+  const btn=document.querySelector('.btn-pdf');
+  btn.textContent='⏳ Generando...'; btn.disabled=true;
+  document.querySelectorAll('.btn-del').forEach(b=>b.style.visibility='hidden');
+  document.querySelectorAll('.ac-list').forEach(el=>el.style.display='none');
+  document.querySelector('.toolbar').style.display='none';
+  try{
+    const canvas=await html2canvas(document.getElementById('hoja'),{scale:2,useCORS:true,backgroundColor:'#ffffff',logging:false,windowWidth:1050});
+    const {jsPDF}=window.jspdf;
+    const pdf=new jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
+    const pW=pdf.internal.pageSize.getWidth(), pH=pdf.internal.pageSize.getHeight();
+    const iW=canvas.width, iH=canvas.height;
+    const ratio=Math.min(pW/(iW/2*0.264583),pH/(iH/2*0.264583));
+    const fW=(iW/2*0.264583)*ratio, fH=(iH/2*0.264583)*ratio;
+    const x=(pW-fW)/2, y=(pH-fH)/2;
+    if(fH<=pH){ pdf.addImage(canvas.toDataURL('image/jpeg',0.95),'JPEG',x,y>0?y:0,fW,fH); }
+    else{
+      const pgH=(pH/0.264583)*2; let yp=0,pg=0;
+      while(yp<iH){
+        if(pg>0) pdf.addPage();
+        const sH=Math.min(pgH,iH-yp);
+        const sc=document.createElement('canvas'); sc.width=iW; sc.height=sH;
+        sc.getContext('2d').drawImage(canvas,0,yp,iW,sH,0,0,iW,sH);
+        const sr=pW/(iW/2*0.264583);
+        pdf.addImage(sc.toDataURL('image/jpeg',0.95),'JPEG',0,0,pW,(sH/2*0.264583)*sr);
+        yp+=sH; pg++;
+      }
+    }
+    const h=getHeader();
+    pdf.save(`REQ_${h.nro}_${h.fecha}.pdf`);
+    showToast('✓ PDF descargado','#27ae60');
+  }catch(err){ alert('Error PDF: '+err.message); }
+  finally{
+    document.querySelectorAll('.btn-del').forEach(b=>b.style.visibility='');
+    document.querySelector('.toolbar').style.display='';
+    btn.textContent='⬇ PDF'; btn.disabled=false;
+  }
+}
+
+function limpiar(){
+  document.getElementById('items-body').innerHTML=''; rowId=0;
+  ['h_solped','h_reserva','h_pep','h_solicitante','h_tipo_mat','p_proyecto','p_no','p_tipo','p_solic','rev_nombre','rev_area','rev_stock1'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  document.querySelectorAll('input[type=checkbox]').forEach(cb=>cb.checked=false);
+  document.getElementById('h_fecha').value=new Date().toISOString().slice(0,10);
+  for(let i=0;i<3;i++) addFila();
+}
+
+function showToast(msg,bg='#27ae60'){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.style.background=bg; t.style.color='#fff';
+  t.style.opacity='1'; setTimeout(()=>t.style.opacity='0',2500);
+}
+
+for(let i=0;i<3;i++) addFila();
+</script>
+</body>
+</html>
