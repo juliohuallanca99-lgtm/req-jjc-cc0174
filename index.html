@@ -17,8 +17,6 @@
   --r:6px;--rlg:12px;
 }
 body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
-
-/* ── NAV ── */
 nav{position:sticky;top:0;z-index:200;background:var(--navy);height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;border-bottom:2px solid var(--light)}
 .nav-brand{display:flex;align-items:center;gap:10px}
 .nav-logo{width:32px;height:32px;background:var(--light);border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;color:#fff;flex-shrink:0}
@@ -30,17 +28,11 @@ nav{position:sticky;top:0;z-index:200;background:var(--navy);height:52px;display
 .nav-user{display:flex;align-items:center;gap:8px;color:rgba(255,255,255,.65);font-size:11px}
 .avatar{width:26px;height:26px;background:var(--light);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff}
 .badge-count{background:var(--red);color:#fff;font-size:9px;font-weight:700;min-width:16px;height:16px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;padding:0 3px}
-
-/* ── LAYOUT ── */
 .page{display:none;padding:24px;max-width:1200px;margin:0 auto}
 .page.active{display:block}
-
-/* ── CARDS ── */
 .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--rlg);overflow:hidden;margin-bottom:16px}
 .card-head{padding:13px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:#fafbfc}
 .card-title{font-size:13px;font-weight:600;color:var(--ink);display:flex;align-items:center;gap:8px}
-
-/* ── BUTTONS ── */
 .btn{display:inline-flex;align-items:center;gap:6px;padding:7px 16px;border-radius:var(--r);font-size:12px;font-weight:500;cursor:pointer;border:none;font-family:inherit;transition:.15s}
 .btn-primary{background:var(--blue);color:#fff}.btn-primary:hover{background:var(--mid)}
 .btn-success{background:var(--green);color:#fff}
@@ -49,22 +41,16 @@ nav{position:sticky;top:0;z-index:200;background:var(--navy);height:52px;display
 .btn-sm{padding:5px 10px;font-size:11px}
 .btn-xs{padding:3px 8px;font-size:10px;border-radius:4px}
 .btn-icon{width:28px;height:28px;padding:0;justify-content:center;border-radius:var(--r)}
-
-/* ── BADGES ── */
 .badge{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600}
 .b-blue{background:var(--ice);color:var(--mid)}
 .b-green{background:var(--green-bg);color:var(--green)}
 .b-red{background:var(--red-bg);color:var(--red)}
 .b-amber{background:var(--amber-bg);color:#92650a}
 .b-gray{background:var(--bg);color:var(--ink4);border:1px solid var(--border)}
-
-/* ── STATS ── */
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
 .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--rlg);padding:16px 18px}
 .stat-val{font-size:28px;font-weight:700;line-height:1;margin-bottom:4px}
 .stat-label{font-size:11px;color:var(--ink4)}
-
-/* ── MAIN TABLE ── */
 .tbl-wrap{overflow-x:auto}
 table.data{width:100%;border-collapse:collapse;font-size:12px}
 table.data th{background:var(--hdr);color:var(--hdr-txt);padding:7px 10px;font-size:10px;font-weight:600;text-align:left;border:0.5px solid #2c5282;white-space:nowrap}
@@ -74,25 +60,16 @@ table.data tr:hover td{background:#f8fafc}
 table.data td.center{text-align:center}
 table.data td.stock-cell{background:rgba(192,57,43,.1);color:var(--red);font-weight:700;text-align:center;font-family:monospace}
 table.data td.buy-cell{background:rgba(26,122,68,.1);color:var(--green);font-weight:700;text-align:center;font-family:monospace}
-
-/* ── SOLPED INLINE EDIT ── */
 .solped-cell{display:flex;align-items:center;gap:4px}
 .solped-val{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink2);font-weight:500}
-.solped-val.empty{color:var(--ink5);font-style:italic;font-size:10px}
 .solped-input{border:1px solid var(--light);border-radius:4px;padding:3px 6px;font-size:11px;font-family:'JetBrains Mono',monospace;width:120px;color:var(--navy);font-weight:600}
 .solped-input:focus{outline:none;box-shadow:0 0 0 2px rgba(46,134,193,.2)}
-
-/* ── PDF CELL ── */
 .pdf-cell{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
-.pdf-thumb{display:flex;align-items:center;gap:4px;background:var(--red-bg);border:1px solid rgba(192,57,43,.25);border-radius:4px;padding:2px 7px;font-size:10px;font-weight:600;color:var(--red);cursor:pointer;text-decoration:none;max-width:120px;overflow:hidden}
+.pdf-thumb{display:flex;align-items:center;gap:4px;background:var(--red-bg);border:1px solid rgba(192,57,43,.25);border-radius:4px;padding:2px 7px;font-size:10px;font-weight:600;color:var(--red);cursor:pointer;max-width:120px;overflow:hidden}
 .pdf-thumb:hover{background:#fce8e5}
 .pdf-thumb span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:80px}
 .pdf-upload-btn{display:inline-flex;align-items:center;gap:3px;padding:3px 7px;border-radius:4px;font-size:10px;font-weight:600;cursor:pointer;border:1px dashed var(--border);background:transparent;color:var(--ink4);font-family:inherit;transition:.15s}
 .pdf-upload-btn:hover{border-color:var(--red);color:var(--red);background:var(--red-bg)}
-.pdf-input{display:none}
-
-/* ── FORMS ── */
-.form-grid{display:grid;gap:12px}
 .form-row{display:grid;gap:12px}
 .field{display:flex;flex-direction:column;gap:4px}
 .field label{font-size:10px;font-weight:600;color:var(--ink4);text-transform:uppercase;letter-spacing:.05em}
@@ -100,8 +77,6 @@ table.data td.buy-cell{background:rgba(26,122,68,.1);color:var(--green);font-wei
 .field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--light);box-shadow:0 0 0 3px rgba(46,134,193,.12)}
 .field input[readonly]{background:#f8fafc;color:var(--ink3)}
 .field textarea{resize:vertical;min-height:60px}
-
-/* ── ITEMS TABLE (form) ── */
 .items-section{border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
 .items-section table{width:100%;border-collapse:collapse;font-size:11.5px}
 .items-section th{background:var(--hdr);color:var(--hdr-txt);padding:6px 8px;font-size:10px;font-weight:600;text-align:center;border:0.5px solid #2c5282}
@@ -114,8 +89,6 @@ table.data td.buy-cell{background:rgba(26,122,68,.1);color:var(--green);font-wei
 .legend-bar{display:flex;gap:14px;align-items:center;padding:6px 12px;background:#f8fafc;border-top:1px solid var(--border);font-size:10px}
 .leg{display:flex;align-items:center;gap:4px}
 .leg-dot{width:10px;height:10px;border-radius:2px}
-
-/* ── APPROVAL TRACK ── */
 .approval-track{display:flex;align-items:center;overflow-x:auto;padding:8px 0;gap:0}
 .appr-step{display:flex;align-items:center;flex-shrink:0}
 .appr-node{display:flex;flex-direction:column;align-items:center;gap:3px;width:86px}
@@ -125,13 +98,9 @@ table.data td.buy-cell{background:rgba(26,122,68,.1);color:var(--green);font-wei
 .appr-label{font-size:8.5px;color:var(--ink4);text-align:center;line-height:1.3;font-weight:500}
 .appr-line{width:20px;height:2px;background:var(--border);flex-shrink:0}
 .appr-line.done{background:var(--green)}
-
-/* ── SIGNATURE PAD ── */
 .sig-wrap{border:1.5px solid var(--border);border-radius:var(--r);overflow:hidden;background:#fafbfc}
 .sig-canvas{display:block;cursor:crosshair;touch-action:none}
 .sig-bar{display:flex;align-items:center;justify-content:space-between;padding:5px 10px;background:var(--bg);border-top:1px solid var(--border);font-size:10px;color:var(--ink4)}
-
-/* ── MODAL ── */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;display:none;align-items:center;justify-content:center;padding:20px}
 .modal-overlay.open{display:flex}
 .modal{background:var(--surface);border-radius:var(--rlg);width:100%;max-width:560px;max-height:90vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,.3)}
@@ -139,43 +108,36 @@ table.data td.buy-cell{background:rgba(26,122,68,.1);color:var(--green);font-wei
 .modal-title{font-size:15px;font-weight:700}
 .modal-body{padding:20px}
 .modal-foot{padding:13px 20px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end}
-
-/* ── MODAL: VER RQ ── */
 .rq-detail-header{background:var(--ice);border-radius:var(--r);padding:12px 14px;display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
 .rq-dh-label{font-size:9px;color:var(--mid);text-transform:uppercase;font-weight:600;margin-bottom:2px}
 .rq-dh-val{font-weight:600;color:var(--ink)}
 
-/* ── PDF VIEWER MODAL ── */
-.pdf-modal-body{padding:0;height:70vh}
-.pdf-modal-body iframe{width:100%;height:100%;border:none}
+/* ── PDF VIEWER — CORREGIDO ── */
+.pdf-modal-body{padding:0;height:75vh;position:relative;background:#525659;display:flex;flex-direction:column}
+.pdf-viewer-embed{width:100%;flex:1;border:none;display:block}
+.pdf-img-viewer{width:100%;flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px;background:#525659}
+.pdf-img-viewer img{max-width:100%;box-shadow:0 4px 20px rgba(0,0,0,.5);border-radius:2px}
+.pdf-open-bar{background:rgba(0,0,0,.75);padding:8px 16px;display:flex;align-items:center;justify-content:space-between;font-size:11px;color:#ddd;flex-shrink:0}
+.pdf-fallback{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:16px;color:#ccc;text-align:center;padding:32px}
+.pdf-fallback-icon{font-size:56px}
+.pdf-fallback h3{font-size:16px;font-weight:600;color:#fff}
+.pdf-fallback p{font-size:13px;line-height:1.6;max-width:360px}
 
-/* ── TOAST ── */
 .toast-container{position:fixed;bottom:20px;right:20px;z-index:999;display:flex;flex-direction:column;gap:8px}
 .toast{padding:10px 16px;border-radius:var(--r);font-size:12px;font-weight:500;color:#fff;box-shadow:0 4px 16px rgba(0,0,0,.2);animation:slideIn .25s ease;display:flex;align-items:center;gap:8px}
 .toast.ok{background:var(--green)}.toast.err{background:var(--red)}.toast.inf{background:var(--blue)}
 @keyframes slideIn{from{transform:translateX(100px);opacity:0}to{transform:none;opacity:1}}
-
-/* ── EMPTY ── */
 .empty{text-align:center;padding:48px 20px;color:var(--ink4)}
 .empty-icon{font-size:40px;margin-bottom:12px}
 .empty h3{font-size:15px;font-weight:600;color:var(--ink3);margin-bottom:6px}
 .empty p{font-size:12px}
-
-/* ── FILTER BAR ── */
 .filter-bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
 .filter-bar input,.filter-bar select{padding:6px 10px;border:1px solid var(--border);border-radius:var(--r);font-size:12px;font-family:inherit;background:var(--surface)}
-
-/* ── PRINT ── */
-@media print{
-  nav,.no-print{display:none!important}
-  .page{display:block!important;padding:0}
-  body{background:#fff}
-}
+@media print{nav,.no-print{display:none!important}.page{display:block!important;padding:0}body{background:#fff}}
 </style>
 </head>
 <body>
 
-<!-- NAV -->
 <nav>
   <div class="nav-brand">
     <div class="nav-logo">JJC</div>
@@ -202,7 +164,7 @@ table.data td.buy-cell{background:rgba(26,122,68,.1);color:var(--green);font-wei
 
 <div class="toast-container" id="toasts"></div>
 
-<!-- ═══════════ DASHBOARD ═══════════ -->
+<!-- DASHBOARD -->
 <div class="page active" id="page-dashboard">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
     <div>
@@ -211,14 +173,12 @@ table.data td.buy-cell{background:rgba(26,122,68,.1);color:var(--green);font-wei
     </div>
     <button class="btn btn-primary" onclick="showPage('nuevo')">➕ Nuevo Requerimiento</button>
   </div>
-
   <div class="stats">
     <div class="stat-card" style="border-top:3px solid var(--blue)"><div class="stat-val" style="color:var(--blue)" id="s-total">0</div><div class="stat-label">Total RQ registrados</div></div>
     <div class="stat-card" style="border-top:3px solid var(--amber)"><div class="stat-val" style="color:var(--amber)" id="s-pend">0</div><div class="stat-label">Pendientes de firma</div></div>
     <div class="stat-card" style="border-top:3px solid var(--green)"><div class="stat-val" style="color:var(--green)" id="s-aprov">0</div><div class="stat-label">Aprobados completos</div></div>
     <div class="stat-card" style="border-top:3px solid var(--red)"><div class="stat-val" style="color:var(--red)" id="s-items">0</div><div class="stat-label">Ítems totales registrados</div></div>
   </div>
-
   <div class="card">
     <div class="card-head">
       <div class="card-title">📋 Últimos requerimientos</div>
@@ -226,22 +186,11 @@ table.data td.buy-cell{background:rgba(26,122,68,.1);color:var(--green);font-wei
     </div>
     <div class="tbl-wrap">
       <table class="data">
-        <thead>
-          <tr>
-            <th>N° RQ</th>
-            <th>Fecha</th>
-            <th>Proyecto</th>
-            <th>Tipo</th>
-            <th>Solicitante</th>
-            <th class="center">Ítems</th>
-            <th class="center">Estado</th>
-            <th class="center">Firmas</th>
-            <!-- NUEVAS COLUMNAS -->
-            <th class="center">COD. SOLPED (SAP)</th>
-            <th class="center">PDF Escaneado</th>
-            <th class="center">Acciones</th>
-          </tr>
-        </thead>
+        <thead><tr>
+          <th>N° RQ</th><th>Fecha</th><th>Proyecto</th><th>Tipo</th><th>Solicitante</th>
+          <th class="center">Ítems</th><th class="center">Estado</th><th class="center">Firmas</th>
+          <th class="center">COD. SOLPED (SAP)</th><th class="center">PDF Escaneado</th><th class="center">Acciones</th>
+        </tr></thead>
         <tbody id="dash-tbody">
           <tr><td colspan="11"><div class="empty"><div class="empty-icon">📋</div><h3>Sin requerimientos</h3><p>Crea tu primer RQ con el botón de arriba</p></div></td></tr>
         </tbody>
@@ -250,7 +199,7 @@ table.data td.buy-cell{background:rgba(26,122,68,.1);color:var(--green);font-wei
   </div>
 </div>
 
-<!-- ═══════════ NUEVO RQ ═══════════ -->
+<!-- NUEVO RQ -->
 <div class="page" id="page-nuevo">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
     <div>
@@ -262,8 +211,6 @@ table.data td.buy-cell{background:rgba(26,122,68,.1);color:var(--green);font-wei
       <button class="btn btn-primary" onclick="saveRQ()">💾 Guardar RQ</button>
     </div>
   </div>
-
-  <!-- ENCABEZADO -->
   <div class="card" style="margin-bottom:14px">
     <div class="card-head"><div class="card-title">📄 Encabezado del Requerimiento</div></div>
     <div style="padding:18px">
@@ -274,20 +221,13 @@ table.data td.buy-cell{background:rgba(26,122,68,.1);color:var(--green);font-wei
         <div class="field"><label>N° RQ (Automático)</label><input type="text" id="f-rqnum" readonly style="font-weight:700;color:var(--blue)"></div>
       </div>
       <div class="form-row" style="grid-template-columns:1fr 1fr 1fr 1fr;margin-bottom:12px">
-        <div class="field">
-          <label>Proyecto</label>
-          <select id="f-proyecto">
-            <option>JJC-001-26-PS</option><option>JJC-001-26</option><option>JJC-001-26-EL</option>
-          </select>
+        <div class="field"><label>Proyecto</label>
+          <select id="f-proyecto"><option>JJC-001-26-PS</option><option>JJC-001-26</option><option>JJC-001-26-EL</option></select>
         </div>
-        <div class="field">
-          <label>Tipo de material</label>
-          <select id="f-tipomat">
-            <option>EQUIPOS Y MATERIALES</option><option>SEGURIDAD</option><option>HERRAMIENTAS</option><option>EQUIPOS MENORES</option><option>SERVICIOS</option>
-          </select>
+        <div class="field"><label>Tipo de material</label>
+          <select id="f-tipomat"><option>EQUIPOS Y MATERIALES</option><option>SEGURIDAD</option><option>HERRAMIENTAS</option><option>EQUIPOS MENORES</option><option>SERVICIOS</option></select>
         </div>
-        <div class="field">
-          <label>Clasificación SAP</label>
+        <div class="field"><label>Clasificación SAP</label>
           <select id="f-sap">
             <option value="ZMAT">ZMAT – Material</option><option value="ZREP">ZREP – Repuesto</option>
             <option value="ZEPP">ZEPP – EPP</option><option value="ZCOM">ZCOM – Consumible</option>
@@ -295,8 +235,7 @@ table.data td.buy-cell{background:rgba(26,122,68,.1);color:var(--green);font-wei
             <option value="ZACT">ZACT – Activo</option><option value="ZEQU">ZEQU – Equipo</option><option value="ZENC">ZENC – Encargo</option>
           </select>
         </div>
-        <div class="field">
-          <label>Solicitante (Área)</label>
+        <div class="field"><label>Solicitante (Área)</label>
           <select id="f-solicitante">
             <option value="CO">CO – Construcción</option><option value="OT">OT – Oficina Técnica</option>
             <option value="SEG">SEG – Seguridad</option><option value="ADMIN">ADMIN – Administración</option><option value="ALM">ALM – Almacén</option>
@@ -313,8 +252,6 @@ table.data td.buy-cell{background:rgba(26,122,68,.1);color:var(--green);font-wei
       </div>
     </div>
   </div>
-
-  <!-- ITEMS -->
   <div class="card" style="margin-bottom:14px">
     <div class="card-head">
       <div class="card-title">📦 Ítems del Requerimiento</div>
@@ -322,24 +259,14 @@ table.data td.buy-cell{background:rgba(26,122,68,.1);color:var(--green);font-wei
     </div>
     <div class="items-section">
       <table id="items-table">
-        <thead>
-          <tr>
-            <th style="width:28px">#</th>
-            <th style="width:90px">Proyecto</th>
-            <th style="width:40px">RQ</th>
-            <th style="width:60px">Tipo</th>
-            <th style="width:70px">Partida</th>
-            <th style="width:90px">Código SAP</th>
-            <th style="min-width:200px">Descripción</th>
-            <th style="width:60px">Cant.</th>
-            <th style="width:50px">Und.</th>
-            <th style="width:70px;background:rgba(192,57,43,.25)">STOCK</th>
-            <th style="width:80px;background:rgba(26,122,68,.25)">A COMPRAR</th>
-            <th style="width:100px">Fecha req. obra</th>
-            <th style="width:70px">Obs.</th>
-            <th style="width:28px"></th>
-          </tr>
-        </thead>
+        <thead><tr>
+          <th style="width:28px">#</th><th style="width:90px">Proyecto</th><th style="width:40px">RQ</th>
+          <th style="width:60px">Tipo</th><th style="width:70px">Partida</th><th style="width:90px">Código SAP</th>
+          <th style="min-width:200px">Descripción</th><th style="width:60px">Cant.</th><th style="width:50px">Und.</th>
+          <th style="width:70px;background:rgba(192,57,43,.25)">STOCK</th>
+          <th style="width:80px;background:rgba(26,122,68,.25)">A COMPRAR</th>
+          <th style="width:100px">Fecha req. obra</th><th style="width:70px">Obs.</th><th style="width:28px"></th>
+        </tr></thead>
         <tbody id="items-tbody"></tbody>
       </table>
       <div style="padding:8px 10px;background:#f8fafc;border-top:1px solid var(--border)">
@@ -353,7 +280,7 @@ table.data td.buy-cell{background:rgba(26,122,68,.1);color:var(--green);font-wei
   </div>
 </div>
 
-<!-- ═══════════ LISTA ═══════════ -->
+<!-- LISTA -->
 <div class="page" id="page-lista">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
     <h1 style="font-size:22px;font-weight:700">Todos los Requerimientos</h1>
@@ -371,25 +298,21 @@ table.data td.buy-cell{background:rgba(26,122,68,.1);color:var(--green);font-wei
   <div class="card">
     <div class="tbl-wrap">
       <table class="data">
-        <thead>
-          <tr>
-            <th>N° RQ</th><th>Fecha</th><th>Proyecto</th><th>Tipo SAP</th><th>Solicitante</th>
-            <th class="center">Ítems</th>
-            <th class="center" style="background:rgba(192,57,43,.2)">Stock</th>
-            <th class="center" style="background:rgba(26,122,68,.2)">A Comprar</th>
-            <th class="center">Estado</th><th class="center">Firmas</th>
-            <th class="center">COD. SOLPED</th>
-            <th class="center">PDF</th>
-            <th class="center">Acciones</th>
-          </tr>
-        </thead>
+        <thead><tr>
+          <th>N° RQ</th><th>Fecha</th><th>Proyecto</th><th>Tipo SAP</th><th>Solicitante</th>
+          <th class="center">Ítems</th>
+          <th class="center" style="background:rgba(192,57,43,.2)">Stock</th>
+          <th class="center" style="background:rgba(26,122,68,.2)">A Comprar</th>
+          <th class="center">Estado</th><th class="center">Firmas</th>
+          <th class="center">COD. SOLPED</th><th class="center">PDF</th><th class="center">Acciones</th>
+        </tr></thead>
         <tbody id="lista-tbody"></tbody>
       </table>
     </div>
   </div>
 </div>
 
-<!-- ═══════════ FIRMAS ═══════════ -->
+<!-- FIRMAS -->
 <div class="page" id="page-firmas">
   <div style="margin-bottom:18px">
     <h1 style="font-size:22px;font-weight:700">Pendientes de Firma</h1>
@@ -398,7 +321,7 @@ table.data td.buy-cell{background:rgba(26,122,68,.1);color:var(--green);font-wei
   <div id="firmas-list"></div>
 </div>
 
-<!-- ═══════════ BASE DE DATOS ═══════════ -->
+<!-- BASE DE DATOS -->
 <div class="page" id="page-base">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
     <div>
@@ -413,23 +336,21 @@ table.data td.buy-cell{background:rgba(26,122,68,.1);color:var(--green);font-wei
   <div class="card">
     <div class="tbl-wrap">
       <table class="data">
-        <thead>
-          <tr>
-            <th>#</th><th>Mes</th><th>Fecha</th><th>N° RQ</th><th>Proyecto</th>
-            <th>Tipo</th><th>Solic.</th><th>Cód. SAP</th><th>Descripción</th>
-            <th class="center">Cant.</th><th class="center">Und.</th>
-            <th class="center" style="background:rgba(192,57,43,.2)">Stock</th>
-            <th class="center" style="background:rgba(26,122,68,.2)">A Comprar</th>
-            <th>Fecha req.</th><th>COD. SOLPED</th><th>Estado</th>
-          </tr>
-        </thead>
+        <thead><tr>
+          <th>#</th><th>Mes</th><th>Fecha</th><th>N° RQ</th><th>Proyecto</th>
+          <th>Tipo</th><th>Solic.</th><th>Cód. SAP</th><th>Descripción</th>
+          <th class="center">Cant.</th><th class="center">Und.</th>
+          <th class="center" style="background:rgba(192,57,43,.2)">Stock</th>
+          <th class="center" style="background:rgba(26,122,68,.2)">A Comprar</th>
+          <th>Fecha req.</th><th>COD. SOLPED</th><th>Estado</th>
+        </tr></thead>
         <tbody id="base-tbody"></tbody>
       </table>
     </div>
   </div>
 </div>
 
-<!-- ═══════════ MODAL: VER RQ ═══════════ -->
+<!-- MODAL: VER RQ -->
 <div class="modal-overlay" id="modal-rq">
   <div class="modal" style="max-width:720px">
     <div class="modal-head">
@@ -441,7 +362,7 @@ table.data td.buy-cell{background:rgba(26,122,68,.1);color:var(--green);font-wei
   </div>
 </div>
 
-<!-- ═══════════ MODAL: FIRMA ═══════════ -->
+<!-- MODAL: FIRMA -->
 <div class="modal-overlay" id="modal-firma">
   <div class="modal" style="max-width:500px">
     <div class="modal-head">
@@ -469,49 +390,44 @@ table.data td.buy-cell{background:rgba(26,122,68,.1);color:var(--green);font-wei
   </div>
 </div>
 
-<!-- ═══════════ MODAL: VER PDF ═══════════ -->
+<!-- MODAL: VER PDF — versión corregida con embed + ObjectURL -->
 <div class="modal-overlay" id="modal-pdf">
-  <div class="modal" style="max-width:800px">
+  <div class="modal" style="max-width:860px">
     <div class="modal-head">
       <div class="modal-title" id="modal-pdf-title">📄 PDF Adjunto</div>
-      <div style="display:flex;gap:8px">
+      <div style="display:flex;gap:8px;align-items:center">
         <button class="btn btn-primary btn-sm" id="modal-pdf-download">⬇️ Descargar</button>
-        <button class="btn btn-ghost btn-sm" onclick="closeModal('modal-pdf')">✕ Cerrar</button>
+        <button class="btn btn-ghost btn-sm" onclick="cerrarModalPDF()">✕ Cerrar</button>
       </div>
     </div>
-    <div class="pdf-modal-body"><iframe id="modal-pdf-frame" src=""></iframe></div>
+    <div class="pdf-modal-body" id="pdf-modal-body"></div>
   </div>
 </div>
 
 <script>
-// ═══════════════════════════════════════════════
-// DATABASE
-// ═══════════════════════════════════════════════
 const DB_KEY = 'jjc_req_cc0154_v2';
 const MESES = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
 const FIRMAS_ORDEN = ['OT','Construcción','Almacén','Administración','Planificador/Costos','MCB'];
 
-function getDB(){ try{ return JSON.parse(localStorage.getItem(DB_KEY)) || {reqs:[]}; }catch(e){ return {reqs:[]}; } }
-function saveDB(db){ localStorage.setItem(DB_KEY, JSON.stringify(db)); }
+function getDB(){ try{ return JSON.parse(localStorage.getItem(DB_KEY))||{reqs:[]}; }catch(e){ return{reqs:[]}; } }
+function saveDB(db){ localStorage.setItem(DB_KEY,JSON.stringify(db)); }
 
 function nextRQNum(){
-  const db = getDB(), y = new Date().getFullYear();
-  const existing = db.reqs.filter(r => r.rqNum && r.rqNum.includes(`-${y}-`));
-  const maxN = existing.reduce((m,r) => { const p = r.rqNum.split('-'); return Math.max(m, parseInt(p[p.length-1])||0); }, 0);
+  const db=getDB(), y=new Date().getFullYear();
+  const ex=db.reqs.filter(r=>r.rqNum&&r.rqNum.includes(`-${y}-`));
+  const maxN=ex.reduce((m,r)=>{const p=r.rqNum.split('-');return Math.max(m,parseInt(p[p.length-1])||0);},0);
   return `RQ-0154-${y}-${String(maxN+1).padStart(3,'0')}`;
 }
 
-// ═══════════════════════════════════════════════
-// ITEMS TABLE
-// ═══════════════════════════════════════════════
-let itemCounter = 0;
+// ── ITEMS ──
+let itemCounter=0;
 function addItem(data={}){
   itemCounter++;
-  const n = itemCounter;
-  const proy = document.getElementById('f-proyecto')?.value || 'JJC-001-26-PS';
-  const tr = document.createElement('tr');
-  tr.setAttribute('data-item', n);
-  tr.innerHTML = `
+  const n=itemCounter;
+  const proy=document.getElementById('f-proyecto')?.value||'JJC-001-26-PS';
+  const tr=document.createElement('tr');
+  tr.setAttribute('data-item',n);
+  tr.innerHTML=`
     <td style="text-align:center;color:var(--ink4)">${n}</td>
     <td><input class="i-proy" value="${data.proyecto||proy}" style="width:86px"></td>
     <td><input class="i-rq" value="${data.rqSub||'1'}" style="width:36px;text-align:center"></td>
@@ -533,345 +449,277 @@ function addItem(data={}){
   `;
   document.getElementById('items-tbody').appendChild(tr);
 }
-
 function calcBuy(n){
-  const row = document.querySelector(`tr[data-item="${n}"]`);
-  if(!row) return;
-  const qty = parseFloat(row.querySelector('.i-qty').value)||0;
-  const stk = parseFloat(row.querySelector('.i-stock').value)||0;
-  const cell = document.getElementById('buy-'+n);
-  if(cell) cell.textContent = Math.max(0, qty-stk);
+  const row=document.querySelector(`tr[data-item="${n}"]`);
+  if(!row)return;
+  const qty=parseFloat(row.querySelector('.i-qty').value)||0;
+  const stk=parseFloat(row.querySelector('.i-stock').value)||0;
+  const cell=document.getElementById('buy-'+n);
+  if(cell)cell.textContent=Math.max(0,qty-stk);
 }
-
-function removeItem(n){
-  document.querySelector(`tr[data-item="${n}"]`)?.remove();
-}
-
+function removeItem(n){ document.querySelector(`tr[data-item="${n}"]`)?.remove(); }
 function collectItems(){
-  const rows = document.querySelectorAll('#items-tbody tr[data-item]');
-  return [...rows].map((row,i) => {
-    const desc = row.querySelector('.i-desc').value.trim();
-    if(!desc) return null;
-    const qty = parseFloat(row.querySelector('.i-qty').value)||0;
-    const stk = parseFloat(row.querySelector('.i-stock').value)||0;
-    return {
-      num: i+1,
-      proyecto: row.querySelector('.i-proy').value,
-      rqSub: row.querySelector('.i-rq').value,
-      tipo: row.querySelector('.i-tipo').value,
-      partida: row.querySelector('.i-part').value,
-      codigo: row.querySelector('.i-cod').value,
-      descripcion: desc, cantidad: qty,
-      unidad: row.querySelector('.i-und').value,
-      stock: stk, aComprar: Math.max(0,qty-stk),
-      fechaReq: row.querySelector('.i-fech').value,
-      obs: row.querySelector('.i-obs').value
-    };
+  return [...document.querySelectorAll('#items-tbody tr[data-item]')].map((row,i)=>{
+    const desc=row.querySelector('.i-desc').value.trim();
+    if(!desc)return null;
+    const qty=parseFloat(row.querySelector('.i-qty').value)||0;
+    const stk=parseFloat(row.querySelector('.i-stock').value)||0;
+    return{num:i+1,proyecto:row.querySelector('.i-proy').value,rqSub:row.querySelector('.i-rq').value,
+      tipo:row.querySelector('.i-tipo').value,partida:row.querySelector('.i-part').value,
+      codigo:row.querySelector('.i-cod').value,descripcion:desc,cantidad:qty,
+      unidad:row.querySelector('.i-und').value,stock:stk,aComprar:Math.max(0,qty-stk),
+      fechaReq:row.querySelector('.i-fech').value,obs:row.querySelector('.i-obs').value};
   }).filter(Boolean);
 }
 
-// ═══════════════════════════════════════════════
-// GUARDAR RQ
-// ═══════════════════════════════════════════════
+// ── GUARDAR RQ ──
 function saveRQ(){
-  const fecha = document.getElementById('f-fecha').value;
-  if(!fecha){ showToast('Ingrese la fecha','err'); return; }
-  const items = collectItems();
-  if(!items.length){ showToast('Agregue al menos un ítem','err'); return; }
-  const rqNum = document.getElementById('f-rqnum').value;
-  const rq = {
-    id: Date.now().toString(),
-    rqNum, fecha,
-    proyecto: document.getElementById('f-proyecto').value,
-    tipoMat: document.getElementById('f-tipomat').value,
-    sapClass: document.getElementById('f-sap').value,
-    solicitante: document.getElementById('f-solicitante').value,
-    solped: document.getElementById('f-solped').value,
-    reserva: document.getElementById('f-reserva').value,
-    pep: document.getElementById('f-pep').value,
-    obs: document.getElementById('f-obs').value,
-    items, estado: 'revision', firmas: {},
-    pdfData: null, pdfName: null,
-    creadoEn: new Date().toISOString()
-  };
-  const db = getDB();
-  db.reqs.unshift(rq);
-  saveDB(db);
-  showToast(`✅ ${rqNum} guardado exitosamente`, 'ok');
-  resetForm();
-  updateStats();
-  showPage('lista');
+  const fecha=document.getElementById('f-fecha').value;
+  if(!fecha){showToast('Ingrese la fecha','err');return;}
+  const items=collectItems();
+  if(!items.length){showToast('Agregue al menos un ítem','err');return;}
+  const rqNum=document.getElementById('f-rqnum').value;
+  const rq={id:Date.now().toString(),rqNum,fecha,
+    proyecto:document.getElementById('f-proyecto').value,
+    tipoMat:document.getElementById('f-tipomat').value,
+    sapClass:document.getElementById('f-sap').value,
+    solicitante:document.getElementById('f-solicitante').value,
+    solped:document.getElementById('f-solped').value,
+    reserva:document.getElementById('f-reserva').value,
+    pep:document.getElementById('f-pep').value,
+    obs:document.getElementById('f-obs').value,
+    items,estado:'revision',firmas:{},pdfData:null,pdfName:null,
+    creadoEn:new Date().toISOString()};
+  const db=getDB();db.reqs.unshift(rq);saveDB(db);
+  showToast(`✅ ${rqNum} guardado exitosamente`,'ok');
+  resetForm();updateStats();showPage('lista');
 }
-
 function resetForm(){
-  itemCounter = 0;
-  document.getElementById('items-tbody').innerHTML = '';
-  document.getElementById('f-fecha').value = new Date().toISOString().split('T')[0];
-  ['f-solped','f-reserva','f-pep','f-obs'].forEach(id => { const el = document.getElementById(id); if(el) el.value=''; });
-  const num = nextRQNum();
-  document.getElementById('f-rqnum').value = num;
-  document.getElementById('new-rq-num').textContent = num;
+  itemCounter=0;document.getElementById('items-tbody').innerHTML='';
+  document.getElementById('f-fecha').value=new Date().toISOString().split('T')[0];
+  ['f-solped','f-reserva','f-pep','f-obs'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  const num=nextRQNum();
+  document.getElementById('f-rqnum').value=num;
+  document.getElementById('new-rq-num').textContent=num;
   addItem();
 }
 
-// ═══════════════════════════════════════════════
-// SOLPED INLINE EDIT
-// ═══════════════════════════════════════════════
-function editSolped(rqId, currentVal){
-  // Find cell and replace with input
-  const cell = document.getElementById('solped-cell-'+rqId);
-  if(!cell) return;
-  const input = document.createElement('input');
-  input.type = 'text';
-  input.value = currentVal || '';
-  input.className = 'solped-input';
-  input.placeholder = 'Ej: 4500012345';
-  input.onkeydown = e => {
-    if(e.key === 'Enter') saveSolped(rqId, input.value);
-    if(e.key === 'Escape') renderSolpedCell(rqId, currentVal);
-  };
-  input.onblur = () => saveSolped(rqId, input.value);
-  cell.innerHTML = '';
-  cell.appendChild(input);
-  input.focus();
+// ── SOLPED INLINE ──
+function editSolped(rqId,currentVal){
+  const cell=document.getElementById('solped-cell-'+rqId);
+  if(!cell)return;
+  const input=document.createElement('input');
+  input.type='text';input.value=currentVal||'';input.className='solped-input';input.placeholder='Ej: 4500012345';
+  input.onkeydown=e=>{if(e.key==='Enter')saveSolped(rqId,input.value);if(e.key==='Escape')renderSolpedCell(rqId,currentVal);};
+  input.onblur=()=>saveSolped(rqId,input.value);
+  cell.innerHTML='';cell.appendChild(input);input.focus();
 }
-
-function saveSolped(rqId, val){
-  const db = getDB();
-  const rq = db.reqs.find(r => r.id === rqId);
-  if(rq){ rq.solped = val.trim(); saveDB(db); }
-  renderSolpedCell(rqId, val.trim());
-  if(val.trim()) showToast('COD. SOLPED actualizado', 'ok');
+function saveSolped(rqId,val){
+  const db=getDB();const rq=db.reqs.find(r=>r.id===rqId);
+  if(rq){rq.solped=val.trim();saveDB(db);}
+  renderSolpedCell(rqId,val.trim());
+  if(val.trim())showToast('COD. SOLPED actualizado','ok');
 }
-
-function renderSolpedCell(rqId, val){
-  const cell = document.getElementById('solped-cell-'+rqId);
-  if(!cell) return;
+function renderSolpedCell(rqId,val){
+  const cell=document.getElementById('solped-cell-'+rqId);if(!cell)return;
   if(val){
-    cell.innerHTML = `<div class="solped-cell">
-      <span class="solped-val">${val}</span>
-      <button class="btn-xs btn-ghost" onclick="editSolped('${rqId}','${val}')" title="Editar">✏️</button>
-    </div>`;
-  } else {
-    cell.innerHTML = `<button class="btn-xs" style="background:var(--ice);color:var(--mid);border:1px solid var(--border);border-radius:4px;padding:3px 8px;font-size:10px;cursor:pointer;font-family:inherit" onclick="editSolped('${rqId}','')">+ Agregar SOLPED</button>`;
+    cell.innerHTML=`<div class="solped-cell"><span class="solped-val">${val}</span>
+      <button class="btn-xs btn-ghost" onclick="editSolped('${rqId}','${val}')" title="Editar">✏️</button></div>`;
+  }else{
+    cell.innerHTML=`<button class="btn-xs" style="background:var(--ice);color:var(--mid);border:1px solid var(--border);border-radius:4px;padding:3px 8px;font-size:10px;cursor:pointer;font-family:inherit" onclick="editSolped('${rqId}','')">+ Agregar SOLPED</button>`;
   }
 }
 
-// ═══════════════════════════════════════════════
-// PDF UPLOAD
-// ═══════════════════════════════════════════════
+// ── PDF UPLOAD ──
 function uploadPDF(rqId){
-  const input = document.createElement('input');
-  input.type = 'file';
-  input.accept = 'application/pdf,image/*';
-  input.onchange = async e => {
-    const file = e.target.files[0];
-    if(!file) return;
-    if(file.size > 10 * 1024 * 1024){ showToast('Archivo muy grande (máx. 10MB)', 'err'); return; }
-    showToast('Cargando archivo…', 'inf');
-    const reader = new FileReader();
-    reader.onload = ev => {
-      const db = getDB();
-      const rq = db.reqs.find(r => r.id === rqId);
-      if(rq){
-        rq.pdfData = ev.target.result;
-        rq.pdfName = file.name;
-        rq.pdfType = file.type;
-        rq.pdfUploadedAt = new Date().toISOString();
-        saveDB(db);
-        renderPDFCell(rqId, file.name);
-        showToast(`📄 ${file.name} adjuntado`, 'ok');
-      }
+  const input=document.createElement('input');
+  input.type='file';input.accept='application/pdf,image/*';
+  input.onchange=e=>{
+    const file=e.target.files[0];if(!file)return;
+    if(file.size>10*1024*1024){showToast('Archivo muy grande (máx. 10MB)','err');return;}
+    showToast('Cargando archivo…','inf');
+    const reader=new FileReader();
+    reader.onload=ev=>{
+      const db=getDB();const rq=db.reqs.find(r=>r.id===rqId);
+      if(rq){rq.pdfData=ev.target.result;rq.pdfName=file.name;rq.pdfType=file.type;rq.pdfUploadedAt=new Date().toISOString();saveDB(db);}
+      renderPDFCell(rqId,file.name);showToast(`📄 ${file.name} adjuntado`,'ok');
     };
     reader.readAsDataURL(file);
   };
   input.click();
 }
-
-function renderPDFCell(rqId, pdfName){
-  const cell = document.getElementById('pdf-cell-'+rqId);
-  if(!cell) return;
+function renderPDFCell(rqId,pdfName){
+  const cell=document.getElementById('pdf-cell-'+rqId);if(!cell)return;
   if(pdfName){
-    const shortName = pdfName.length > 16 ? pdfName.substring(0,14)+'…' : pdfName;
-    cell.innerHTML = `<div class="pdf-cell">
-      <a class="pdf-thumb" onclick="verPDF('${rqId}')" title="${pdfName}">
-        📄 <span>${shortName}</span>
-      </a>
-      <button class="btn-xs" style="background:var(--red-bg);color:var(--red);border:1px solid rgba(192,57,43,.2);border-radius:4px;padding:2px 5px;font-size:10px;cursor:pointer;font-family:inherit" onclick="eliminarPDF('${rqId}')" title="Eliminar PDF">✕</button>
+    const shortName=pdfName.length>16?pdfName.substring(0,14)+'…':pdfName;
+    cell.innerHTML=`<div class="pdf-cell">
+      <a class="pdf-thumb" onclick="verPDF('${rqId}')" title="${pdfName}">📄 <span>${shortName}</span></a>
+      <button class="btn-xs" style="background:var(--red-bg);color:var(--red);border:1px solid rgba(192,57,43,.2);border-radius:4px;padding:2px 5px;font-size:10px;cursor:pointer;font-family:inherit" onclick="eliminarPDF('${rqId}')" title="Eliminar">✕</button>
     </div>`;
-  } else {
-    cell.innerHTML = `<button class="pdf-upload-btn" onclick="uploadPDF('${rqId}')">📎 Adjuntar PDF</button>`;
+  }else{
+    cell.innerHTML=`<button class="pdf-upload-btn" onclick="uploadPDF('${rqId}')">📎 Adjuntar PDF</button>`;
   }
+}
+function eliminarPDF(rqId){
+  if(!confirm('¿Eliminar el PDF adjunto?'))return;
+  const db=getDB();const rq=db.reqs.find(r=>r.id===rqId);
+  if(rq){rq.pdfData=null;rq.pdfName=null;rq.pdfType=null;saveDB(db);}
+  renderPDFCell(rqId,null);showToast('PDF eliminado','inf');
+}
+
+// ── PDF VIEWER CORREGIDO ──
+let _pdfObjURL=null;
+
+function cerrarModalPDF(){
+  closeModal('modal-pdf');
+  if(_pdfObjURL){URL.revokeObjectURL(_pdfObjURL);_pdfObjURL=null;}
+  document.getElementById('pdf-modal-body').innerHTML='';
 }
 
 function verPDF(rqId){
-  const db = getDB();
-  const rq = db.reqs.find(r => r.id === rqId);
-  if(!rq || !rq.pdfData){ showToast('No hay PDF adjunto','err'); return; }
-  document.getElementById('modal-pdf-title').textContent = `📄 ${rq.pdfName || 'PDF Adjunto'} — ${rq.rqNum}`;
-  const frame = document.getElementById('modal-pdf-frame');
-  if(rq.pdfType && rq.pdfType.startsWith('image/')){
-    frame.srcdoc = `<html><body style="margin:0;background:#333;display:flex;align-items:center;justify-content:center;min-height:100vh"><img src="${rq.pdfData}" style="max-width:100%;max-height:100vh;object-fit:contain"></body></html>`;
-  } else {
-    frame.src = rq.pdfData;
+  const db=getDB();const rq=db.reqs.find(r=>r.id===rqId);
+  if(!rq||!rq.pdfData){showToast('No hay archivo adjunto','err');return;}
+  document.getElementById('modal-pdf-title').textContent=`📄 ${rq.pdfName||'Archivo'} — ${rq.rqNum}`;
+  const body=document.getElementById('pdf-modal-body');body.innerHTML='';
+  if(_pdfObjURL){URL.revokeObjectURL(_pdfObjURL);_pdfObjURL=null;}
+
+  // IMAGEN: mostrar directo
+  if(rq.pdfType&&rq.pdfType.startsWith('image/')){
+    body.innerHTML=`<div class="pdf-img-viewer"><img src="${rq.pdfData}" alt="${rq.pdfName}"></div>`;
+    document.getElementById('modal-pdf-download').onclick=()=>descargarArchivo(rq);
+    openModal('modal-pdf');return;
   }
-  const dlBtn = document.getElementById('modal-pdf-download');
-  dlBtn.onclick = () => {
-    const a = document.createElement('a');
-    a.href = rq.pdfData;
-    a.download = rq.pdfName || `${rq.rqNum}.pdf`;
-    a.click();
-  };
+
+  // PDF: convertir base64 → Blob → ObjectURL → embed
+  try{
+    const b64=rq.pdfData.includes(',')? rq.pdfData.split(',')[1] : rq.pdfData;
+    const bin=atob(b64);
+    const buf=new Uint8Array(bin.length);
+    for(let i=0;i<bin.length;i++)buf[i]=bin.charCodeAt(i);
+    const blob=new Blob([buf],{type:'application/pdf'});
+    _pdfObjURL=URL.createObjectURL(blob);
+
+    const embed=document.createElement('embed');
+    embed.src=_pdfObjURL+'#toolbar=1&navpanes=0&scrollbar=1&view=FitH';
+    embed.type='application/pdf';
+    embed.className='pdf-viewer-embed';
+    body.appendChild(embed);
+
+    // Barra inferior con enlace "abrir en nueva pestaña"
+    const bar=document.createElement('div');
+    bar.className='pdf-open-bar';
+    bar.innerHTML=`<span>📄 ${rq.pdfName||'PDF'} · ${rq.rqNum}</span>
+      <a href="${_pdfObjURL}" target="_blank" style="color:#7ec8e3;font-weight:600;text-decoration:none">🔗 Abrir en nueva pestaña</a>`;
+    body.appendChild(bar);
+
+  }catch(err){
+    body.innerHTML=`<div class="pdf-fallback">
+      <div class="pdf-fallback-icon">📄</div>
+      <h3>${rq.pdfName||'Archivo PDF'}</h3>
+      <p>Tu navegador no puede mostrar el PDF en línea.<br>Usa el botón de descarga para abrirlo.</p>
+      <button class="btn btn-primary" onclick="descargarArchivo_id('${rqId}')">⬇️ Descargar PDF</button>
+    </div>`;
+  }
+
+  document.getElementById('modal-pdf-download').onclick=()=>descargarArchivo(rq);
   openModal('modal-pdf');
 }
 
-function eliminarPDF(rqId){
-  if(!confirm('¿Eliminar el PDF adjunto?')) return;
-  const db = getDB();
-  const rq = db.reqs.find(r => r.id === rqId);
-  if(rq){ rq.pdfData = null; rq.pdfName = null; rq.pdfType = null; saveDB(db); }
-  renderPDFCell(rqId, null);
-  showToast('PDF eliminado', 'inf');
+function descargarArchivo(rq){
+  const a=document.createElement('a');
+  a.href=_pdfObjURL||rq.pdfData;
+  a.download=rq.pdfName||`${rq.rqNum}.pdf`;a.click();
+}
+function descargarArchivo_id(id){
+  const db=getDB();const rq=db.reqs.find(r=>r.id===id);if(rq)descargarArchivo(rq);
 }
 
-// ═══════════════════════════════════════════════
-// RENDER PAGES
-// ═══════════════════════════════════════════════
+// ── PAGES ──
 function showPage(id){
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
   document.getElementById('page-'+id).classList.add('active');
   document.getElementById('tab-'+id)?.classList.add('active');
-  if(id==='dashboard') renderDashboard();
-  if(id==='lista') renderLista();
-  if(id==='firmas') renderFirmas();
-  if(id==='base') renderBase();
+  if(id==='dashboard')renderDashboard();
+  if(id==='lista')renderLista();
+  if(id==='firmas')renderFirmas();
+  if(id==='base')renderBase();
 }
 
 function estadoBadge(e){
-  return {
-    revision: '<span class="badge b-amber">⏳ En revisión</span>',
-    aprobado: '<span class="badge b-green">✅ Aprobado</span>',
-    rechazado: '<span class="badge b-red">❌ Rechazado</span>',
-    borrador: '<span class="badge b-gray">📝 Borrador</span>'
-  }[e] || `<span class="badge b-gray">${e}</span>`;
+  return{revision:'<span class="badge b-amber">⏳ En revisión</span>',
+    aprobado:'<span class="badge b-green">✅ Aprobado</span>',
+    rechazado:'<span class="badge b-red">❌ Rechazado</span>',
+    borrador:'<span class="badge b-gray">📝 Borrador</span>'}[e]||`<span class="badge b-gray">${e}</span>`;
 }
+function firmasProg(rq){const done=Object.keys(rq.firmas||{}).length;return `<span style="font-size:11px;font-family:monospace">${done}/${FIRMAS_ORDEN.length}</span>`;}
 
-function firmasProg(rq){
-  const done = Object.keys(rq.firmas||{}).length;
-  return `<span style="font-size:11px;font-family:monospace">${done}/${FIRMAS_ORDEN.length}</span>`;
-}
-
-function buildTableRow(r, cols='dashboard'){
-  const items = r.items||[];
-  const totalStk = items.reduce((s,i)=>s+i.stock,0);
-  const totalBuy = items.reduce((s,i)=>s+i.aComprar,0);
-  const done = Object.keys(r.firmas||{}).length;
-  const hasPDF = !!r.pdfData;
-
-  const commonCols = `
+function buildRow(r,mode){
+  const it=r.items||[];
+  const stk=it.reduce((s,i)=>s+i.stock,0);
+  const buy=it.reduce((s,i)=>s+i.aComprar,0);
+  const common=`
     <td style="font-weight:700;color:var(--blue)">${r.rqNum}</td>
     <td>${r.fecha||''}</td>
     <td style="font-size:11px">${r.proyecto||''}</td>
     <td><span class="badge b-blue">${r.sapClass||''}</span></td>
     <td>${r.solicitante||''}</td>
-    <td class="center">${items.length}</td>
-  `;
-
-  if(cols==='lista'){
-    return `<tr>
-      ${commonCols}
-      <td class="stock-cell">${totalStk}</td>
-      <td class="buy-cell">${totalBuy}</td>
-      <td class="center">${estadoBadge(r.estado)}</td>
-      <td class="center">${firmasProg(r)}</td>
-      <td class="center" id="solped-cell-${r.id}"></td>
-      <td class="center" id="pdf-cell-${r.id}"></td>
-      <td class="center" style="white-space:nowrap">
-        <button class="btn btn-ghost btn-sm" onclick="verRQ('${r.id}')">👁️ Ver</button>
-        <button class="btn btn-primary btn-sm" onclick="abrirFirma('${r.id}')">✍️</button>
-        <button class="btn btn-ghost btn-sm" style="color:var(--red)" onclick="eliminarRQ('${r.id}')">🗑️</button>
-      </td>
-    </tr>`;
-  }
-
-  // dashboard
-  return `<tr>
-    ${commonCols}
-    <td class="center">${estadoBadge(r.estado)}</td>
-    <td class="center">${firmasProg(r)}</td>
+    <td class="center">${it.length}</td>`;
+  if(mode==='lista'){return `<tr>${common}
+    <td class="stock-cell">${stk}</td><td class="buy-cell">${buy}</td>
+    <td class="center">${estadoBadge(r.estado)}</td><td class="center">${firmasProg(r)}</td>
     <td class="center" id="solped-cell-${r.id}"></td>
     <td class="center" id="pdf-cell-${r.id}"></td>
     <td class="center" style="white-space:nowrap">
       <button class="btn btn-ghost btn-sm" onclick="verRQ('${r.id}')">👁️ Ver</button>
       <button class="btn btn-primary btn-sm" onclick="abrirFirma('${r.id}')">✍️</button>
-    </td>
-  </tr>`;
+      <button class="btn btn-ghost btn-sm" style="color:var(--red)" onclick="eliminarRQ('${r.id}')">🗑️</button>
+    </td></tr>`;}
+  return `<tr>${common}
+    <td class="center">${estadoBadge(r.estado)}</td><td class="center">${firmasProg(r)}</td>
+    <td class="center" id="solped-cell-${r.id}"></td>
+    <td class="center" id="pdf-cell-${r.id}"></td>
+    <td class="center" style="white-space:nowrap">
+      <button class="btn btn-ghost btn-sm" onclick="verRQ('${r.id}')">👁️ Ver</button>
+      <button class="btn btn-primary btn-sm" onclick="abrirFirma('${r.id}')">✍️</button>
+    </td></tr>`;
 }
 
 function renderDashboard(){
-  const db = getDB();
-  document.getElementById('s-total').textContent = db.reqs.length;
-  document.getElementById('s-pend').textContent = db.reqs.filter(r=>r.estado==='revision').length;
-  document.getElementById('s-aprov').textContent = db.reqs.filter(r=>r.estado==='aprobado').length;
-  document.getElementById('s-items').textContent = db.reqs.reduce((s,r)=>s+(r.items||[]).length,0);
-  document.getElementById('pending-count').textContent = db.reqs.filter(r=>r.estado==='revision').length;
-
-  const tbody = document.getElementById('dash-tbody');
-  if(!db.reqs.length){
-    tbody.innerHTML = `<tr><td colspan="11"><div class="empty"><div class="empty-icon">📋</div><h3>Sin requerimientos aún</h3><p>Crea el primero con "Nuevo Requerimiento"</p></div></td></tr>`;
-    return;
-  }
-  tbody.innerHTML = db.reqs.slice(0,10).map(r => buildTableRow(r,'dashboard')).join('');
-  // Render dynamic cells after DOM insert
-  db.reqs.slice(0,10).forEach(r => {
-    renderSolpedCell(r.id, r.solped||'');
-    renderPDFCell(r.id, r.pdfName||null);
-  });
+  const db=getDB();
+  document.getElementById('s-total').textContent=db.reqs.length;
+  document.getElementById('s-pend').textContent=db.reqs.filter(r=>r.estado==='revision').length;
+  document.getElementById('s-aprov').textContent=db.reqs.filter(r=>r.estado==='aprobado').length;
+  document.getElementById('s-items').textContent=db.reqs.reduce((s,r)=>s+(r.items||[]).length,0);
+  document.getElementById('pending-count').textContent=db.reqs.filter(r=>r.estado==='revision').length;
+  const tbody=document.getElementById('dash-tbody');
+  if(!db.reqs.length){tbody.innerHTML=`<tr><td colspan="11"><div class="empty"><div class="empty-icon">📋</div><h3>Sin requerimientos aún</h3><p>Crea el primero con "Nuevo Requerimiento"</p></div></td></tr>`;return;}
+  tbody.innerHTML=db.reqs.slice(0,10).map(r=>buildRow(r,'dashboard')).join('');
+  db.reqs.slice(0,10).forEach(r=>{renderSolpedCell(r.id,r.solped||'');renderPDFCell(r.id,r.pdfName||null);});
 }
 
 function renderLista(){
-  const db = getDB();
-  let reqs = db.reqs;
-  const search = document.getElementById('filter-search')?.value?.toLowerCase()||'';
-  const estado = document.getElementById('filter-estado')?.value||'';
-  if(search) reqs = reqs.filter(r => JSON.stringify(r).toLowerCase().includes(search));
-  if(estado) reqs = reqs.filter(r => r.estado===estado);
-
-  const tbody = document.getElementById('lista-tbody');
-  if(!reqs.length){
-    tbody.innerHTML = `<tr><td colspan="13"><div class="empty"><div class="empty-icon">🔍</div><h3>Sin resultados</h3><p>Ajusta los filtros</p></div></td></tr>`;
-    return;
-  }
-  tbody.innerHTML = reqs.map(r => buildTableRow(r,'lista')).join('');
-  reqs.forEach(r => {
-    renderSolpedCell(r.id, r.solped||'');
-    renderPDFCell(r.id, r.pdfName||null);
-  });
+  const db=getDB();let reqs=db.reqs;
+  const search=document.getElementById('filter-search')?.value?.toLowerCase()||'';
+  const estado=document.getElementById('filter-estado')?.value||'';
+  if(search)reqs=reqs.filter(r=>JSON.stringify(r).toLowerCase().includes(search));
+  if(estado)reqs=reqs.filter(r=>r.estado===estado);
+  const tbody=document.getElementById('lista-tbody');
+  if(!reqs.length){tbody.innerHTML=`<tr><td colspan="13"><div class="empty"><div class="empty-icon">🔍</div><h3>Sin resultados</h3><p>Ajusta los filtros</p></div></td></tr>`;return;}
+  tbody.innerHTML=reqs.map(r=>buildRow(r,'lista')).join('');
+  reqs.forEach(r=>{renderSolpedCell(r.id,r.solped||'');renderPDFCell(r.id,r.pdfName||null);});
 }
 
 function renderFirmas(){
-  const db = getDB();
-  const reqs = db.reqs.filter(r => r.estado==='revision');
-  const container = document.getElementById('firmas-list');
-  if(!reqs.length){
-    container.innerHTML = `<div class="empty"><div class="empty-icon">✅</div><h3>Sin pendientes de firma</h3><p>Todos los RQ han sido procesados</p></div>`;
-    return;
-  }
-  container.innerHTML = reqs.map(r => {
-    const items = r.items||[];
-    const done = Object.keys(r.firmas||{}).length;
+  const db=getDB();const reqs=db.reqs.filter(r=>r.estado==='revision');
+  const c=document.getElementById('firmas-list');
+  if(!reqs.length){c.innerHTML=`<div class="empty"><div class="empty-icon">✅</div><h3>Sin pendientes de firma</h3><p>Todos los RQ han sido procesados</p></div>`;return;}
+  c.innerHTML=reqs.map(r=>{
+    const items=r.items||[];const done=Object.keys(r.firmas||{}).length;
     return `<div class="card" style="margin-bottom:14px">
       <div class="card-head">
-        <div class="card-title">
-          <span style="color:var(--blue)">${r.rqNum}</span>
-          <span class="badge b-amber">⏳ En revisión</span>
-          <span style="font-size:11px;color:var(--ink4);font-weight:400">${r.fecha} · ${r.proyecto}</span>
-        </div>
-        <div style="display:flex;gap:8px">
-          <button class="btn btn-ghost btn-sm" onclick="verRQ('${r.id}')">👁️ Ver</button>
-          <button class="btn btn-success btn-sm" onclick="abrirFirma('${r.id}')">✍️ Firmar</button>
-        </div>
+        <div class="card-title"><span style="color:var(--blue)">${r.rqNum}</span><span class="badge b-amber">⏳ En revisión</span><span style="font-size:11px;color:var(--ink4);font-weight:400">${r.fecha} · ${r.proyecto}</span></div>
+        <div style="display:flex;gap:8px"><button class="btn btn-ghost btn-sm" onclick="verRQ('${r.id}')">👁️ Ver</button><button class="btn btn-success btn-sm" onclick="abrirFirma('${r.id}')">✍️ Firmar</button></div>
       </div>
       <div style="padding:16px">
         <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px">
@@ -882,19 +730,8 @@ function renderFirmas(){
         </div>
         <div style="font-size:10px;font-weight:600;color:var(--ink4);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Cadena de aprobaciones</div>
         <div class="approval-track">
-          ${FIRMAS_ORDEN.map((area,i) => {
-            const firma = (r.firmas||{})[area];
-            const cls = firma ? 'done' : (i===done?'active':'');
-            const linecls = firma ? ' done' : '';
-            const line = i < FIRMAS_ORDEN.length-1 ? `<div class="appr-line${linecls}"></div>` : '';
-            return `<div class="appr-step">
-              <div class="appr-node">
-                <div class="appr-circle ${cls}">${firma?'✓':i+1}</div>
-                <div class="appr-label">${area}</div>
-                ${firma?`<div style="font-size:7px;color:var(--green);font-weight:600">${firma.nombre||''}</div>`:''}
-                ${firma?`<div style="font-size:7px;color:var(--ink5)">${firma.fecha||''}</div>`:''}
-              </div>${line}
-            </div>`;
+          ${FIRMAS_ORDEN.map((area,i)=>{const f=(r.firmas||{})[area];const cls=f?'done':(i===done?'active':'');const line=i<FIRMAS_ORDEN.length-1?`<div class="appr-line${f?' done':''}"></div>`:'';
+            return `<div class="appr-step"><div class="appr-node"><div class="appr-circle ${cls}">${f?'✓':i+1}</div><div class="appr-label">${area}</div>${f?`<div style="font-size:7px;color:var(--green);font-weight:600">${f.nombre||''}</div>`:''}${f?`<div style="font-size:7px;color:var(--ink5)">${f.fecha||''}</div>`:''}</div>${line}</div>`;
           }).join('')}
         </div>
       </div>
@@ -903,49 +740,29 @@ function renderFirmas(){
 }
 
 function renderBase(){
-  const db = getDB();
-  const tbody = document.getElementById('base-tbody');
-  let allItems = [];
-  db.reqs.forEach(r => {
-    (r.items||[]).forEach(it => {
-      const d = new Date(r.fecha||r.creadoEn);
-      allItems.push({...it, rqNum:r.rqNum, fecha:r.fecha, mes:MESES[d.getMonth()]||'', estado:r.estado, proyecto:r.proyecto, solicitante:r.solicitante, solped:r.solped||''});
-    });
-  });
-  if(!allItems.length){
-    tbody.innerHTML = `<tr><td colspan="16"><div class="empty"><div class="empty-icon">🗄️</div><h3>Sin datos</h3><p>Los ítems aparecerán aquí al guardar RQs</p></div></td></tr>`;
-    return;
-  }
-  tbody.innerHTML = allItems.map((it,i) => `<tr>
-    <td class="center">${i+1}</td>
-    <td class="center">${it.mes}</td>
-    <td>${it.fecha||''}</td>
-    <td style="font-weight:700;color:var(--blue)">${it.rqNum}</td>
-    <td style="font-size:11px">${it.proyecto||''}</td>
-    <td class="center"><span class="badge b-blue">${it.tipo||''}</span></td>
-    <td class="center">${it.solicitante||''}</td>
-    <td style="font-family:monospace;font-size:11px">${it.codigo||''}</td>
-    <td style="font-size:12px">${it.descripcion||''}</td>
-    <td class="center">${it.cantidad}</td>
-    <td class="center">${it.unidad}</td>
-    <td class="stock-cell">${it.stock}</td>
-    <td class="buy-cell">${it.aComprar}</td>
+  const db=getDB();const tbody=document.getElementById('base-tbody');
+  let all=[];
+  db.reqs.forEach(r=>{(r.items||[]).forEach(it=>{const d=new Date(r.fecha||r.creadoEn);all.push({...it,rqNum:r.rqNum,fecha:r.fecha,mes:MESES[d.getMonth()]||'',estado:r.estado,proyecto:r.proyecto,solicitante:r.solicitante,solped:r.solped||''});});});
+  if(!all.length){tbody.innerHTML=`<tr><td colspan="16"><div class="empty"><div class="empty-icon">🗄️</div><h3>Sin datos</h3><p>Los ítems aparecerán aquí al guardar RQs</p></div></td></tr>`;return;}
+  tbody.innerHTML=all.map((it,i)=>`<tr>
+    <td class="center">${i+1}</td><td class="center">${it.mes}</td><td>${it.fecha||''}</td>
+    <td style="font-weight:700;color:var(--blue)">${it.rqNum}</td><td style="font-size:11px">${it.proyecto||''}</td>
+    <td class="center"><span class="badge b-blue">${it.tipo||''}</span></td><td class="center">${it.solicitante||''}</td>
+    <td style="font-family:monospace;font-size:11px">${it.codigo||''}</td><td style="font-size:12px">${it.descripcion||''}</td>
+    <td class="center">${it.cantidad}</td><td class="center">${it.unidad}</td>
+    <td class="stock-cell">${it.stock}</td><td class="buy-cell">${it.aComprar}</td>
     <td style="font-size:11px">${it.fechaReq||''}</td>
     <td style="font-family:monospace;font-size:11px;color:var(--mid)">${it.solped||'—'}</td>
     <td>${estadoBadge(it.estado)}</td>
   </tr>`).join('');
 }
 
-// ═══════════════════════════════════════════════
-// VER RQ (MODAL)
-// ═══════════════════════════════════════════════
+// ── VER RQ ──
 function verRQ(id){
-  const db = getDB();
-  const rq = db.reqs.find(r => r.id===id);
-  if(!rq) return;
-  const done = Object.keys(rq.firmas||{}).length;
-  document.getElementById('modal-rq-title').textContent = `${rq.rqNum} — ${rq.proyecto}`;
-  document.getElementById('modal-rq-body').innerHTML = `
+  const db=getDB();const rq=db.reqs.find(r=>r.id===id);if(!rq)return;
+  const done=Object.keys(rq.firmas||{}).length;
+  document.getElementById('modal-rq-title').textContent=`${rq.rqNum} — ${rq.proyecto}`;
+  document.getElementById('modal-rq-body').innerHTML=`
     <div class="rq-detail-header">
       <div><div class="rq-dh-label">N° RQ</div><div class="rq-dh-val" style="color:var(--blue)">${rq.rqNum}</div></div>
       <div><div class="rq-dh-label">Fecha</div><div class="rq-dh-val">${rq.fecha}</div></div>
@@ -959,280 +776,172 @@ function verRQ(id){
     <div style="font-size:11px;font-weight:700;color:var(--ink4);text-transform:uppercase;margin-bottom:8px">Ítems</div>
     <div style="overflow-x:auto;margin-bottom:16px">
       <table class="data" style="font-size:11px">
-        <thead><tr>
-          <th class="center">#</th><th>Código SAP</th><th>Descripción</th>
+        <thead><tr><th class="center">#</th><th>Código SAP</th><th>Descripción</th>
           <th class="center">Cant.</th><th class="center">Und.</th>
           <th class="center" style="background:rgba(192,57,43,.2)">STOCK</th>
-          <th class="center" style="background:rgba(26,122,68,.2)">A COMPRAR</th>
-          <th>Fecha req.</th>
+          <th class="center" style="background:rgba(26,122,68,.2)">A COMPRAR</th><th>Fecha req.</th>
         </tr></thead>
-        <tbody>
-          ${(rq.items||[]).map(it=>`<tr>
-            <td class="center">${it.num}</td>
-            <td style="font-family:monospace;font-size:10px">${it.codigo||'—'}</td>
-            <td>${it.descripcion}</td>
-            <td class="center">${it.cantidad}</td>
-            <td class="center">${it.unidad}</td>
-            <td class="stock-cell">${it.stock}</td>
-            <td class="buy-cell">${it.aComprar}</td>
-            <td style="font-size:10px">${it.fechaReq||'—'}</td>
-          </tr>`).join('')}
-          <tr style="background:#f8fafc;font-weight:700">
-            <td colspan="3" style="text-align:right;padding-right:10px;font-size:11px">TOTALES</td>
-            <td class="center">${(rq.items||[]).reduce((s,i)=>s+i.cantidad,0)}</td>
-            <td></td>
-            <td class="stock-cell">${(rq.items||[]).reduce((s,i)=>s+i.stock,0)}</td>
-            <td class="buy-cell">${(rq.items||[]).reduce((s,i)=>s+i.aComprar,0)}</td>
-            <td></td>
-          </tr>
-        </tbody>
+        <tbody>${(rq.items||[]).map(it=>`<tr>
+          <td class="center">${it.num}</td>
+          <td style="font-family:monospace;font-size:10px">${it.codigo||'—'}</td>
+          <td>${it.descripcion}</td><td class="center">${it.cantidad}</td><td class="center">${it.unidad}</td>
+          <td class="stock-cell">${it.stock}</td><td class="buy-cell">${it.aComprar}</td>
+          <td style="font-size:10px">${it.fechaReq||'—'}</td>
+        </tr>`).join('')}
+        <tr style="background:#f8fafc;font-weight:700">
+          <td colspan="3" style="text-align:right;padding-right:10px;font-size:11px">TOTALES</td>
+          <td class="center">${(rq.items||[]).reduce((s,i)=>s+i.cantidad,0)}</td><td></td>
+          <td class="stock-cell">${(rq.items||[]).reduce((s,i)=>s+i.stock,0)}</td>
+          <td class="buy-cell">${(rq.items||[]).reduce((s,i)=>s+i.aComprar,0)}</td><td></td>
+        </tr></tbody>
       </table>
     </div>
     <div style="font-size:11px;font-weight:700;color:var(--ink4);text-transform:uppercase;margin-bottom:8px">Cadena de aprobaciones</div>
     <div class="approval-track">
-      ${FIRMAS_ORDEN.map((area,i) => {
-        const firma = (rq.firmas||{})[area];
-        const cls = firma ? 'done' : (i===done?'active':'');
-        const line = i<FIRMAS_ORDEN.length-1?`<div class="appr-line${firma?' done':''}"></div>`:'';
-        return `<div class="appr-step">
-          <div class="appr-node">
-            <div class="appr-circle ${cls}">${firma?'✓':i+1}</div>
-            <div class="appr-label">${area}</div>
-            ${firma?`<div style="font-size:7px;color:var(--green);font-weight:600">${firma.nombre||''}</div>`:''}
-            ${firma&&firma.firmaImg?`<img src="${firma.firmaImg}" style="width:60px;margin-top:2px;border:1px solid var(--green-bg);border-radius:2px">`:''}
-          </div>${line}
-        </div>`;
+      ${FIRMAS_ORDEN.map((area,i)=>{const f=(rq.firmas||{})[area];const cls=f?'done':(i===done?'active':'');const line=i<FIRMAS_ORDEN.length-1?`<div class="appr-line${f?' done':''}"></div>`:'';
+        return `<div class="appr-step"><div class="appr-node"><div class="appr-circle ${cls}">${f?'✓':i+1}</div><div class="appr-label">${area}</div>${f?`<div style="font-size:7px;color:var(--green);font-weight:600">${f.nombre||''}</div>`:''}${f&&f.firmaImg?`<img src="${f.firmaImg}" style="width:60px;margin-top:2px;border:1px solid var(--green-bg);border-radius:2px">`:''}</div>${line}</div>`;
       }).join('')}
-    </div>
-  `;
-  document.getElementById('modal-rq-foot').innerHTML = `
+    </div>`;
+  document.getElementById('modal-rq-foot').innerHTML=`
     <button class="btn btn-ghost" onclick="closeModal('modal-rq')">Cerrar</button>
     ${rq.pdfData?`<button class="btn btn-ghost btn-sm" onclick="verPDF('${rq.id}');closeModal('modal-rq')">📄 Ver PDF</button>`:''}
-    <button class="btn btn-primary" onclick="closeModal('modal-rq');abrirFirma('${rq.id}')">✍️ Firmar</button>
-  `;
+    <button class="btn btn-primary" onclick="closeModal('modal-rq');abrirFirma('${rq.id}')">✍️ Firmar</button>`;
   openModal('modal-rq');
 }
 
-// ═══════════════════════════════════════════════
-// FIRMA DIGITAL
-// ═══════════════════════════════════════════════
-let currentFirmaRQ = null;
-let sigDrawing = false, sigCtx = null;
-
+// ── FIRMA ──
+let currentFirmaRQ=null,sigDrawing=false,sigCtx=null;
 function abrirFirma(id){
-  const db = getDB();
-  const rq = db.reqs.find(r => r.id===id);
-  if(!rq){ showToast('RQ no encontrado','err'); return; }
-  const done = Object.keys(rq.firmas||{}).length;
-  if(done >= FIRMAS_ORDEN.length){ showToast('Ya tiene todas las firmas','inf'); return; }
-  currentFirmaRQ = id;
-  const nextArea = FIRMAS_ORDEN[done];
-  document.getElementById('firma-area-label').innerHTML = `<strong>${rq.rqNum}</strong> &nbsp;·&nbsp; Área: <strong>${nextArea}</strong> &nbsp;<span style="color:var(--ink4)">(${done+1}/${FIRMAS_ORDEN.length})</span>`;
-  ['firma-nombre','firma-cargo','firma-obs'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
-  openModal('modal-firma');
-  setTimeout(initSig, 80);
+  const db=getDB();const rq=db.reqs.find(r=>r.id===id);
+  if(!rq){showToast('RQ no encontrado','err');return;}
+  const done=Object.keys(rq.firmas||{}).length;
+  if(done>=FIRMAS_ORDEN.length){showToast('Ya tiene todas las firmas','inf');return;}
+  currentFirmaRQ=id;
+  const nextArea=FIRMAS_ORDEN[done];
+  document.getElementById('firma-area-label').innerHTML=`<strong>${rq.rqNum}</strong> &nbsp;·&nbsp; Área: <strong>${nextArea}</strong> &nbsp;<span style="color:var(--ink4)">(${done+1}/${FIRMAS_ORDEN.length})</span>`;
+  ['firma-nombre','firma-cargo','firma-obs'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  openModal('modal-firma');setTimeout(initSig,80);
 }
-
 function initSig(){
-  const c = document.getElementById('sig-canvas');
-  sigCtx = c.getContext('2d');
-  sigCtx.clearRect(0,0,c.width,c.height);
-  sigCtx.strokeStyle = '#002060'; sigCtx.lineWidth = 2; sigCtx.lineCap = 'round'; sigCtx.lineJoin = 'round';
-  const pos = (e,c) => { const r=c.getBoundingClientRect(); return [e.clientX-r.left, e.clientY-r.top]; };
-  const posT = (e,c) => { const r=c.getBoundingClientRect(),t=e.touches[0]; return [t.clientX-r.left, t.clientY-r.top]; };
-  c.onmousedown = e => { sigDrawing=true; sigCtx.beginPath(); sigCtx.moveTo(...pos(e,c)); };
-  c.onmousemove = e => { if(!sigDrawing) return; sigCtx.lineTo(...pos(e,c)); sigCtx.stroke(); };
-  c.onmouseup = c.onmouseleave = () => sigDrawing=false;
-  c.ontouchstart = e => { e.preventDefault(); sigDrawing=true; sigCtx.beginPath(); sigCtx.moveTo(...posT(e,c)); };
-  c.ontouchmove = e => { e.preventDefault(); if(!sigDrawing) return; sigCtx.lineTo(...posT(e,c)); sigCtx.stroke(); };
-  c.ontouchend = () => sigDrawing=false;
+  const c=document.getElementById('sig-canvas');sigCtx=c.getContext('2d');
+  sigCtx.clearRect(0,0,c.width,c.height);sigCtx.strokeStyle='#002060';sigCtx.lineWidth=2;sigCtx.lineCap='round';sigCtx.lineJoin='round';
+  const pos=(e,c)=>{const r=c.getBoundingClientRect();return[e.clientX-r.left,e.clientY-r.top]};
+  const posT=(e,c)=>{const r=c.getBoundingClientRect(),t=e.touches[0];return[t.clientX-r.left,t.clientY-r.top]};
+  c.onmousedown=e=>{sigDrawing=true;sigCtx.beginPath();sigCtx.moveTo(...pos(e,c))};
+  c.onmousemove=e=>{if(!sigDrawing)return;sigCtx.lineTo(...pos(e,c));sigCtx.stroke()};
+  c.onmouseup=c.onmouseleave=()=>sigDrawing=false;
+  c.ontouchstart=e=>{e.preventDefault();sigDrawing=true;sigCtx.beginPath();sigCtx.moveTo(...posT(e,c))};
+  c.ontouchmove=e=>{e.preventDefault();if(!sigDrawing)return;sigCtx.lineTo(...posT(e,c));sigCtx.stroke()};
+  c.ontouchend=()=>sigDrawing=false;
 }
-
-function clearSig(){ if(sigCtx){ const c=document.getElementById('sig-canvas'); sigCtx.clearRect(0,0,c.width,c.height); } }
-
-function isBlank(){ const c=document.getElementById('sig-canvas'); return !sigCtx || !sigCtx.getImageData(0,0,c.width,c.height).data.some(v=>v!==0); }
-
+function clearSig(){if(sigCtx){const c=document.getElementById('sig-canvas');sigCtx.clearRect(0,0,c.width,c.height);}}
+function isBlank(){const c=document.getElementById('sig-canvas');return!sigCtx||!sigCtx.getImageData(0,0,c.width,c.height).data.some(v=>v!==0);}
 function confirmarFirma(){
-  const nombre = document.getElementById('firma-nombre').value.trim();
-  if(!nombre){ showToast('Ingrese su nombre completo','err'); return; }
-  if(isBlank()){ showToast('Dibuje su firma en el recuadro','err'); return; }
-  const db = getDB();
-  const rq = db.reqs.find(r => r.id===currentFirmaRQ);
-  if(!rq) return;
-  const done = Object.keys(rq.firmas||{}).length;
-  const area = FIRMAS_ORDEN[done];
-  const firmaImg = document.getElementById('sig-canvas').toDataURL('image/png');
-  if(!rq.firmas) rq.firmas = {};
-  rq.firmas[area] = {
-    nombre, cargo: document.getElementById('firma-cargo').value,
-    obs: document.getElementById('firma-obs').value,
-    firmaImg, fecha: new Date().toLocaleDateString('es-PE'),
-    hora: new Date().toLocaleTimeString('es-PE',{hour:'2-digit',minute:'2-digit'}),
-    timestamp: new Date().toISOString()
-  };
-  const doneNow = Object.keys(rq.firmas).length;
-  if(doneNow >= FIRMAS_ORDEN.length) rq.estado = 'aprobado';
-  saveDB(db);
-  closeModal('modal-firma');
-  showToast(`✅ ${area} firmó (${doneNow}/${FIRMAS_ORDEN.length})`, 'ok');
+  const nombre=document.getElementById('firma-nombre').value.trim();
+  if(!nombre){showToast('Ingrese su nombre completo','err');return;}
+  if(isBlank()){showToast('Dibuje su firma en el recuadro','err');return;}
+  const db=getDB();const rq=db.reqs.find(r=>r.id===currentFirmaRQ);if(!rq)return;
+  const done=Object.keys(rq.firmas||{}).length;const area=FIRMAS_ORDEN[done];
+  const firmaImg=document.getElementById('sig-canvas').toDataURL('image/png');
+  if(!rq.firmas)rq.firmas={};
+  rq.firmas[area]={nombre,cargo:document.getElementById('firma-cargo').value,
+    obs:document.getElementById('firma-obs').value,firmaImg,
+    fecha:new Date().toLocaleDateString('es-PE'),
+    hora:new Date().toLocaleTimeString('es-PE',{hour:'2-digit',minute:'2-digit'}),
+    timestamp:new Date().toISOString()};
+  const doneNow=Object.keys(rq.firmas).length;
+  if(doneNow>=FIRMAS_ORDEN.length)rq.estado='aprobado';
+  saveDB(db);closeModal('modal-firma');
+  showToast(`✅ ${area} firmó (${doneNow}/${FIRMAS_ORDEN.length})`,'ok');
   updateStats();
-  const page = document.querySelector('.page.active').id;
-  if(page==='page-dashboard') renderDashboard();
-  if(page==='page-firmas') renderFirmas();
-  if(page==='page-lista') renderLista();
+  const page=document.querySelector('.page.active').id;
+  if(page==='page-dashboard')renderDashboard();
+  if(page==='page-firmas')renderFirmas();
+  if(page==='page-lista')renderLista();
 }
-
 function rechazarRQ(){
-  const db = getDB();
-  const rq = db.reqs.find(r => r.id===currentFirmaRQ);
-  if(!rq) return;
-  const done = Object.keys(rq.firmas||{}).length;
-  const area = FIRMAS_ORDEN[done];
-  rq.estado = 'rechazado';
-  saveDB(db);
-  closeModal('modal-firma');
-  showToast(`RQ rechazado en etapa: ${area}`, 'err');
-  updateStats();
+  const db=getDB();const rq=db.reqs.find(r=>r.id===currentFirmaRQ);if(!rq)return;
+  const done=Object.keys(rq.firmas||{}).length;const area=FIRMAS_ORDEN[done];
+  rq.estado='rechazado';saveDB(db);closeModal('modal-firma');
+  showToast(`RQ rechazado en etapa: ${area}`,'err');updateStats();
 }
 
-// ═══════════════════════════════════════════════
-// UTILS
-// ═══════════════════════════════════════════════
+// ── UTILS ──
 function eliminarRQ(id){
-  if(!confirm('¿Eliminar este RQ? No se puede deshacer.')) return;
-  const db = getDB();
-  db.reqs = db.reqs.filter(r => r.id!==id);
-  saveDB(db);
-  showToast('RQ eliminado','inf');
-  renderLista(); updateStats();
+  if(!confirm('¿Eliminar este RQ? No se puede deshacer.'))return;
+  const db=getDB();db.reqs=db.reqs.filter(r=>r.id!==id);saveDB(db);
+  showToast('RQ eliminado','inf');renderLista();updateStats();
 }
-
-function openModal(id){ document.getElementById(id).classList.add('open'); }
-function closeModal(id){ document.getElementById(id).classList.remove('open'); }
-
-function showToast(msg, type='inf'){
-  const c = document.getElementById('toasts');
-  const t = document.createElement('div');
-  t.className = `toast ${type}`;
-  t.textContent = msg;
-  c.appendChild(t);
-  setTimeout(()=>t.remove(), 3500);
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+function showToast(msg,type='inf'){
+  const c=document.getElementById('toasts'),t=document.createElement('div');
+  t.className=`toast ${type}`;t.textContent=msg;c.appendChild(t);setTimeout(()=>t.remove(),3500);
 }
-
 function updateStats(){
-  const db = getDB();
-  document.getElementById('s-total').textContent = db.reqs.length;
-  document.getElementById('s-pend').textContent = db.reqs.filter(r=>r.estado==='revision').length;
-  document.getElementById('s-aprov').textContent = db.reqs.filter(r=>r.estado==='aprobado').length;
-  document.getElementById('s-items').textContent = db.reqs.reduce((s,r)=>s+(r.items||[]).length,0);
-  document.getElementById('pending-count').textContent = db.reqs.filter(r=>r.estado==='revision').length;
+  const db=getDB();
+  document.getElementById('s-total').textContent=db.reqs.length;
+  document.getElementById('s-pend').textContent=db.reqs.filter(r=>r.estado==='revision').length;
+  document.getElementById('s-aprov').textContent=db.reqs.filter(r=>r.estado==='aprobado').length;
+  document.getElementById('s-items').textContent=db.reqs.reduce((s,r)=>s+(r.items||[]).length,0);
+  document.getElementById('pending-count').textContent=db.reqs.filter(r=>r.estado==='revision').length;
 }
-
 function exportarCSV(){
-  const db = getDB();
-  const rows = [['N° RQ','Fecha','Proyecto','Tipo SAP','Solicitante','Ítems','Stock Total','A Comprar Total','Estado','Firmas','COD. SOLPED','PDF Adjunto']];
-  db.reqs.forEach(r => {
-    const buy = (r.items||[]).reduce((s,i)=>s+i.aComprar,0);
-    const stk = (r.items||[]).reduce((s,i)=>s+i.stock,0);
-    rows.push([r.rqNum,r.fecha||'',r.proyecto||'',r.sapClass||'',r.solicitante||'',(r.items||[]).length,stk,buy,r.estado,Object.keys(r.firmas||{}).length+'/'+FIRMAS_ORDEN.length,r.solped||'',r.pdfName||'']);
-  });
-  const csv = rows.map(r=>r.join(',')).join('\n');
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'}));
-  a.download = `RQ_JJC_CC0154_${new Date().toISOString().split('T')[0]}.csv`;
-  a.click();
-  showToast('CSV exportado','ok');
+  const db=getDB();
+  const rows=[['N° RQ','Fecha','Proyecto','Tipo SAP','Solicitante','Ítems','Stock','A Comprar','Estado','Firmas','COD. SOLPED','PDF']];
+  db.reqs.forEach(r=>{const buy=(r.items||[]).reduce((s,i)=>s+i.aComprar,0);const stk=(r.items||[]).reduce((s,i)=>s+i.stock,0);
+    rows.push([r.rqNum,r.fecha||'',r.proyecto||'',r.sapClass||'',r.solicitante||'',(r.items||[]).length,stk,buy,r.estado,Object.keys(r.firmas||{}).length+'/'+FIRMAS_ORDEN.length,r.solped||'',r.pdfName||'']);});
+  const csv=rows.map(r=>r.join(',')).join('\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'}));
+  a.download=`RQ_JJC_CC0154_${new Date().toISOString().split('T')[0]}.csv`;a.click();showToast('CSV exportado','ok');
 }
-
 function exportarCSVBase(){
-  const db = getDB();
-  const rows = [['Mes','Fecha','N° RQ','Proyecto','Tipo','Solic.','Cód.SAP','Descripción','Cant.','Und.','Stock','A Comprar','Fecha req.','COD. SOLPED','Estado']];
-  db.reqs.forEach(r => {
-    const d = new Date(r.fecha||r.creadoEn);
-    (r.items||[]).forEach(it => {
-      rows.push([MESES[d.getMonth()]||'',r.fecha||'',r.rqNum,r.proyecto||'',it.tipo||'',r.solicitante||'',it.codigo||'',`"${it.descripcion}"`,it.cantidad,it.unidad,it.stock,it.aComprar,it.fechaReq||'',r.solped||'',r.estado]);
-    });
-  });
-  const csv = rows.map(r=>r.join(',')).join('\n');
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'}));
-  a.download = `BDATOS_CC0154_${new Date().toISOString().split('T')[0]}.csv`;
-  a.click();
-  showToast('CSV exportado','ok');
+  const db=getDB();
+  const rows=[['Mes','Fecha','N° RQ','Proyecto','Tipo','Solic.','Cód.SAP','Descripción','Cant.','Und.','Stock','A Comprar','Fecha req.','COD. SOLPED','Estado']];
+  db.reqs.forEach(r=>{const d=new Date(r.fecha||r.creadoEn);
+    (r.items||[]).forEach(it=>{rows.push([MESES[d.getMonth()]||'',r.fecha||'',r.rqNum,r.proyecto||'',it.tipo||'',r.solicitante||'',it.codigo||'',`"${it.descripcion}"`,it.cantidad,it.unidad,it.stock,it.aComprar,it.fechaReq||'',r.solped||'',r.estado]);});});
+  const csv=rows.map(r=>r.join(',')).join('\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'}));
+  a.download=`BDATOS_CC0154_${new Date().toISOString().split('T')[0]}.csv`;a.click();showToast('CSV exportado','ok');
 }
-
 function limpiarDatos(){
-  if(!confirm('¿Eliminar TODOS los datos? No se puede deshacer.')) return;
-  localStorage.removeItem(DB_KEY);
-  showToast('Base de datos limpiada','inf');
-  updateStats(); renderDashboard();
+  if(!confirm('¿Eliminar TODOS los datos? No se puede deshacer.'))return;
+  localStorage.removeItem(DB_KEY);showToast('Base de datos limpiada','inf');updateStats();renderDashboard();
 }
 
-// ═══════════════════════════════════════════════
-// DEMO DATA
-// ═══════════════════════════════════════════════
+// ── DEMO DATA ──
 function cargarDemo(){
-  const db = getDB();
-  if(db.reqs.length > 0) return;
-  db.reqs = [
+  const db=getDB();if(db.reqs.length>0)return;
+  db.reqs=[
     {id:'demo1',rqNum:'RQ-0154-2026-001',fecha:'2026-01-14',proyecto:'JJC-001-26-PS',tipoMat:'EQUIPOS Y MATERIALES',sapClass:'ZMAT',solicitante:'CO',solped:'4500012345',reserva:'',pep:'P-CC0154-2026',obs:'Urgente',estado:'aprobado',pdfData:null,pdfName:null,
-      firmas:{
-        'OT':{nombre:'Ing. Carlos Ramos',cargo:'Jefe OT',fecha:'14/01/2026',hora:'08:30',obs:'',firmaImg:'',timestamp:'2026-01-14T08:30:00Z'},
-        'Construcción':{nombre:'Ing. Pedro López',cargo:'Jefe Construcción',fecha:'14/01/2026',hora:'09:15',obs:'',firmaImg:'',timestamp:'2026-01-14T09:15:00Z'},
-        'Almacén':{nombre:'J. Huallanca',cargo:'Asist. Almacén II',fecha:'14/01/2026',hora:'10:00',obs:'',firmaImg:'',timestamp:'2026-01-14T10:00:00Z'},
-        'Administración':{nombre:'Lic. Ana Torres',cargo:'Administradora',fecha:'14/01/2026',hora:'11:30',obs:'',firmaImg:'',timestamp:'2026-01-14T11:30:00Z'},
-        'Planificador/Costos':{nombre:'Ing. Marcos Gil',cargo:'Planificador',fecha:'14/01/2026',hora:'14:00',obs:'',firmaImg:'',timestamp:'2026-01-14T14:00:00Z'},
-        'MCB':{nombre:'Ing. Roberto Soto',cargo:'Superv. Marcobre',fecha:'15/01/2026',hora:'09:00',obs:'',firmaImg:'',timestamp:'2026-01-15T09:00:00Z'}
-      },
-      items:[
-        {num:1,proyecto:'JJC-001-26-PS',rqSub:'1',tipo:'MAT',partida:'1.01',codigo:'10000001',descripcion:'CABLE DE COBRE DESNUDO TRENZADO TEMPLE BLANDO 120mm2',cantidad:220,unidad:'M',stock:100,aComprar:120,fechaReq:'2026-01-20',obs:''},
-        {num:2,proyecto:'JJC-001-26-PS',rqSub:'1',tipo:'MAT',partida:'1.01',codigo:'10000002',descripcion:'CABLE DE PUESTA TIERRA AISLADO VERDE/AMARILLO 70mm2',cantidad:150,unidad:'M',stock:50,aComprar:100,fechaReq:'2026-01-20',obs:''},
-        {num:3,proyecto:'JJC-001-26-PS',rqSub:'1',tipo:'MAT',partida:'1.01',codigo:'10000003',descripcion:'CINTA SEÑALIZADORA COLOR AMARILLO',cantidad:400,unidad:'M',stock:30,aComprar:370,fechaReq:'2026-01-20',obs:''}
-      ],creadoEn:'2026-01-14T07:00:00Z'},
+      firmas:{'OT':{nombre:'Ing. Carlos Ramos',cargo:'Jefe OT',fecha:'14/01/2026',hora:'08:30',obs:'',firmaImg:'',timestamp:'2026-01-14T08:30:00Z'},'Construcción':{nombre:'Ing. Pedro López',cargo:'Jefe Construcción',fecha:'14/01/2026',hora:'09:15',obs:'',firmaImg:'',timestamp:'2026-01-14T09:15:00Z'},'Almacén':{nombre:'J. Huallanca',cargo:'Asist. Almacén II',fecha:'14/01/2026',hora:'10:00',obs:'',firmaImg:'',timestamp:'2026-01-14T10:00:00Z'},'Administración':{nombre:'Lic. Ana Torres',cargo:'Administradora',fecha:'14/01/2026',hora:'11:30',obs:'',firmaImg:'',timestamp:'2026-01-14T11:30:00Z'},'Planificador/Costos':{nombre:'Ing. Marcos Gil',cargo:'Planificador',fecha:'14/01/2026',hora:'14:00',obs:'',firmaImg:'',timestamp:'2026-01-14T14:00:00Z'},'MCB':{nombre:'Ing. Roberto Soto',cargo:'Superv. Marcobre',fecha:'15/01/2026',hora:'09:00',obs:'',firmaImg:'',timestamp:'2026-01-15T09:00:00Z'}},
+      items:[{num:1,proyecto:'JJC-001-26-PS',rqSub:'1',tipo:'MAT',partida:'1.01',codigo:'10000001',descripcion:'CABLE DE COBRE DESNUDO TRENZADO TEMPLE BLANDO 120mm2',cantidad:220,unidad:'M',stock:100,aComprar:120,fechaReq:'2026-01-20',obs:''},{num:2,proyecto:'JJC-001-26-PS',rqSub:'1',tipo:'MAT',partida:'1.01',codigo:'10000002',descripcion:'CABLE DE PUESTA TIERRA AISLADO VERDE/AMARILLO 70mm2',cantidad:150,unidad:'M',stock:50,aComprar:100,fechaReq:'2026-01-20',obs:''},{num:3,proyecto:'JJC-001-26-PS',rqSub:'1',tipo:'MAT',partida:'1.01',codigo:'10000003',descripcion:'CINTA SEÑALIZADORA COLOR AMARILLO',cantidad:400,unidad:'M',stock:30,aComprar:370,fechaReq:'2026-01-20',obs:''}],creadoEn:'2026-01-14T07:00:00Z'},
     {id:'demo2',rqNum:'RQ-0154-2026-002',fecha:'2026-01-15',proyecto:'JJC-001-26-PS',tipoMat:'EQUIPOS Y MATERIALES',sapClass:'ZMAT',solicitante:'CO',solped:'4500012346',reserva:'',pep:'P-CC0154-2026',obs:'',estado:'aprobado',pdfData:null,pdfName:null,
-      firmas:{
-        'OT':{nombre:'Ing. Carlos Ramos',cargo:'Jefe OT',fecha:'15/01/2026',hora:'08:00',obs:'',firmaImg:'',timestamp:'2026-01-15T08:00:00Z'},
-        'Construcción':{nombre:'Ing. Pedro López',cargo:'Jefe Construcción',fecha:'15/01/2026',hora:'09:00',obs:'',firmaImg:'',timestamp:'2026-01-15T09:00:00Z'},
-        'Almacén':{nombre:'J. Huallanca',cargo:'Asist. Almacén II',fecha:'15/01/2026',hora:'10:30',obs:'',firmaImg:'',timestamp:'2026-01-15T10:30:00Z'},
-        'Administración':{nombre:'Lic. Ana Torres',cargo:'Administradora',fecha:'15/01/2026',hora:'13:00',obs:'',firmaImg:'',timestamp:'2026-01-15T13:00:00Z'},
-        'Planificador/Costos':{nombre:'Ing. Marcos Gil',cargo:'Planificador',fecha:'15/01/2026',hora:'15:00',obs:'',firmaImg:'',timestamp:'2026-01-15T15:00:00Z'},
-        'MCB':{nombre:'Ing. Roberto Soto',cargo:'Superv. Marcobre',fecha:'16/01/2026',hora:'09:00',obs:'',firmaImg:'',timestamp:'2026-01-16T09:00:00Z'}
-      },
-      items:[
-        {num:1,proyecto:'JJC-001-26-PS',rqSub:'2',tipo:'MAT',partida:'1.02',codigo:'10000004',descripcion:'CABLE UNIPOLAR BT XLPE/PVC 1/C 240mm2',cantidad:200,unidad:'M',stock:10,aComprar:190,fechaReq:'2026-01-22',obs:''},
-        {num:2,proyecto:'JJC-001-26-PS',rqSub:'2',tipo:'MAT',partida:'1.02',codigo:'10000005',descripcion:'CABLE PT AISLADO VERDE/AMARILLO 120mm2',cantidad:50,unidad:'M',stock:0,aComprar:50,fechaReq:'2026-01-22',obs:''},
-        {num:3,proyecto:'JJC-001-26-PS',rqSub:'2',tipo:'MAT',partida:'1.02',codigo:'10000006',descripcion:'CABLE TRIPOLAR BT XLPE/PVC 1-4#25mm2 +T',cantidad:150,unidad:'M',stock:150,aComprar:0,fechaReq:'2026-01-22',obs:'Stock disponible'},
-        {num:4,proyecto:'JJC-001-26-PS',rqSub:'2',tipo:'MAT',partida:'1.02',codigo:'10000007',descripcion:'AMPLIACION ALQ. ANDAMIOS 4200184154',cantidad:30000,unidad:'GLB',stock:0,aComprar:30000,fechaReq:'2026-01-22',obs:''}
-      ],creadoEn:'2026-01-15T07:00:00Z'},
+      firmas:{'OT':{nombre:'Ing. Carlos Ramos',cargo:'Jefe OT',fecha:'15/01/2026',hora:'08:00',obs:'',firmaImg:'',timestamp:'2026-01-15T08:00:00Z'},'Construcción':{nombre:'Ing. Pedro López',cargo:'Jefe Construcción',fecha:'15/01/2026',hora:'09:00',obs:'',firmaImg:'',timestamp:'2026-01-15T09:00:00Z'},'Almacén':{nombre:'J. Huallanca',cargo:'Asist. Almacén II',fecha:'15/01/2026',hora:'10:30',obs:'',firmaImg:'',timestamp:'2026-01-15T10:30:00Z'},'Administración':{nombre:'Lic. Ana Torres',cargo:'Administradora',fecha:'15/01/2026',hora:'13:00',obs:'',firmaImg:'',timestamp:'2026-01-15T13:00:00Z'},'Planificador/Costos':{nombre:'Ing. Marcos Gil',cargo:'Planificador',fecha:'15/01/2026',hora:'15:00',obs:'',firmaImg:'',timestamp:'2026-01-15T15:00:00Z'},'MCB':{nombre:'Ing. Roberto Soto',cargo:'Superv. Marcobre',fecha:'16/01/2026',hora:'09:00',obs:'',firmaImg:'',timestamp:'2026-01-16T09:00:00Z'}},
+      items:[{num:1,proyecto:'JJC-001-26-PS',rqSub:'2',tipo:'MAT',partida:'1.02',codigo:'10000004',descripcion:'CABLE UNIPOLAR BT XLPE/PVC 1/C 240mm2',cantidad:200,unidad:'M',stock:10,aComprar:190,fechaReq:'2026-01-22',obs:''},{num:2,proyecto:'JJC-001-26-PS',rqSub:'2',tipo:'MAT',partida:'1.02',codigo:'10000005',descripcion:'CABLE PT AISLADO VERDE/AMARILLO 120mm2',cantidad:50,unidad:'M',stock:0,aComprar:50,fechaReq:'2026-01-22',obs:''},{num:3,proyecto:'JJC-001-26-PS',rqSub:'2',tipo:'MAT',partida:'1.02',codigo:'10000006',descripcion:'CABLE TRIPOLAR BT XLPE/PVC 1-4#25mm2 +T',cantidad:150,unidad:'M',stock:150,aComprar:0,fechaReq:'2026-01-22',obs:'Stock disponible'},{num:4,proyecto:'JJC-001-26-PS',rqSub:'2',tipo:'MAT',partida:'1.02',codigo:'10000007',descripcion:'AMPLIACION ALQ. ANDAMIOS 4200184154',cantidad:30000,unidad:'GLB',stock:0,aComprar:30000,fechaReq:'2026-01-22',obs:''}],creadoEn:'2026-01-15T07:00:00Z'},
     {id:'demo3',rqNum:'RQ-0154-2026-003',fecha:'2026-06-26',proyecto:'JJC-001-26-PS',tipoMat:'SEGURIDAD',sapClass:'ZEPP',solicitante:'SEG',solped:'',reserva:'',pep:'P-CC0154-2026',obs:'EPP mensual',estado:'revision',pdfData:null,pdfName:null,
-      firmas:{
-        'OT':{nombre:'Ing. Carlos Ramos',cargo:'Jefe OT',fecha:'26/06/2026',hora:'08:30',obs:'',firmaImg:'',timestamp:'2026-06-26T08:30:00Z'}
-      },
-      items:[
-        {num:1,proyecto:'JJC-001-26-PS',rqSub:'3',tipo:'SEG',partida:'2.01',codigo:'20000001',descripcion:'CASCO DE SEGURIDAD JOCKEY COLOR BLANCO RAZA LARGA',cantidad:20,unidad:'UN',stock:5,aComprar:15,fechaReq:'2026-07-01',obs:''},
-        {num:2,proyecto:'JJC-001-26-PS',rqSub:'3',tipo:'SEG',partida:'2.01',codigo:'20000002',descripcion:'LENTES DE SEGURIDAD TRANSPARENTES ANTIEMPAÑANTES',cantidad:50,unidad:'UN',stock:10,aComprar:40,fechaReq:'2026-07-01',obs:''},
-        {num:3,proyecto:'JJC-001-26-PS',rqSub:'3',tipo:'SEG',partida:'2.01',codigo:'20000003',descripcion:'GUANTES DE CUERO REFORZADO TALLA L',cantidad:30,unidad:'PAR',stock:8,aComprar:22,fechaReq:'2026-07-01',obs:''}
-      ],creadoEn:'2026-06-26T07:00:00Z'}
+      firmas:{'OT':{nombre:'Ing. Carlos Ramos',cargo:'Jefe OT',fecha:'26/06/2026',hora:'08:30',obs:'',firmaImg:'',timestamp:'2026-06-26T08:30:00Z'}},
+      items:[{num:1,proyecto:'JJC-001-26-PS',rqSub:'3',tipo:'SEG',partida:'2.01',codigo:'20000001',descripcion:'CASCO DE SEGURIDAD JOCKEY COLOR BLANCO RAZA LARGA',cantidad:20,unidad:'UN',stock:5,aComprar:15,fechaReq:'2026-07-01',obs:''},{num:2,proyecto:'JJC-001-26-PS',rqSub:'3',tipo:'SEG',partida:'2.01',codigo:'20000002',descripcion:'LENTES DE SEGURIDAD TRANSPARENTES ANTIEMPAÑANTES',cantidad:50,unidad:'UN',stock:10,aComprar:40,fechaReq:'2026-07-01',obs:''},{num:3,proyecto:'JJC-001-26-PS',rqSub:'3',tipo:'SEG',partida:'2.01',codigo:'20000003',descripcion:'GUANTES DE CUERO REFORZADO TALLA L',cantidad:30,unidad:'PAR',stock:8,aComprar:22,fechaReq:'2026-07-01',obs:''}],creadoEn:'2026-06-26T07:00:00Z'}
   ];
   saveDB(db);
 }
 
-// ═══════════════════════════════════════════════
-// INIT
-// ═══════════════════════════════════════════════
-document.addEventListener('DOMContentLoaded', () => {
+// ── INIT ──
+document.addEventListener('DOMContentLoaded',()=>{
   cargarDemo();
-  document.getElementById('f-fecha').value = new Date().toISOString().split('T')[0];
-  document.getElementById('dash-date').textContent = new Date().toLocaleDateString('es-PE',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
-  const num = nextRQNum();
-  document.getElementById('f-rqnum').value = num;
-  document.getElementById('new-rq-num').textContent = num;
-  addItem();
-  renderDashboard();
-  updateStats();
-  // Close modals on overlay click
-  document.querySelectorAll('.modal-overlay').forEach(o => {
-    o.addEventListener('click', e => { if(e.target===o) closeModal(o.id); });
+  document.getElementById('f-fecha').value=new Date().toISOString().split('T')[0];
+  document.getElementById('dash-date').textContent=new Date().toLocaleDateString('es-PE',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  const num=nextRQNum();
+  document.getElementById('f-rqnum').value=num;
+  document.getElementById('new-rq-num').textContent=num;
+  addItem();renderDashboard();updateStats();
+  document.querySelectorAll('.modal-overlay').forEach(o=>{
+    o.addEventListener('click',e=>{
+      if(e.target===o){
+        if(o.id==='modal-pdf')cerrarModalPDF();
+        else closeModal(o.id);
+      }
+    });
   });
 });
 </script>
