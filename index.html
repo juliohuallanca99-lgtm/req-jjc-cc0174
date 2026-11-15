@@ -55,8 +55,8 @@
       <p class="ing-sub">Ingresa tus datos para acceder a la plataforma</p>
       <p class="aviso-privado">Esta sección es solo para el personal autorizado.</p>
 
-      <label for="usuario">Usuario</label>
-      <input type="text" id="usuario" autocomplete="username" autocapitalize="off" spellcheck="false">
+      <label for="usuario">Usuario o correo</label>
+      <input type="text" id="usuario" autocomplete="username" autocapitalize="off" spellcheck="false" placeholder="julio.huallanca o tu@correo.com">
 
       <label for="clave">Contraseña</label>
       <div class="ing-clave">
@@ -69,7 +69,11 @@
       </div>
 
       <button type="button" class="ing-olvido" id="olvido" aria-expanded="false" aria-controls="ayudaOlvido">¿Olvidaste tu contraseña?</button>
-      <p class="ing-ayuda" id="ayudaOlvido" hidden>Pide al administrador del sistema que te asigne una contraseña nueva desde la sección «Cuentas».</p>
+      <div class="ing-ayuda" id="ayudaOlvido" hidden>
+        Escribe tu usuario o correo arriba y te enviaremos un enlace para crear una contraseña nueva.
+        <button type="button" class="ing-entrar" id="btnRecuperar" style="width:100%;margin:10px 0 0;padding:10px;font-size:15px">Enviar enlace a mi correo</button>
+        <div id="msgRecuperar" style="margin-top:8px"></div>
+      </div>
 
       <button type="submit" class="ing-entrar" id="btnIngresar">Iniciar sesión</button>
       <div class="fallo" id="fallo" role="alert"></div>
@@ -160,7 +164,7 @@ $('formIngreso').addEventListener('submit', async e => {
   if (!usuario || !clave) { fallo.textContent = 'Escribe tu usuario y contraseña.'; return; }
   btn.disabled = true; btn.textContent = 'Verificando…';
   try {
-    const { error } = await sb.auth.signInWithPassword({ email: correoDe(usuario), password: clave });
+    const { error } = await sb.auth.signInWithPassword({ email: await correoParaIngreso(usuario), password: clave });
     if (error) throw error;
     const p = await perfilActual();
     if (!p) { await sb.auth.signOut(); throw new Error('Tu cuenta está desactivada. Habla con el administrador.'); }
@@ -193,6 +197,29 @@ $('verClave').addEventListener('click', () => {
 $('olvido').addEventListener('click', () => {
   const a = $('ayudaOlvido'); a.hidden = !a.hidden;
   $('olvido').setAttribute('aria-expanded', String(!a.hidden));
+  $('msgRecuperar').textContent = ''; $('fallo').textContent = '';
+});
+
+/* Recuperar contraseña por correo */
+$('btnRecuperar').addEventListener('click', async () => {
+  const dato = $('usuario').value.trim();
+  const msg = $('msgRecuperar'), btn = $('btnRecuperar');
+  msg.style.color = ''; msg.textContent = '';
+  if (!dato) { msg.style.color = 'var(--rojo)'; msg.textContent = 'Primero escribe tu usuario o correo.'; $('usuario').focus(); return; }
+  btn.disabled = true; btn.textContent = 'Enviando…';
+  try {
+    const correo = await correoParaIngreso(dato);
+    if (esCorreoInterno(correo)) {
+      msg.textContent = 'Esta cuenta no tiene un correo registrado. Pide al administrador que te asigne una contraseña nueva.';
+      return;
+    }
+    const { error } = await sb.auth.resetPasswordForEmail(correo, { redirectTo: location.origin + '/restablecer' });
+    if (error) throw error;
+    msg.style.color = 'var(--verde)';
+    msg.textContent = 'Listo. Si los datos son correctos, te llegará un correo con un enlace. Revisa también la carpeta de spam.';
+  } catch (err) {
+    msg.style.color = 'var(--rojo)'; msg.textContent = mensajeError(err);
+  } finally { btn.disabled = false; btn.textContent = 'Enviar enlace a mi correo'; }
 });
 
 /* Cambiar mi contraseña */

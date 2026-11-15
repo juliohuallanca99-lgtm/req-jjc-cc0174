@@ -22,6 +22,14 @@ const ROLES = {
 
 const $ = id => document.getElementById(id);
 const correoDe = usuario => String(usuario || '').trim().toLowerCase() + '@req-jjc.local';
+const esCorreoInterno = c => /@req-jjc\.local$/i.test(String(c || ''));
+
+/* Lo que la persona escribe (usuario o correo) → correo de su cuenta */
+async function correoParaIngreso(dato) {
+  const { data, error } = await sb.rpc('correo_ingreso', { p_dato: String(dato || '').trim() });
+  if (error) throw error;
+  return data;
+}
 
 /* Traduce los mensajes de error al español */
 function mensajeError(e) {
@@ -31,6 +39,8 @@ function mensajeError(e) {
   if (/rate limit|too many/i.test(m)) return 'Demasiados intentos. Espera unos minutos.';
   if (/failed to fetch|network/i.test(m)) return 'Sin conexión. Revisa tu internet e intenta de nuevo.';
   if (/password should be|weak/i.test(m)) return 'La contraseña es muy débil. Usa al menos 10 caracteres.';
+  if (/same.*password|different from the old/i.test(m)) return 'La contraseña nueva debe ser distinta de la anterior.';
+  if (/email.*not.*confirmed/i.test(m)) return 'El correo de la cuenta no está confirmado. Habla con el administrador.';
   return m || 'Ocurrió un error inesperado.';
 }
 

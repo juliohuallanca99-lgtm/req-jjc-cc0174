@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nueva contraseña · Requerimientos JJC</title>
+<link rel="icon" href="/img/logo-jjc.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/estilo.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.js"></script>
+<script src="/comun.js"></script>
+</head>
+<body>
+<div class="ingreso visible" id="ingreso">
+  <div class="ing-foto" aria-hidden="true"></div>
+  <img class="ing-marca" src="/img/marca-blanca.png" alt="" aria-hidden="true">
+  <div class="ing-lado">
+    <div class="ing-logo"><img src="/img/logo-jjc.png" alt="JJC Grupo"></div>
+
+    <form class="ing-form" id="formNueva" novalidate hidden>
+      <h1>Nueva contraseña</h1>
+      <p class="ing-sub" id="paraQuien">Crea una contraseña que solo tú conozcas.</p>
+      <label for="clave1">Contraseña nueva</label>
+      <input type="password" id="clave1" autocomplete="new-password">
+      <label for="clave2">Repite la contraseña</label>
+      <input type="password" id="clave2" autocomplete="new-password">
+      <p class="ing-ayuda">Al menos 10 caracteres.</p>
+      <button type="submit" class="ing-entrar" id="btnGuardar">Guardar contraseña</button>
+      <div class="fallo" id="fallo" role="alert"></div>
+    </form>
+
+    <div class="ing-form" id="caja" >
+      <h1 id="cajaTitulo">Verificando enlace…</h1>
+      <p class="ing-sub" id="cajaTexto"></p>
+      <a class="ing-entrar" href="/" id="cajaBoton" hidden style="text-align:center;text-decoration:none">Ir a iniciar sesión</a>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  const i = new Image();
+  i.onload = () => { $('ingreso').style.setProperty('--foto', 'url("/img/fondo-ingreso.jpg")'); $('ingreso').classList.add('con-foto'); };
+  i.src = '/img/fondo-ingreso.jpg';
+})();
+
+function mostrarCaja(titulo, texto) {
+  $('formNueva').hidden = true;
+  $('caja').hidden = false;
+  $('cajaTitulo').textContent = titulo;
+  $('cajaTexto').textContent = texto;
+  $('cajaBoton').hidden = false;
+}
+
+/* El enlace del correo trae un permiso temporal en la dirección */
+(async () => {
+  const hash = new URLSearchParams(location.hash.slice(1));
+  if (hash.get('error')) {
+    mostrarCaja('Enlace no válido', 'El enlace venció o ya fue usado. Vuelve a la pantalla de ingreso y solicita otro con «¿Olvidaste tu contraseña?».');
+    return;
+  }
+  await new Promise(r => setTimeout(r, 400));          // deja que la librería lea el enlace
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) {
+    mostrarCaja('Enlace no válido', 'Abre esta página desde el enlace que te llegó por correo. Si ya lo usaste, solicita uno nuevo.');
+    return;
+  }
+  history.replaceState(null, '', location.pathname);   // quita el permiso de la barra de direcciones
+  const p = await perfilActual();
+  if (!p) {
+    await sb.auth.signOut();
+    mostrarCaja('Cuenta desactivada', 'Tu cuenta no está activa. Habla con el administrador del sistema.');
+    return;
+  }
+  $('paraQuien').textContent = `Hola, ${p.nombre.split(' ')[0]}. Crea una contraseña que solo tú conozcas.`;
+  $('caja').hidden = true;
+  $('formNueva').hidden = false;
+  $('clave1').focus();
+})();
+
+$('formNueva').addEventListener('submit', async e => {
+  e.preventDefault();
+  const a = $('clave1').value, b = $('clave2').value, f = $('fallo');
+  f.textContent = '';
+  if (a.length < 10) { f.textContent = 'La contraseña debe tener al menos 10 caracteres.'; return; }
+  if (a !== b) { f.textContent = 'Las contraseñas no coinciden.'; return; }
+  $('btnGuardar').disabled = true;
+  const { error } = await sb.auth.updateUser({ password: a });
+  $('btnGuardar').disabled = false;
+  if (error) { f.textContent = mensajeError(error); return; }
+  await sb.auth.signOut();
+  mostrarCaja('Contraseña actualizada', 'Ya puedes ingresar con tu contraseña nueva.');
+});
+</script>
+</body>
+</html>
