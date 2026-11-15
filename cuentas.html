@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cuentas · Requerimientos JJC</title>
+<link rel="icon" href="/img/logo-jjc.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/estilo.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.js"></script>
+<script src="/comun.js"></script>
+</head>
+<body>
+
+<header class="cabecera">
+  <img src="/img/marca-blanca.png" alt="JJC">
+  <div class="titulo"><small>SISTEMA DE REQUERIMIENTOS</small><b>Cuentas</b></div>
+  <div class="quien"><b id="quienNombre"></b><span id="quienRol"></span></div>
+  <a class="boton-cab" href="/">← Inicio</a>
+</header>
+
+<main class="contenido">
+
+  <!-- ── Primera cuenta (solo cuando no existe ninguna) ── -->
+  <section id="primera" hidden>
+    <h2>Crear la primera cuenta</h2>
+    <p class="sub">Esta cuenta será la del <b>administrador del sistema</b>. Después, solo el administrador podrá crear las demás cuentas.</p>
+    <form class="tarjeta" id="formPrimera" novalidate>
+      <div class="rejilla">
+        <div class="campo"><label for="p_usuario">Usuario</label><input id="p_usuario" autocomplete="username" autocapitalize="off" spellcheck="false" placeholder="julio.huallanca">
+          <div class="nota">Minúsculas, sin espacios ni tildes.</div></div>
+        <div class="campo"><label for="p_nombre">Nombre completo</label><input id="p_nombre" placeholder="Julio César Huallanca Huamani"></div>
+        <div class="campo"><label for="p_cargo">Cargo</label><input id="p_cargo" placeholder="Asistente de Almacén de Obra II"></div>
+        <div class="campo"><label for="p_rol">Rol de firma</label><select id="p_rol"></select></div>
+        <div class="campo"><label for="p_clave">Contraseña</label><input type="password" id="p_clave" autocomplete="new-password">
+          <div class="nota">Al menos 10 caracteres.</div></div>
+        <div class="campo"><label for="p_clave2">Repite la contraseña</label><input type="password" id="p_clave2" autocomplete="new-password"></div>
+      </div>
+      <div class="fallo" id="falloPrimera"></div>
+      <div class="acciones"><button class="boton" id="btnPrimera">Crear cuenta e ingresar</button></div>
+    </form>
+  </section>
+
+  <!-- ── Administración de cuentas ── -->
+  <section id="admin" hidden>
+    <h2>Cuentas del sistema</h2>
+    <p class="sub">Cada persona firma solo en la etapa de su rol. Las cuentas desactivadas no pueden ingresar.</p>
+
+    <form class="tarjeta" id="formNueva" novalidate>
+      <h3>Nueva cuenta</h3>
+      <div class="rejilla">
+        <div class="campo"><label for="n_usuario">Usuario</label><input id="n_usuario" autocapitalize="off" spellcheck="false" placeholder="kevin.castro">
+          <div class="nota">Minúsculas, sin espacios ni tildes.</div></div>
+        <div class="campo"><label for="n_nombre">Nombre completo</label><input id="n_nombre"></div>
+        <div class="campo"><label for="n_cargo">Cargo</label><input id="n_cargo"></div>
+        <div class="campo"><label for="n_rol">Rol de firma</label><select id="n_rol"></select></div>
+        <div class="campo"><label for="n_clave">Contraseña inicial</label>
+          <div style="display:flex;gap:6px"><input id="n_clave" autocomplete="off" style="flex:1"><button type="button" class="boton claro" onclick="$('n_clave').value=generarClave()">Generar</button></div>
+          <div class="nota">Entrégasela a la persona; luego puede cambiarla.</div></div>
+        <label class="marcar"><input type="checkbox" id="n_admin"> Administrador del sistema</label>
+      </div>
+      <div class="fallo" id="falloNueva"></div>
+      <div class="acciones"><button class="boton" id="btnNueva">Crear cuenta</button></div>
+    </form>
+
+    <div class="tabla-caja">
+      <table class="tabla">
+        <thead><tr><th>Usuario</th><th>Nombre</th><th>Cargo</th><th>Rol</th><th>Estado</th><th>Último acceso</th><th></th></tr></thead>
+        <tbody id="lista"><tr><td colspan="7" style="text-align:center;color:var(--gris2);padding:24px">Cargando…</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<!-- Editar cuenta -->
+<div class="velo" id="veloEditar">
+  <form class="modal" id="formEditar" novalidate>
+    <h3>Editar cuenta <span class="mono" id="e_usuario" style="font-size:15px;color:var(--gris2)"></span></h3>
+    <div class="rejilla">
+      <div class="campo"><label for="e_nombre">Nombre completo</label><input id="e_nombre"></div>
+      <div class="campo"><label for="e_cargo">Cargo</label><input id="e_cargo"></div>
+      <div class="campo"><label for="e_rol">Rol de firma</label><select id="e_rol"></select></div>
+      <div class="campo"><label for="e_clave">Contraseña nueva (opcional)</label>
+        <div style="display:flex;gap:6px"><input id="e_clave" autocomplete="off" style="flex:1" placeholder="Dejar vacío para no cambiar"><button type="button" class="boton claro" onclick="$('e_clave').value=generarClave()">Generar</button></div></div>
+      <label class="marcar"><input type="checkbox" id="e_admin"> Administrador del sistema</label>
+      <label class="marcar"><input type="checkbox" id="e_activo"> Cuenta activa</label>
+    </div>
+    <div class="fallo" id="falloEditar"></div>
+    <div class="acciones">
+      <button type="button" class="boton claro" onclick="$('veloEditar').classList.remove('abierto')">Cancelar</button>
+      <button class="boton" id="btnEditar">Guardar cambios</button>
+    </div>
+  </form>
+</div>
+
+<!-- Datos de la cuenta recién creada -->
+<div class="velo" id="veloCreada">
+  <div class="modal">
+    <h3>Cuenta creada</h3>
+    <p>Entrega estos datos a la persona. La contraseña no se volverá a mostrar.</p>
+    <div class="tarjeta" style="margin:0" id="datosCreada"></div>
+    <div class="acciones">
+      <button class="boton claro" type="button" onclick="copiarCreada()">Copiar</button>
+      <button class="boton" type="button" onclick="$('veloCreada').classList.remove('abierto')">Listo</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let yo = null, cuentas = [], editando = null, textoCreada = '';
+
+const opcionesRol = () => Object.entries(ROLES).map(([v, t]) => `<option value="${v}">${t}</option>`).join('');
+['p_rol', 'n_rol', 'e_rol'].forEach(id => $(id).innerHTML = opcionesRol());
+$('p_rol').value = 'almacen';
+$('n_rol').value = 'solicitante';
+
+function generarClave() {
+  const letras = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';
+  const r = crypto.getRandomValues(new Uint32Array(12));
+  return Array.from(r, n => letras[n % letras.length]).join('').replace(/(.{4})(?!$)/g, '$1-');
+}
+const fecha = f => f ? new Date(f).toLocaleString('es-PE', { dateStyle: 'short', timeStyle: 'short' }) : '—';
+
+/* ── Primera cuenta ── */
+$('formPrimera').addEventListener('submit', async e => {
+  e.preventDefault();
+  const f = $('falloPrimera'); f.textContent = '';
+  const usuario = $('p_usuario').value.trim().toLowerCase();
+  const clave = $('p_clave').value;
+  if (clave !== $('p_clave2').value) { f.textContent = 'Las contraseñas no coinciden.'; return; }
+  $('btnPrimera').disabled = true;
+  try {
+    const { error } = await sb.rpc('crear_cuenta', {
+      p_usuario: usuario, p_nombre: $('p_nombre').value, p_cargo: $('p_cargo').value,
+      p_rol: $('p_rol').value, p_clave: clave, p_admin: true });
+    if (error) throw error;
+    const r = await sb.auth.signInWithPassword({ email: correoDe(usuario), password: clave });
+    if (r.error) throw r.error;
+    location.replace('/');
+  } catch (err) { f.textContent = mensajeError(err); }
+  finally { $('btnPrimera').disabled = false; }
+});
+
+/* ── Lista ── */
+async function cargar() {
+  const { data, error } = await sb.from('perfiles').select('*').order('activo', { ascending: false }).order('nombre');
+  if (error) { aviso(mensajeError(error), 'error'); return; }
+  cuentas = data;
+  $('lista').innerHTML = data.map(c => `
+    <tr class="${c.activo ? '' : 'apagada'}">
+      <td class="mono">${escapar(c.usuario || '—')}</td>
+      <td>${escapar(c.nombre)}${c.id === yo.id ? ' <span class="etiqueta">tú</span>' : ''}</td>
+      <td>${escapar(c.cargo || '—')}</td>
+      <td><span class="etiqueta azul">${escapar(ROLES[c.rol] || c.rol)}</span>${c.es_admin ? ' <span class="etiqueta">Admin</span>' : ''}</td>
+      <td>${c.activo ? '<span class="etiqueta verde">Activa</span>' : '<span class="etiqueta rojo">Desactivada</span>'}</td>
+      <td>${fecha(c.ultimo_acceso)}</td>
+      <td><button class="boton claro" style="padding:6px 12px" onclick="editar('${c.id}')">Editar</button></td>
+    </tr>`).join('') || '<tr><td colspan="7">Sin cuentas</td></tr>';
+}
+
+/* ── Nueva ── */
+$('formNueva').addEventListener('submit', async e => {
+  e.preventDefault();
+  const f = $('falloNueva'); f.textContent = '';
+  const datos = {
+    p_usuario: $('n_usuario').value.trim().toLowerCase(), p_nombre: $('n_nombre').value, p_cargo: $('n_cargo').value,
+    p_rol: $('n_rol').value, p_clave: $('n_clave').value, p_admin: $('n_admin').checked };
+  $('btnNueva').disabled = true;
+  const { data, error } = await sb.rpc('crear_cuenta', datos);
+  $('btnNueva').disabled = false;
+  if (error) { f.textContent = mensajeError(error); return; }
+  textoCreada = `Sistema de Requerimientos JJC\n${location.origin}\nUsuario: ${data.usuario}\nContraseña: ${datos.p_clave}\nRol: ${ROLES[data.rol]}`;
+  $('datosCreada').innerHTML = `<div><b>Página:</b> ${escapar(location.origin)}</div><div><b>Usuario:</b> <span class="mono">${escapar(data.usuario)}</span></div>
+    <div><b>Contraseña:</b> <span class="mono">${escapar(datos.p_clave)}</span></div><div><b>Rol:</b> ${escapar(ROLES[data.rol])}</div>`;
+  $('veloCreada').classList.add('abierto');
+  $('formNueva').reset(); $('n_rol').value = 'solicitante';
+  cargar();
+});
+function copiarCreada() { navigator.clipboard.writeText(textoCreada).then(() => aviso('Copiado')); }
+
+/* ── Editar ── */
+function editar(id) {
+  editando = cuentas.find(c => c.id === id);
+  $('e_usuario').textContent = editando.usuario || '';
+  $('e_nombre').value = editando.nombre; $('e_cargo').value = editando.cargo || '';
+  $('e_rol').value = editando.rol; $('e_admin').checked = editando.es_admin; $('e_activo').checked = editando.activo;
+  $('e_clave').value = ''; $('falloEditar').textContent = '';
+  $('veloEditar').classList.add('abierto');
+}
+$('formEditar').addEventListener('submit', async e => {
+  e.preventDefault();
+  const clave = $('e_clave').value.trim();
+  $('btnEditar').disabled = true;
+  const { error } = await sb.rpc('editar_cuenta', {
+    p_id: editando.id, p_nombre: $('e_nombre').value, p_cargo: $('e_cargo').value, p_rol: $('e_rol').value,
+    p_admin: $('e_admin').checked, p_activo: $('e_activo').checked, p_clave_nueva: clave || null });
+  $('btnEditar').disabled = false;
+  if (error) { $('falloEditar').textContent = mensajeError(error); return; }
+  $('veloEditar').classList.remove('abierto');
+  aviso(clave ? `Cambios guardados. Contraseña nueva: ${clave}` : 'Cambios guardados');
+  cargar();
+});
+
+/* ── Arranque ── */
+(async () => {
+  const { data: hay, error } = await sb.rpc('hay_cuentas');
+  if (error) { aviso(mensajeError(error), 'error'); return; }
+  if (hay === false) {
+    $('quienNombre').textContent = 'Instalación inicial';
+    $('primera').hidden = false;
+    $('p_usuario').focus();
+    return;
+  }
+  yo = await exigirSesion({ soloAdmin: true });
+  $('quienNombre').textContent = yo.nombre;
+  $('quienRol').textContent = ROLES[yo.rol] + ' · Administrador';
+  $('admin').hidden = false;
+  cargar();
+})();
+</script>
+</body>
+</html>
