@@ -153,6 +153,10 @@ table.data td.buy-cell{background:rgba(26,122,68,.1);color:var(--green);font-wei
     <button class="nav-tab" onclick="showPage('firmas')" id="tab-firmas">✍️ Firmas <span class="badge-count" id="pending-count">0</span></button>
     <button class="nav-tab" onclick="showPage('base')" id="tab-base">🗄️ Base de datos</button>
   </div>
+  <div style="display:flex;align-items:center;gap:10px;margin-right:12px">
+    <span id="sync-status" style="font-size:11px;color:rgba(255,255,255,.6)">…</span>
+    <button class="nav-tab" onclick="refrescar()" title="Traer lo último de la nube">🔄</button>
+  </div>
   <div class="nav-user">
     <div class="avatar">JH</div>
     <div>
@@ -172,6 +176,10 @@ table.data td.buy-cell{background:rgba(26,122,68,.1);color:var(--green);font-wei
       <div style="font-size:12px;color:var(--ink4);margin-top:2px" id="dash-date"></div>
     </div>
     <button class="btn btn-primary" onclick="showPage('nuevo')">➕ Nuevo Requerimiento</button>
+  </div>
+  <div id="aviso-locales" style="display:none;align-items:center;justify-content:space-between;gap:12px;background:var(--amber-bg);border:1px solid rgba(212,160,23,.4);border-radius:var(--rlg);padding:12px 16px;margin-bottom:16px;font-size:13px">
+    <span>⚠️ Tienes <strong id="aviso-locales-n">0</strong> RQ guardados solo en este navegador. Súbelos a la nube para que se vean en todos los equipos.</span>
+    <button class="btn btn-primary btn-sm" onclick="subirLocales()">☁️ Subir a la nube</button>
   </div>
   <div class="stats">
     <div class="stat-card" style="border-top:3px solid var(--blue)"><div class="stat-val" style="color:var(--blue)" id="s-total">0</div><div class="stat-label">Total RQ registrados</div></div>
@@ -330,7 +338,7 @@ table.data td.buy-cell{background:rgba(26,122,68,.1);color:var(--green);font-wei
     </div>
     <div style="display:flex;gap:8px">
       <button class="btn btn-ghost btn-sm" onclick="exportarCSVBase()">📊 Exportar CSV</button>
-      <button class="btn btn-ghost btn-sm" onclick="limpiarDatos()" style="color:var(--red)">🗑️ Limpiar todo</button>
+      <button class="btn btn-ghost btn-sm" onclick="refrescar()">🔄 Actualizar</button>
     </div>
   </div>
   <div class="card">
@@ -409,14 +417,83 @@ const DB_KEY = 'jjc_req_cc0154_v2';
 const MESES = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
 const FIRMAS_ORDEN = ['OT','Construcción','Almacén','Administración','Planificador/Costos','MCB'];
 
-function getDB(){ try{ return JSON.parse(localStorage.getItem(DB_KEY))||{reqs:[]}; }catch(e){ return{reqs:[]}; } }
-function saveDB(db){ localStorage.setItem(DB_KEY,JSON.stringify(db)); }
+// ── BASE DE DATOS EN LA NUBE (Upstash Redis vía /api/requerimientos) ──
+const API='/api/requerimientos';
+// Fecha de hoy según el reloj de quien usa la página (hora de Perú en obra)
+function hoyLocal(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
+let CACHE={reqs:[]};
+function getDB(){ return CACHE; }
+
+async function api(method,body,qs=''){
+  const r=await fetch(API+qs,{method,headers:{'Content-Type':'application/json'},
+    body:body?JSON.stringify(body):undefined});
+  let data={};try{data=await r.json();}catch(e){}
+  if(!r.ok)throw new Error(data.error||('Error '+r.status));
+  return data;
+}
+async function cargarDesdeNube(){
+  setSync('Cargando…','inf');
+  try{
+    CACHE.reqs=await api('GET');
+    setSync('☁️ Sincronizado','ok');
+  }catch(e){
+    setSync('⚠️ Sin conexión a la base','err');
+    showToast('No se pudo cargar: '+e.message,'err');
+  }
+}
+async function actualizarRQ(id,cambios){
+  const {rq}=await api('PUT',{id,...cambios});
+  const i=CACHE.reqs.findIndex(r=>r.id===id);
+  if(i>=0)CACHE.reqs[i]=rq;
+  return rq;
+}
+function setSync(txt,type){
+  const el=document.getElementById('sync-status');if(!el)return;
+  el.textContent=txt;
+  el.style.color=type==='ok'?'#7ee2a8':type==='err'?'#ff9b8f':'rgba(255,255,255,.6)';
+}
+async function refrescar(){
+  await cargarDesdeNube();
+  const page=document.querySelector('.page.active')?.id||'page-dashboard';
+  showPage(page.replace('page-',''));
+  prepararNumero();mostrarAvisoLocales();
+}
+
+// ── RQ que quedaron guardados solo en este navegador (versión anterior) ──
+function rqLocales(){
+  try{
+    const old=JSON.parse(localStorage.getItem(DB_KEY))||{reqs:[]};
+    const enNube=new Set(CACHE.reqs.map(r=>r.id));
+    return (old.reqs||[]).filter(r=>!String(r.id).startsWith('demo')&&!enNube.has(r.id));
+  }catch(e){return[];}
+}
+function mostrarAvisoLocales(){
+  const n=rqLocales().length;
+  const box=document.getElementById('aviso-locales');if(!box)return;
+  box.style.display=n?'flex':'none';
+  if(n)document.getElementById('aviso-locales-n').textContent=n;
+}
+async function subirLocales(){
+  const lista=rqLocales();if(!lista.length)return;
+  if(!confirm(`Se subirán ${lista.length} RQ a la nube conservando su número. ¿Continuar?`))return;
+  let ok=0;
+  for(const rq of lista){
+    try{await api('POST',{...rq,importar:true});ok++;}catch(e){showToast(`${rq.rqNum}: ${e.message}`,'err');}
+  }
+  showToast(`✅ ${ok} de ${lista.length} RQ subidos a la nube`,'ok');
+  await refrescar();
+}
 
 function nextRQNum(){
   const db=getDB(), y=new Date().getFullYear();
   const ex=db.reqs.filter(r=>r.rqNum&&r.rqNum.includes(`-${y}-`));
   const maxN=ex.reduce((m,r)=>{const p=r.rqNum.split('-');return Math.max(m,parseInt(p[p.length-1])||0);},0);
   return `RQ-0154-${y}-${String(maxN+1).padStart(3,'0')}`;
+}
+function prepararNumero(){
+  const num=nextRQNum();
+  document.getElementById('f-rqnum').value=num;
+  document.getElementById('new-rq-num').textContent=num+' (se confirma al guardar)';
 }
 
 // ── ITEMS ──
@@ -473,13 +550,14 @@ function collectItems(){
 }
 
 // ── GUARDAR RQ ──
-function saveRQ(){
+let guardando=false;
+async function saveRQ(){
+  if(guardando)return;
   const fecha=document.getElementById('f-fecha').value;
   if(!fecha){showToast('Ingrese la fecha','err');return;}
   const items=collectItems();
   if(!items.length){showToast('Agregue al menos un ítem','err');return;}
-  const rqNum=document.getElementById('f-rqnum').value;
-  const rq={id:Date.now().toString(),rqNum,fecha,
+  const rq={fecha,
     proyecto:document.getElementById('f-proyecto').value,
     tipoMat:document.getElementById('f-tipomat').value,
     sapClass:document.getElementById('f-sap').value,
@@ -488,19 +566,27 @@ function saveRQ(){
     reserva:document.getElementById('f-reserva').value,
     pep:document.getElementById('f-pep').value,
     obs:document.getElementById('f-obs').value,
-    items,estado:'revision',firmas:{},pdfData:null,pdfName:null,
-    creadoEn:new Date().toISOString()};
-  const db=getDB();db.reqs.unshift(rq);saveDB(db);
-  showToast(`✅ ${rqNum} guardado exitosamente`,'ok');
-  resetForm();updateStats();showPage('lista');
+    items,estado:'revision',firmas:{}};
+  guardando=true;setBotonGuardar(true);
+  try{
+    const {rq:nuevo}=await api('POST',rq);
+    CACHE.reqs.unshift(nuevo);
+    showToast(`✅ ${nuevo.rqNum} guardado en la nube`,'ok');
+    resetForm();updateStats();showPage('lista');
+  }catch(e){
+    showToast('❌ No se guardó: '+e.message,'err');
+  }finally{guardando=false;setBotonGuardar(false);}
+}
+function setBotonGuardar(on){
+  document.querySelectorAll('[onclick="saveRQ()"]').forEach(b=>{
+    b.disabled=on;b.style.opacity=on?.6:1;b.textContent=on?'⏳ Guardando…':'💾 Guardar RQ';
+  });
 }
 function resetForm(){
   itemCounter=0;document.getElementById('items-tbody').innerHTML='';
-  document.getElementById('f-fecha').value=new Date().toISOString().split('T')[0];
+  document.getElementById('f-fecha').value=hoyLocal();
   ['f-solped','f-reserva','f-pep','f-obs'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-  const num=nextRQNum();
-  document.getElementById('f-rqnum').value=num;
-  document.getElementById('new-rq-num').textContent=num;
+  prepararNumero();
   addItem();
 }
 
@@ -510,15 +596,22 @@ function editSolped(rqId,currentVal){
   if(!cell)return;
   const input=document.createElement('input');
   input.type='text';input.value=currentVal||'';input.className='solped-input';input.placeholder='Ej: 4500012345';
-  input.onkeydown=e=>{if(e.key==='Enter')saveSolped(rqId,input.value);if(e.key==='Escape')renderSolpedCell(rqId,currentVal);};
-  input.onblur=()=>saveSolped(rqId,input.value);
+  input.onkeydown=e=>{if(e.key==='Enter')input.blur();if(e.key==='Escape')renderSolpedCell(rqId,currentVal);};
+  input.onblur=()=>{if(input.isConnected)saveSolped(rqId,input.value);};
   cell.innerHTML='';cell.appendChild(input);input.focus();
 }
-function saveSolped(rqId,val){
-  const db=getDB();const rq=db.reqs.find(r=>r.id===rqId);
-  if(rq){rq.solped=val.trim();saveDB(db);}
-  renderSolpedCell(rqId,val.trim());
-  if(val.trim())showToast('COD. SOLPED actualizado','ok');
+async function saveSolped(rqId,val){
+  const rq=getDB().reqs.find(r=>r.id===rqId);
+  const nuevo=val.trim();
+  if(!rq||(rq.solped||'')===nuevo){renderSolpedCell(rqId,rq?.solped||'');return;}
+  try{
+    await actualizarRQ(rqId,{solped:nuevo});
+    renderSolpedCell(rqId,nuevo);
+    showToast('COD. SOLPED guardado en la nube','ok');
+  }catch(e){
+    renderSolpedCell(rqId,rq.solped||'');
+    showToast('❌ No se guardó el SOLPED: '+e.message,'err');
+  }
 }
 function renderSolpedCell(rqId,val){
   const cell=document.getElementById('solped-cell-'+rqId);if(!cell)return;
@@ -536,13 +629,14 @@ function uploadPDF(rqId){
   input.type='file';input.accept='application/pdf,image/*';
   input.onchange=e=>{
     const file=e.target.files[0];if(!file)return;
-    if(file.size>10*1024*1024){showToast('Archivo muy grande (máx. 10MB)','err');return;}
-    showToast('Cargando archivo…','inf');
+    if(file.size>3*1024*1024){showToast('Archivo muy grande (máx. 3 MB). Comprímelo con iLovePDF y vuelve a intentar.','err');return;}
+    showToast('Subiendo archivo…','inf');
     const reader=new FileReader();
-    reader.onload=ev=>{
-      const db=getDB();const rq=db.reqs.find(r=>r.id===rqId);
-      if(rq){rq.pdfData=ev.target.result;rq.pdfName=file.name;rq.pdfType=file.type;rq.pdfUploadedAt=new Date().toISOString();saveDB(db);}
-      renderPDFCell(rqId,file.name);showToast(`📄 ${file.name} adjuntado`,'ok');
+    reader.onload=async ev=>{
+      try{
+        await actualizarRQ(rqId,{pdfData:ev.target.result,pdfName:file.name,pdfType:file.type,pdfUploadedAt:new Date().toISOString()});
+        renderPDFCell(rqId,file.name);showToast(`📄 ${file.name} guardado en la nube`,'ok');
+      }catch(e){showToast('❌ No se subió el archivo: '+e.message,'err');}
     };
     reader.readAsDataURL(file);
   };
@@ -560,15 +654,16 @@ function renderPDFCell(rqId,pdfName){
     cell.innerHTML=`<button class="pdf-upload-btn" onclick="uploadPDF('${rqId}')">📎 Adjuntar PDF</button>`;
   }
 }
-function eliminarPDF(rqId){
-  if(!confirm('¿Eliminar el PDF adjunto?'))return;
-  const db=getDB();const rq=db.reqs.find(r=>r.id===rqId);
-  if(rq){rq.pdfData=null;rq.pdfName=null;rq.pdfType=null;saveDB(db);}
-  renderPDFCell(rqId,null);showToast('PDF eliminado','inf');
+async function eliminarPDF(rqId){
+  if(!confirm('¿Eliminar el PDF adjunto? No se puede deshacer.'))return;
+  try{
+    await actualizarRQ(rqId,{pdfData:null,pdfName:null,pdfType:null});
+    renderPDFCell(rqId,null);showToast('PDF eliminado','inf');
+  }catch(e){showToast('❌ No se eliminó: '+e.message,'err');}
 }
 
 // ── PDF VIEWER CORREGIDO ──
-let _pdfObjURL=null;
+let _pdfObjURL=null,_pdfRQ=null;
 
 function cerrarModalPDF(){
   closeModal('modal-pdf');
@@ -576,9 +671,15 @@ function cerrarModalPDF(){
   document.getElementById('pdf-modal-body').innerHTML='';
 }
 
-function verPDF(rqId){
-  const db=getDB();const rq=db.reqs.find(r=>r.id===rqId);
-  if(!rq||!rq.pdfData){showToast('No hay archivo adjunto','err');return;}
+async function verPDF(rqId){
+  const base=getDB().reqs.find(r=>r.id===rqId);
+  if(!base||!base.pdfName){showToast('No hay archivo adjunto','err');return;}
+  showToast('Abriendo archivo…','inf');
+  let pdfData;
+  try{({pdfData}=await api('GET',null,'?pdf='+encodeURIComponent(rqId)));}
+  catch(e){showToast('❌ No se pudo abrir: '+e.message,'err');return;}
+  const rq={...base,pdfData};
+  _pdfRQ=rq;
   document.getElementById('modal-pdf-title').textContent=`📄 ${rq.pdfName||'Archivo'} — ${rq.rqNum}`;
   const body=document.getElementById('pdf-modal-body');body.innerHTML='';
   if(_pdfObjURL){URL.revokeObjectURL(_pdfObjURL);_pdfObjURL=null;}
@@ -630,9 +731,7 @@ function descargarArchivo(rq){
   a.href=_pdfObjURL||rq.pdfData;
   a.download=rq.pdfName||`${rq.rqNum}.pdf`;a.click();
 }
-function descargarArchivo_id(id){
-  const db=getDB();const rq=db.reqs.find(r=>r.id===id);if(rq)descargarArchivo(rq);
-}
+function descargarArchivo_id(id){ if(_pdfRQ&&_pdfRQ.id===id)descargarArchivo(_pdfRQ); }
 
 // ── PAGES ──
 function showPage(id){
@@ -804,7 +903,7 @@ function verRQ(id){
     </div>`;
   document.getElementById('modal-rq-foot').innerHTML=`
     <button class="btn btn-ghost" onclick="closeModal('modal-rq')">Cerrar</button>
-    ${rq.pdfData?`<button class="btn btn-ghost btn-sm" onclick="verPDF('${rq.id}');closeModal('modal-rq')">📄 Ver PDF</button>`:''}
+    ${rq.pdfName?`<button class="btn btn-ghost btn-sm" onclick="verPDF('${rq.id}');closeModal('modal-rq')">📄 Ver PDF</button>`:''}
     <button class="btn btn-primary" onclick="closeModal('modal-rq');abrirFirma('${rq.id}')">✍️ Firmar</button>`;
   openModal('modal-rq');
 }
@@ -836,22 +935,25 @@ function initSig(){
 }
 function clearSig(){if(sigCtx){const c=document.getElementById('sig-canvas');sigCtx.clearRect(0,0,c.width,c.height);}}
 function isBlank(){const c=document.getElementById('sig-canvas');return!sigCtx||!sigCtx.getImageData(0,0,c.width,c.height).data.some(v=>v!==0);}
-function confirmarFirma(){
+async function confirmarFirma(){
   const nombre=document.getElementById('firma-nombre').value.trim();
   if(!nombre){showToast('Ingrese su nombre completo','err');return;}
   if(isBlank()){showToast('Dibuje su firma en el recuadro','err');return;}
-  const db=getDB();const rq=db.reqs.find(r=>r.id===currentFirmaRQ);if(!rq)return;
-  const done=Object.keys(rq.firmas||{}).length;const area=FIRMAS_ORDEN[done];
+  const rq=getDB().reqs.find(r=>r.id===currentFirmaRQ);if(!rq)return;
+  const firmas={...(rq.firmas||{})};
+  const done=Object.keys(firmas).length;const area=FIRMAS_ORDEN[done];
   const firmaImg=document.getElementById('sig-canvas').toDataURL('image/png');
-  if(!rq.firmas)rq.firmas={};
-  rq.firmas[area]={nombre,cargo:document.getElementById('firma-cargo').value,
+  firmas[area]={nombre,cargo:document.getElementById('firma-cargo').value,
     obs:document.getElementById('firma-obs').value,firmaImg,
     fecha:new Date().toLocaleDateString('es-PE'),
     hora:new Date().toLocaleTimeString('es-PE',{hour:'2-digit',minute:'2-digit'}),
     timestamp:new Date().toISOString()};
-  const doneNow=Object.keys(rq.firmas).length;
-  if(doneNow>=FIRMAS_ORDEN.length)rq.estado='aprobado';
-  saveDB(db);closeModal('modal-firma');
+  const doneNow=Object.keys(firmas).length;
+  const cambios={firmas};
+  if(doneNow>=FIRMAS_ORDEN.length)cambios.estado='aprobado';
+  try{await actualizarRQ(rq.id,cambios);}
+  catch(e){showToast('❌ No se guardó la firma: '+e.message,'err');return;}
+  closeModal('modal-firma');
   showToast(`✅ ${area} firmó (${doneNow}/${FIRMAS_ORDEN.length})`,'ok');
   updateStats();
   const page=document.querySelector('.page.active').id;
@@ -859,17 +961,26 @@ function confirmarFirma(){
   if(page==='page-firmas')renderFirmas();
   if(page==='page-lista')renderLista();
 }
-function rechazarRQ(){
-  const db=getDB();const rq=db.reqs.find(r=>r.id===currentFirmaRQ);if(!rq)return;
+async function rechazarRQ(){
+  const rq=getDB().reqs.find(r=>r.id===currentFirmaRQ);if(!rq)return;
   const done=Object.keys(rq.firmas||{}).length;const area=FIRMAS_ORDEN[done];
-  rq.estado='rechazado';saveDB(db);closeModal('modal-firma');
+  try{
+    await actualizarRQ(rq.id,{estado:'rechazado',rechazo:{area,
+      nombre:document.getElementById('firma-nombre').value.trim(),
+      obs:document.getElementById('firma-obs').value.trim(),fecha:new Date().toISOString()}});
+  }catch(e){showToast('❌ No se guardó: '+e.message,'err');return;}
+  closeModal('modal-firma');
   showToast(`RQ rechazado en etapa: ${area}`,'err');updateStats();
+  const page=document.querySelector('.page.active').id.replace('page-','');showPage(page);
 }
 
 // ── UTILS ──
-function eliminarRQ(id){
-  if(!confirm('¿Eliminar este RQ? No se puede deshacer.'))return;
-  const db=getDB();db.reqs=db.reqs.filter(r=>r.id!==id);saveDB(db);
+async function eliminarRQ(id){
+  const rq=getDB().reqs.find(r=>r.id===id);
+  if(!confirm(`¿Eliminar ${rq?.rqNum||'este RQ'} de la nube? Se borrará para todos y no se puede deshacer.`))return;
+  try{await api('DELETE',null,'?id='+encodeURIComponent(id));}
+  catch(e){showToast('❌ No se eliminó: '+e.message,'err');return;}
+  CACHE.reqs=CACHE.reqs.filter(r=>r.id!==id);
   showToast('RQ eliminado','inf');renderLista();updateStats();
 }
 function openModal(id){document.getElementById(id).classList.add('open');}
@@ -893,7 +1004,7 @@ function exportarCSV(){
     rows.push([r.rqNum,r.fecha||'',r.proyecto||'',r.sapClass||'',r.solicitante||'',(r.items||[]).length,stk,buy,r.estado,Object.keys(r.firmas||{}).length+'/'+FIRMAS_ORDEN.length,r.solped||'',r.pdfName||'']);});
   const csv=rows.map(r=>r.join(',')).join('\n');
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'}));
-  a.download=`RQ_JJC_CC0154_${new Date().toISOString().split('T')[0]}.csv`;a.click();showToast('CSV exportado','ok');
+  a.download=`RQ_JJC_CC0154_${hoyLocal()}.csv`;a.click();showToast('CSV exportado','ok');
 }
 function exportarCSVBase(){
   const db=getDB();
@@ -902,39 +1013,19 @@ function exportarCSVBase(){
     (r.items||[]).forEach(it=>{rows.push([MESES[d.getMonth()]||'',r.fecha||'',r.rqNum,r.proyecto||'',it.tipo||'',r.solicitante||'',it.codigo||'',`"${it.descripcion}"`,it.cantidad,it.unidad,it.stock,it.aComprar,it.fechaReq||'',r.solped||'',r.estado]);});});
   const csv=rows.map(r=>r.join(',')).join('\n');
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'}));
-  a.download=`BDATOS_CC0154_${new Date().toISOString().split('T')[0]}.csv`;a.click();showToast('CSV exportado','ok');
+  a.download=`BDATOS_CC0154_${hoyLocal()}.csv`;a.click();showToast('CSV exportado','ok');
 }
 function limpiarDatos(){
-  if(!confirm('¿Eliminar TODOS los datos? No se puede deshacer.'))return;
-  localStorage.removeItem(DB_KEY);showToast('Base de datos limpiada','inf');updateStats();renderDashboard();
-}
-
-// ── DEMO DATA ──
-function cargarDemo(){
-  const db=getDB();if(db.reqs.length>0)return;
-  db.reqs=[
-    {id:'demo1',rqNum:'RQ-0154-2026-001',fecha:'2026-01-14',proyecto:'JJC-001-26-PS',tipoMat:'EQUIPOS Y MATERIALES',sapClass:'ZMAT',solicitante:'CO',solped:'4500012345',reserva:'',pep:'P-CC0154-2026',obs:'Urgente',estado:'aprobado',pdfData:null,pdfName:null,
-      firmas:{'OT':{nombre:'Ing. Carlos Ramos',cargo:'Jefe OT',fecha:'14/01/2026',hora:'08:30',obs:'',firmaImg:'',timestamp:'2026-01-14T08:30:00Z'},'Construcción':{nombre:'Ing. Pedro López',cargo:'Jefe Construcción',fecha:'14/01/2026',hora:'09:15',obs:'',firmaImg:'',timestamp:'2026-01-14T09:15:00Z'},'Almacén':{nombre:'J. Huallanca',cargo:'Asist. Almacén II',fecha:'14/01/2026',hora:'10:00',obs:'',firmaImg:'',timestamp:'2026-01-14T10:00:00Z'},'Administración':{nombre:'Lic. Ana Torres',cargo:'Administradora',fecha:'14/01/2026',hora:'11:30',obs:'',firmaImg:'',timestamp:'2026-01-14T11:30:00Z'},'Planificador/Costos':{nombre:'Ing. Marcos Gil',cargo:'Planificador',fecha:'14/01/2026',hora:'14:00',obs:'',firmaImg:'',timestamp:'2026-01-14T14:00:00Z'},'MCB':{nombre:'Ing. Roberto Soto',cargo:'Superv. Marcobre',fecha:'15/01/2026',hora:'09:00',obs:'',firmaImg:'',timestamp:'2026-01-15T09:00:00Z'}},
-      items:[{num:1,proyecto:'JJC-001-26-PS',rqSub:'1',tipo:'MAT',partida:'1.01',codigo:'10000001',descripcion:'CABLE DE COBRE DESNUDO TRENZADO TEMPLE BLANDO 120mm2',cantidad:220,unidad:'M',stock:100,aComprar:120,fechaReq:'2026-01-20',obs:''},{num:2,proyecto:'JJC-001-26-PS',rqSub:'1',tipo:'MAT',partida:'1.01',codigo:'10000002',descripcion:'CABLE DE PUESTA TIERRA AISLADO VERDE/AMARILLO 70mm2',cantidad:150,unidad:'M',stock:50,aComprar:100,fechaReq:'2026-01-20',obs:''},{num:3,proyecto:'JJC-001-26-PS',rqSub:'1',tipo:'MAT',partida:'1.01',codigo:'10000003',descripcion:'CINTA SEÑALIZADORA COLOR AMARILLO',cantidad:400,unidad:'M',stock:30,aComprar:370,fechaReq:'2026-01-20',obs:''}],creadoEn:'2026-01-14T07:00:00Z'},
-    {id:'demo2',rqNum:'RQ-0154-2026-002',fecha:'2026-01-15',proyecto:'JJC-001-26-PS',tipoMat:'EQUIPOS Y MATERIALES',sapClass:'ZMAT',solicitante:'CO',solped:'4500012346',reserva:'',pep:'P-CC0154-2026',obs:'',estado:'aprobado',pdfData:null,pdfName:null,
-      firmas:{'OT':{nombre:'Ing. Carlos Ramos',cargo:'Jefe OT',fecha:'15/01/2026',hora:'08:00',obs:'',firmaImg:'',timestamp:'2026-01-15T08:00:00Z'},'Construcción':{nombre:'Ing. Pedro López',cargo:'Jefe Construcción',fecha:'15/01/2026',hora:'09:00',obs:'',firmaImg:'',timestamp:'2026-01-15T09:00:00Z'},'Almacén':{nombre:'J. Huallanca',cargo:'Asist. Almacén II',fecha:'15/01/2026',hora:'10:30',obs:'',firmaImg:'',timestamp:'2026-01-15T10:30:00Z'},'Administración':{nombre:'Lic. Ana Torres',cargo:'Administradora',fecha:'15/01/2026',hora:'13:00',obs:'',firmaImg:'',timestamp:'2026-01-15T13:00:00Z'},'Planificador/Costos':{nombre:'Ing. Marcos Gil',cargo:'Planificador',fecha:'15/01/2026',hora:'15:00',obs:'',firmaImg:'',timestamp:'2026-01-15T15:00:00Z'},'MCB':{nombre:'Ing. Roberto Soto',cargo:'Superv. Marcobre',fecha:'16/01/2026',hora:'09:00',obs:'',firmaImg:'',timestamp:'2026-01-16T09:00:00Z'}},
-      items:[{num:1,proyecto:'JJC-001-26-PS',rqSub:'2',tipo:'MAT',partida:'1.02',codigo:'10000004',descripcion:'CABLE UNIPOLAR BT XLPE/PVC 1/C 240mm2',cantidad:200,unidad:'M',stock:10,aComprar:190,fechaReq:'2026-01-22',obs:''},{num:2,proyecto:'JJC-001-26-PS',rqSub:'2',tipo:'MAT',partida:'1.02',codigo:'10000005',descripcion:'CABLE PT AISLADO VERDE/AMARILLO 120mm2',cantidad:50,unidad:'M',stock:0,aComprar:50,fechaReq:'2026-01-22',obs:''},{num:3,proyecto:'JJC-001-26-PS',rqSub:'2',tipo:'MAT',partida:'1.02',codigo:'10000006',descripcion:'CABLE TRIPOLAR BT XLPE/PVC 1-4#25mm2 +T',cantidad:150,unidad:'M',stock:150,aComprar:0,fechaReq:'2026-01-22',obs:'Stock disponible'},{num:4,proyecto:'JJC-001-26-PS',rqSub:'2',tipo:'MAT',partida:'1.02',codigo:'10000007',descripcion:'AMPLIACION ALQ. ANDAMIOS 4200184154',cantidad:30000,unidad:'GLB',stock:0,aComprar:30000,fechaReq:'2026-01-22',obs:''}],creadoEn:'2026-01-15T07:00:00Z'},
-    {id:'demo3',rqNum:'RQ-0154-2026-003',fecha:'2026-06-26',proyecto:'JJC-001-26-PS',tipoMat:'SEGURIDAD',sapClass:'ZEPP',solicitante:'SEG',solped:'',reserva:'',pep:'P-CC0154-2026',obs:'EPP mensual',estado:'revision',pdfData:null,pdfName:null,
-      firmas:{'OT':{nombre:'Ing. Carlos Ramos',cargo:'Jefe OT',fecha:'26/06/2026',hora:'08:30',obs:'',firmaImg:'',timestamp:'2026-06-26T08:30:00Z'}},
-      items:[{num:1,proyecto:'JJC-001-26-PS',rqSub:'3',tipo:'SEG',partida:'2.01',codigo:'20000001',descripcion:'CASCO DE SEGURIDAD JOCKEY COLOR BLANCO RAZA LARGA',cantidad:20,unidad:'UN',stock:5,aComprar:15,fechaReq:'2026-07-01',obs:''},{num:2,proyecto:'JJC-001-26-PS',rqSub:'3',tipo:'SEG',partida:'2.01',codigo:'20000002',descripcion:'LENTES DE SEGURIDAD TRANSPARENTES ANTIEMPAÑANTES',cantidad:50,unidad:'UN',stock:10,aComprar:40,fechaReq:'2026-07-01',obs:''},{num:3,proyecto:'JJC-001-26-PS',rqSub:'3',tipo:'SEG',partida:'2.01',codigo:'20000003',descripcion:'GUANTES DE CUERO REFORZADO TALLA L',cantidad:30,unidad:'PAR',stock:8,aComprar:22,fechaReq:'2026-07-01',obs:''}],creadoEn:'2026-06-26T07:00:00Z'}
-  ];
-  saveDB(db);
+  showToast('Por seguridad, los RQ se eliminan uno por uno desde "Todos los RQ".','inf');
 }
 
 // ── INIT ──
-document.addEventListener('DOMContentLoaded',()=>{
-  cargarDemo();
-  document.getElementById('f-fecha').value=new Date().toISOString().split('T')[0];
+document.addEventListener('DOMContentLoaded',async()=>{
+  document.getElementById('f-fecha').value=hoyLocal();
   document.getElementById('dash-date').textContent=new Date().toLocaleDateString('es-PE',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
-  const num=nextRQNum();
-  document.getElementById('f-rqnum').value=num;
-  document.getElementById('new-rq-num').textContent=num;
-  addItem();renderDashboard();updateStats();
+  addItem();
+  await cargarDesdeNube();
+  prepararNumero();renderDashboard();updateStats();mostrarAvisoLocales();
   document.querySelectorAll('.modal-overlay').forEach(o=>{
     o.addEventListener('click',e=>{
       if(e.target===o){
