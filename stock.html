@@ -52,6 +52,10 @@
 .cambio{font-weight:600}
 .prev{background:var(--campo);border-radius:10px;padding:12px 14px;margin:10px 0;font-size:14.5px;line-height:1.8}
 .prev b{color:var(--azul)}
+.banda[hidden]{display:none}
+.banda{display:flex;gap:12px;align-items:center;flex-wrap:wrap;background:#fdf3dd;border:1px solid #f0d9a4;border-left:4px solid var(--ambar);border-radius:12px;padding:12px 16px;margin-bottom:18px;font-size:14.5px}
+.banda .campo{min-width:220px}.banda .campo select{padding:8px 10px}
+.boton.peligro{background:#fff;color:var(--rojo);border:1px solid #e8b4ae}.boton.peligro:hover{background:#fbe9e7}
 @media(max-width:900px){.filtros{grid-template-columns:1fr 1fr}}
 </style>
 </head>
@@ -79,12 +83,19 @@
     </div>
   </div>
 
+  <div class="banda" id="bandaSin" hidden>
+    <div style="flex:1;min-width:240px"><b id="sinCuantas"></b> líneas de cargas anteriores no tienen almacén de obra. Desde ahora cada carga va a un almacén; pásalas a uno o elimínalas.</div>
+    <div class="campo"><select id="sinAlm"></select></div>
+    <button class="boton" id="btnPasarSin">Pasar a este almacén</button>
+    <button class="boton peligro" id="btnElimSin">Eliminar estas líneas</button>
+  </div>
+
   <div class="cifras" id="cifras"></div>
 
   <details class="tarjeta resumen-alm" id="resumenAlm">
     <summary>Resumen por almacén de obra</summary>
     <div class="tabla-caja" style="margin-top:12px">
-      <table class="tabla"><thead><tr><th>Almacén de obra</th><th>Líneas</th><th>Con stock</th><th>Sin ubicación</th><th class="col-precio">Valor (S/)</th></tr></thead>
+      <table class="tabla"><thead><tr><th>Almacén de obra</th><th>Líneas</th><th>Con stock</th><th>Sin ubicación</th><th>Última carga</th><th class="col-precio">Valor (S/)</th></tr></thead>
       <tbody id="tablaResumen"></tbody></table>
     </div>
   </details>
@@ -103,7 +114,7 @@
   </div>
   <div class="info-filtro">
     <span id="contador"></span>
-    <label class="chk"><input type="checkbox" id="fSinUbic"> Solo sin almacén o ubicación</label>
+    <label class="chk"><input type="checkbox" id="fSinUbic"> Solo sin ubicación</label>
   </div>
 
   <div class="tabla-caja">
@@ -118,7 +129,7 @@
     <span id="selTexto"></span>
     <div style="display:flex;gap:8px">
       <button class="boton claro" style="background:transparent;color:#fff;border-color:rgba(255,255,255,.4)" onclick="limpiarSel()">Quitar selección</button>
-      <button class="boton" onclick="abrirAsignar()">Asignar almacén / ubicación / usuario</button>
+      <button class="boton" onclick="abrirAsignar()">Asignar ubicación / usuario</button>
     </div>
   </div>
 </main>
@@ -129,7 +140,7 @@
     <h3 id="lTitulo"></h3>
     <p class="sub" id="lSub" style="margin:-8px 0 14px"></p>
     <div class="rejilla" id="lCampos">
-      <div class="campo"><label for="lAlm">Almacén de obra</label><select id="lAlm"></select></div>
+      <div class="campo"><label for="lAlm">Almacén de obra</label><input id="lAlm" disabled><div class="nota">Lo define la carga de SAP</div></div>
       <div class="campo"><label for="lUbi">Ubicación</label><input id="lUbi" placeholder="Estante A-3, Piso, Patio…"></div>
       <div class="campo"><label for="lUsu">Usuario</label><input id="lUsu" placeholder="Persona o área que lo usa"></div>
     </div>
@@ -148,9 +159,7 @@
   <form class="modal" id="formAsignar">
     <h3>Asignar a <span id="aCuantas"></span></h3>
     <p class="sub" style="margin:-6px 0 14px">Marca solo lo que quieras cambiar. Lo demás se mantiene.</p>
-    <label class="marcar" style="margin:0 0 6px"><input type="checkbox" id="aChkAlm"> Almacén de obra</label>
-    <div class="campo"><select id="aAlm"></select></div>
-    <label class="marcar" style="margin:14px 0 6px"><input type="checkbox" id="aChkUbi"> Ubicación</label>
+    <label class="marcar" style="margin:0 0 6px"><input type="checkbox" id="aChkUbi"> Ubicación</label>
     <div class="campo"><input id="aUbi" placeholder="Dejar vacío para borrar"></div>
     <label class="marcar" style="margin:14px 0 6px"><input type="checkbox" id="aChkUsu"> Usuario</label>
     <div class="campo"><input id="aUsu" placeholder="Dejar vacío para borrar"></div>
@@ -166,8 +175,9 @@
 <div class="velo" id="veloCarga">
   <div class="modal">
     <h3>Cargar stock de SAP</h3>
+    <div class="campo"><label for="cAlm">¿A qué almacén de obra corresponde este archivo?</label><select id="cAlm"></select></div>
     <div id="cResumen"></div>
-    <p class="sub" style="margin:8px 0 0">El almacén de obra, la ubicación y el usuario de cada línea se mantienen. Los materiales que ya no aparecen quedan en cero, con su historial.</p>
+    <p class="sub" style="margin:8px 0 0">Solo se actualiza el almacén elegido; los demás no cambian. La ubicación y el usuario de cada línea se mantienen. Lo que ya no aparece en el archivo queda en cero en ese almacén, con su historial.</p>
     <div class="fallo" id="cFallo"></div>
     <div class="acciones">
       <button type="button" class="boton claro" onclick="cerrar('veloCarga')">Cancelar</button>
@@ -193,15 +203,15 @@
 
 <!-- Cargas anteriores -->
 <div class="velo" id="veloCargas">
-  <div class="modal" style="width:min(720px,100%)">
+  <div class="modal" style="width:min(960px,100%)">
     <h3>Cargas de stock</h3>
-    <div class="tabla-caja"><table class="tabla"><thead><tr><th>Fecha</th><th>Archivo</th><th>Cargado por</th><th>Líneas</th><th>Nuevas</th><th>Cambio de cantidad</th><th>Salieron</th></tr></thead><tbody id="listaCargas"></tbody></table></div>
+    <div class="tabla-caja"><table class="tabla"><thead><tr><th>Fecha</th><th>Almacén de obra</th><th>Archivo</th><th>Cargado por</th><th>Líneas</th><th>Nuevas</th><th>Cambio de cantidad</th><th>Salieron</th></tr></thead><tbody id="listaCargas"></tbody></table></div>
     <div class="acciones"><button type="button" class="boton claro" onclick="cerrar('veloCargas')">Cerrar</button></div>
   </div>
 </div>
 
 <script>
-let yo = null, editor = false, precios = false;
+let yo = null, editor = false, precios = false, cargas = [];
 let stock = [], almacenes = [], filtrado = [], mostrar = 200, seleccion = new Set(), lineaAbierta = null, filasCarga = null;
 
 const num = (n, d = 2) => Number(n || 0).toLocaleString('es-PE', { minimumFractionDigits: 0, maximumFractionDigits: d });
@@ -228,17 +238,21 @@ async function cargarDatos() {
       traerTodo('stock', 'id,material,descripcion,centro,almacen_sap,fase,lote,unidad,cantidad,proyecto,almacen_obra_id,ubicacion,usuario,en_sap,actualizado_en'),
       sb.from('almacenes_obra').select('*').order('nombre'),
       precios ? traerTodo('stock_precios', 'stock_id,moneda,precio,valor') : Promise.resolve([]),
-      sb.from('stock_cargas').select('*').order('cargado_en', { ascending: false }).limit(1)
+      sb.from('stock_cargas').select('*').order('cargado_en', { ascending: false }).limit(200)
     ]);
     if (a.error) throw a.error;
     almacenes = a.data;
     const mp = new Map(p.map(x => [x.stock_id, x]));
     stock = s.map(x => ({ ...x, precio: mp.get(x.id)?.precio ?? null, valor: mp.get(x.id)?.valor ?? null }));
-    const u = c.data?.[0];
+    cargas = c.data || [];
+    const u = cargas[0];
     $('ultimaCarga').textContent = u
-      ? `Última carga: ${fechaHora(u.cargado_en)} · ${u.archivo || 'archivo'} · por ${u.cargado_nombre || '—'}`
+      ? `Última carga: ${fechaHora(u.cargado_en)} · ${u.almacen_obra_id ? nombreAlm(u.almacen_obra_id) + ' · ' : ''}${u.archivo || 'archivo'} · por ${u.cargado_nombre || '—'}`
       : (editor ? 'Todavía no hay stock cargado. Usa «Cargar stock de SAP».' : 'Todavía no hay stock cargado.');
     llenarFiltros();
+    const sinAlm = stock.filter(x => !x.almacen_obra_id).length;
+    $('bandaSin').hidden = !(editor && sinAlm);
+    $('sinCuantas').textContent = num(sinAlm, 0);
     aplicarFiltros();
   } catch (e) { aviso(mensajeError(e), 'error'); }
 }
@@ -252,8 +266,10 @@ function llenarFiltros() {
   $('fAlmSap').innerHTML = '<option value="">Todos</option>' + unicos('almacen_sap').map(v => opc(v, '(sin almacén)')).join('');
   $('fLote').innerHTML = '<option value="">Todos</option>' + unicos('lote').map(v => opc(v, '(sin lote)')).join('');
   $('fAlmObra').value = valAlm; $('fAlmSap').value = valSap; $('fLote').value = valLote;
-  const opts = '<option value="">— Sin asignar —</option>' + almacenes.filter(a => a.activo).map(a => `<option value="${a.id}">${escapar(a.nombre)}</option>`).join('');
-  $('lAlm').innerHTML = opts; $('aAlm').innerHTML = opts;
+  const opts = '<option value="">— Elige un almacén —</option>' + almacenes.filter(a => a.activo).map(a => `<option value="${a.id}">${escapar(a.nombre)}</option>`).join('');
+  const vc = $('cAlm').value, vs = $('sinAlm').value;
+  $('cAlm').innerHTML = opts; $('sinAlm').innerHTML = opts;
+  $('cAlm').value = vc; $('sinAlm').value = vs;
 }
 
 /* ═════ Filtros y tabla ═════ */
@@ -268,7 +284,7 @@ function aplicarFiltros() {
     if (alm && alm !== '-1' && String(x.almacen_obra_id) !== alm) return false;
     if (sap && (x.almacen_sap || '__vacio__') !== sap) return false;
     if (lote && (x.lote || '__vacio__') !== lote) return false;
-    if (sinUbic && x.almacen_obra_id && x.ubicacion) return false;
+    if (sinUbic && x.ubicacion) return false;
     if (q && !`${x.material} ${x.descripcion} ${x.ubicacion || ''} ${x.usuario || ''} ${x.fase || ''} ${nombreAlm(x.almacen_obra_id)}`.toLowerCase().includes(q)) return false;
     return true;
   }).sort((a, b) => a.descripcion.localeCompare(b.descripcion) || a.material.localeCompare(b.material));
@@ -279,13 +295,13 @@ function aplicarFiltros() {
 
 function pintarCifras() {
   const conStock = stock.filter(x => x.en_sap && Number(x.cantidad) > 0);
-  const sinUbic = conStock.filter(x => !x.almacen_obra_id || !x.ubicacion).length;
+  const sinUbic = conStock.filter(x => !x.ubicacion).length;
   const valor = conStock.reduce((s, x) => s + Number(x.valor || 0), 0);
   const valorFiltro = filtrado.reduce((s, x) => s + Number(x.valor || 0), 0);
   $('cifras').innerHTML = `
     <div class="cifra"><b>${num(conStock.length, 0)}</b><span>Líneas con stock</span></div>
     <div class="cifra"><b>${num(new Set(conStock.map(x => x.material)).size, 0)}</b><span>Materiales distintos</span></div>
-    <div class="cifra ${sinUbic ? 'alerta' : 'verde'}"><b>${num(sinUbic, 0)}</b><span>Sin almacén o ubicación</span></div>
+    <div class="cifra ${sinUbic ? 'alerta' : 'verde'}"><b>${num(sinUbic, 0)}</b><span>Sin ubicación</span></div>
     <div class="cifra"><b>${num(almacenes.filter(a => a.activo).length, 0)}</b><span>Almacenes de obra</span></div>
     ${precios ? `<div class="cifra verde"><b>${soles(valor)}</b><span>Valor del stock</span></div>
                  <div class="cifra"><b>${soles(valorFiltro)}</b><span>Valor de lo filtrado</span></div>` : ''}`;
@@ -293,11 +309,13 @@ function pintarCifras() {
   // Resumen por almacén de obra
   const grupos = [{ id: null, nombre: 'Sin asignar' }, ...almacenes].map(a => {
     const l = stock.filter(x => (x.almacen_obra_id || null) === a.id && x.en_sap);
-    return { nombre: a.nombre, lineas: l.length, con: l.filter(x => Number(x.cantidad) > 0).length,
+    const uc = cargas.find(c => (c.almacen_obra_id || null) === a.id);
+    return { nombre: a.nombre, uc, lineas: l.length, con: l.filter(x => Number(x.cantidad) > 0).length,
       sinUbi: l.filter(x => Number(x.cantidad) > 0 && !x.ubicacion).length, valor: l.reduce((s, x) => s + Number(x.valor || 0), 0) };
   }).filter(g => g.lineas || g.nombre !== 'Sin asignar');
   $('tablaResumen').innerHTML = grupos.map(g => `<tr><td><b>${escapar(g.nombre)}</b></td><td>${num(g.lineas, 0)}</td><td>${num(g.con, 0)}</td>
     <td>${g.sinUbi ? `<span class="etiqueta" style="background:#fdf3dd;color:var(--ambar)">${g.sinUbi}</span>` : '0'}</td>
+    <td style="white-space:nowrap">${g.uc ? fechaHora(g.uc.cargado_en) : '<span class="vacio">Sin cargas</span>'}</td>
     ${precios ? `<td class="num">${soles(g.valor)}</td>` : ''}</tr>`).join('');
   document.querySelectorAll('.col-precio').forEach(e => e.hidden = !precios);
 }
@@ -359,8 +377,8 @@ async function abrirLinea(id) {
   const x = lineaAbierta;
   $('lTitulo').textContent = `${x.material} · ${x.descripcion}`;
   $('lSub').textContent = `Cantidad: ${num(x.cantidad, 3)} ${x.unidad || ''} · Almacén SAP ${x.almacen_sap || '—'} · Fase ${x.fase || '—'} · Lote ${x.lote || '—'}`;
-  $('lAlm').value = x.almacen_obra_id || ''; $('lUbi').value = x.ubicacion || ''; $('lUsu').value = x.usuario || '';
-  ['lAlm', 'lUbi', 'lUsu'].forEach(i => $(i).disabled = !editor);
+  $('lAlm').value = nombreAlm(x.almacen_obra_id) || 'Sin asignar'; $('lUbi').value = x.ubicacion || ''; $('lUsu').value = x.usuario || '';
+  ['lUbi', 'lUsu'].forEach(i => $(i).disabled = !editor);
   $('lFallo').textContent = '';
   $('lHist').innerHTML = '<li>Cargando…</li>';
   abrir('veloLinea');
@@ -379,29 +397,26 @@ $('formLinea').addEventListener('submit', async e => {
   e.preventDefault();
   if (!editor) return;
   $('lGuardar').disabled = true;
-  const cambios = { almacen_obra_id: $('lAlm').value || null, ubicacion: $('lUbi').value, usuario: $('lUsu').value };
+  const cambios = { ubicacion: $('lUbi').value, usuario: $('lUsu').value };
   const { error } = await sb.rpc('editar_stock', { p_ids: [lineaAbierta.id], p_cambios: cambios });
   $('lGuardar').disabled = false;
   if (error) { $('lFallo').textContent = mensajeError(error); return; }
-  Object.assign(lineaAbierta, { almacen_obra_id: cambios.almacen_obra_id ? Number(cambios.almacen_obra_id) : null,
-    ubicacion: cambios.ubicacion.trim() || null, usuario: cambios.usuario.trim() || null });
+  Object.assign(lineaAbierta, { ubicacion: cambios.ubicacion.trim() || null, usuario: cambios.usuario.trim() || null });
   cerrar('veloLinea'); aviso('Cambios guardados'); aplicarFiltros();
 });
 
 /* ═════ Asignar en bloque ═════ */
 function abrirAsignar() {
   $('aCuantas').textContent = `${seleccion.size} línea${seleccion.size === 1 ? '' : 's'}`;
-  ['aChkAlm', 'aChkUbi', 'aChkUsu'].forEach(i => $(i).checked = false);
-  $('aAlm').value = ''; $('aUbi').value = ''; $('aUsu').value = ''; $('aFallo').textContent = '';
+  ['aChkUbi', 'aChkUsu'].forEach(i => $(i).checked = false);
+  $('aUbi').value = ''; $('aUsu').value = ''; $('aFallo').textContent = '';
   abrir('veloAsignar');
 }
-$('aAlm').addEventListener('change', () => $('aChkAlm').checked = true);
 $('aUbi').addEventListener('input', () => $('aChkUbi').checked = true);
 $('aUsu').addEventListener('input', () => $('aChkUsu').checked = true);
 $('formAsignar').addEventListener('submit', async e => {
   e.preventDefault();
   const cambios = {};
-  if ($('aChkAlm').checked) cambios.almacen_obra_id = $('aAlm').value || null;
   if ($('aChkUbi').checked) cambios.ubicacion = $('aUbi').value;
   if ($('aChkUsu').checked) cambios.usuario = $('aUsu').value;
   if (!Object.keys(cambios).length) { $('aFallo').textContent = 'Marca al menos un dato para cambiar.'; return; }
@@ -411,7 +426,6 @@ $('formAsignar').addEventListener('submit', async e => {
   $('aGuardar').disabled = false;
   if (error) { $('aFallo').textContent = mensajeError(error); return; }
   stock.filter(x => seleccion.has(x.id)).forEach(x => {
-    if ('almacen_obra_id' in cambios) x.almacen_obra_id = cambios.almacen_obra_id ? Number(cambios.almacen_obra_id) : null;
     if ('ubicacion' in cambios) x.ubicacion = cambios.ubicacion.trim() || null;
     if ('usuario' in cambios) x.usuario = cambios.usuario.trim() || null;
   });
@@ -452,34 +466,47 @@ $('archivo').addEventListener('change', async () => {
     }).filter(f => f.material);
     if (!filasCarga.length) throw new Error('El archivo no tiene materiales.');
 
-    // Vista previa contra lo que ya está cargado
-    const actual = new Map(stock.map(x => [[x.material, x.centro || '', x.almacen_sap || '', x.fase || '', x.lote || ''].join('|'), x]));
+    $('cFallo').textContent = '';
+    $('cConfirmar').dataset.archivo = file.name;
+    const filtroAlm = $('fAlmObra').value;
+    $('cAlm').value = filtroAlm && filtroAlm !== '-1' && almacenes.some(a => a.activo && String(a.id) === filtroAlm) ? filtroAlm : '';
+    previa();
+    abrir('veloCarga');
+  } catch (e) { aviso(mensajeError(e), 'error'); }
+});
+$('cAlm').addEventListener('change', previa);
+
+/* Vista previa contra lo que ya está cargado en el almacén elegido */
+function previa() {
+    const alm = Number($('cAlm').value) || null, nombreArch = $('cConfirmar').dataset.archivo;
+    $('cConfirmar').disabled = !alm;
+    if (!alm) { $('cResumen').innerHTML = `<div class="prev">Archivo: <b>${escapar(nombreArch)}</b> · ${num(filasCarga.length, 0)} líneas<br>Elige el almacén de obra para ver qué cambia.</div>`; return; }
+    const delAlm = stock.filter(x => x.almacen_obra_id === alm);
+    const actual = new Map(delAlm.map(x => [[x.material, x.centro || '', x.almacen_sap || '', x.fase || '', x.lote || ''].join('|'), x]));
     const claves = new Set(filasCarga.map(claveDe));
     let nuevas = 0, cambian = 0;
     for (const f of filasCarga) {
       const a = actual.get(claveDe(f));
       if (!a) nuevas++; else if (Number(a.cantidad) !== f.cantidad || !a.en_sap) cambian++;
     }
-    const salen = stock.filter(x => x.en_sap && !claves.has([x.material, x.centro || '', x.almacen_sap || '', x.fase || '', x.lote || ''].join('|'))).length;
-    const conservan = filasCarga.filter(f => { const a = actual.get(claveDe(f)); return a && (a.almacen_obra_id || a.ubicacion || a.usuario); }).length;
+    const salen = delAlm.filter(x => x.en_sap && !claves.has([x.material, x.centro || '', x.almacen_sap || '', x.fase || '', x.lote || ''].join('|'))).length;
+    const conservan = filasCarga.filter(f => { const a = actual.get(claveDe(f)); return a && (a.ubicacion || a.usuario); }).length;
     $('cResumen').innerHTML = `<div class="prev">
-      Archivo: <b>${escapar(file.name)}</b><br>
+      Archivo: <b>${escapar(nombreArch)}</b> → <b>${escapar(nombreAlm(alm))}</b>${delAlm.length ? '' : ' (primera carga de este almacén)'}<br>
       Líneas en el archivo: <b>${num(filasCarga.length, 0)}</b><br>
       Nuevas: <b>${num(nuevas, 0)}</b> · Con cambio de cantidad: <b>${num(cambian, 0)}</b> · Ya no figuran (quedan en 0): <b>${num(salen, 0)}</b><br>
-      Conservan su almacén / ubicación / usuario: <b>${num(conservan, 0)}</b></div>`;
-    $('cFallo').textContent = '';
-    $('cConfirmar').dataset.archivo = file.name;
-    abrir('veloCarga');
-  } catch (e) { aviso(mensajeError(e), 'error'); }
-});
+      Conservan su ubicación / usuario: <b>${num(conservan, 0)}</b></div>`;
+}
 $('cConfirmar').addEventListener('click', async () => {
   const btn = $('cConfirmar'); btn.disabled = true; btn.textContent = 'Cargando…';
-  const { data, error } = await sb.rpc('cargar_stock', { p_archivo: btn.dataset.archivo, p_filas: filasCarga });
+  const { data, error } = await sb.rpc('cargar_stock', { p_almacen: Number($('cAlm').value), p_archivo: btn.dataset.archivo, p_filas: filasCarga });
   btn.disabled = false; btn.textContent = 'Cargar';
+  const almCargado = $('cAlm').value;
   if (error) { $('cFallo').textContent = mensajeError(error); return; }
   cerrar('veloCarga');
   aviso(`Stock cargado: ${data.nuevas} nuevas, ${data.con_cambio} con cambio, ${data.retiradas} salieron`);
   seleccion.clear();
+  $('fAlmObra').value = almCargado;
   await cargarDatos();
 });
 
@@ -489,7 +516,8 @@ function pintarAlmacenes() {
     <td><b>${escapar(a.nombre)}</b>${a.activo ? '' : ' <span class="etiqueta rojo">Inactivo</span>'}</td><td>${escapar(a.descripcion || '—')}</td>
     <td>${stock.filter(x => x.almacen_obra_id === a.id).length}</td>
     <td style="white-space:nowrap"><button class="boton-linea" onclick="renombrarAlm(${a.id})">Renombrar</button>
-      <button class="boton-linea" onclick="activarAlm(${a.id})">${a.activo ? 'Desactivar' : 'Activar'}</button></td></tr>`).join('')
+      <button class="boton-linea" onclick="activarAlm(${a.id})">${a.activo ? 'Desactivar' : 'Activar'}</button>
+      ${stock.some(x => x.almacen_obra_id === a.id) ? '' : `<button class="boton-linea" style="color:var(--rojo)" onclick="eliminarAlm(${a.id})">Eliminar</button>`}</td></tr>`).join('')
     || '<tr><td colspan="4" style="text-align:center;color:var(--gris2);padding:18px">Aún no hay almacenes. Crea el primero arriba.</td></tr>';
 }
 async function guardarAlm(id, nombre, desc, activo) {
@@ -511,20 +539,50 @@ async function renombrarAlm(id) {
   const desc = prompt('Descripción (opcional):', a.descripcion || '');
   await guardarAlm(id, nombre, desc ?? a.descripcion, a.activo);
 }
+async function eliminarAlm(id) {
+  const a = almacenes.find(x => x.id === id);
+  if (!confirm(`¿Eliminar el almacén «${a.nombre}»? No tiene stock cargado.`)) return;
+  const { error } = await sb.rpc('eliminar_almacen_obra', { p_id: id });
+  if (error) { $('almFallo').textContent = mensajeError(error); return; }
+  almacenes = almacenes.filter(x => x.id !== id);
+  if ($('fAlmObra').value === String(id)) $('fAlmObra').value = '';
+  llenarFiltros(); pintarAlmacenes(); aplicarFiltros(); aviso('Almacén eliminado');
+}
 async function activarAlm(id) {
   const a = almacenes.find(x => x.id === id);
   await guardarAlm(id, a.nombre, a.descripcion, !a.activo);
 }
 
+/* ═════ Líneas antiguas sin almacén ═════ */
+$('btnPasarSin').addEventListener('click', async () => {
+  const id = Number($('sinAlm').value);
+  if (!id) { aviso('Elige el almacén de obra', 'info'); return; }
+  if (!confirm(`¿Pasar ${$('sinCuantas').textContent} líneas al almacén «${nombreAlm(id)}»? Se conservan usuario, ubicación e historial.`)) return;
+  const { data, error } = await sb.rpc('pasar_sin_almacen', { p_almacen: id });
+  if (error) { aviso(mensajeError(error), 'error'); return; }
+  aviso(`${num(data, 0)} líneas pasaron a ${nombreAlm(id)}`);
+  $('fAlmObra').value = String(id);
+  await cargarDatos();
+});
+$('btnElimSin').addEventListener('click', async () => {
+  const n = $('sinCuantas').textContent;
+  if (!confirm(`¿Eliminar definitivamente las ${n} líneas sin almacén de obra, con su usuario, ubicación e historial? Esto no se puede deshacer.`)) return;
+  if (prompt('Para confirmar escribe ELIMINAR') !== 'ELIMINAR') return;
+  const { data, error } = await sb.rpc('eliminar_sin_almacen');
+  if (error) { aviso(mensajeError(error), 'error'); return; }
+  aviso(`${num(data, 0)} líneas eliminadas`);
+  await cargarDatos();
+});
+
 /* ═════ Cargas anteriores ═════ */
 $('btnHistCargas').addEventListener('click', async () => {
-  $('listaCargas').innerHTML = '<tr><td colspan="7">Cargando…</td></tr>';
+  $('listaCargas').innerHTML = '<tr><td colspan="8">Cargando…</td></tr>';
   abrir('veloCargas');
   const { data, error } = await sb.from('stock_cargas').select('*').order('cargado_en', { ascending: false }).limit(50);
-  if (error) { $('listaCargas').innerHTML = `<tr><td colspan="7">${escapar(mensajeError(error))}</td></tr>`; return; }
-  $('listaCargas').innerHTML = data.map(c => `<tr><td>${fechaHora(c.cargado_en)}</td><td>${escapar(c.archivo || '—')}</td><td>${escapar(c.cargado_nombre || '—')}</td>
+  if (error) { $('listaCargas').innerHTML = `<tr><td colspan="8">${escapar(mensajeError(error))}</td></tr>`; return; }
+  $('listaCargas').innerHTML = data.map(c => `<tr><td style="white-space:nowrap">${fechaHora(c.cargado_en)}</td><td>${c.almacen_obra_id ? `<span class="etiqueta azul">${escapar(nombreAlm(c.almacen_obra_id))}</span>` : '<span class="vacio">Sin asignar</span>'}</td><td>${escapar(c.archivo || '—')}</td><td>${escapar(c.cargado_nombre || '—')}</td>
     <td>${c.lineas}</td><td>${c.nuevas}</td><td>${c.con_cambio}</td><td>${c.retiradas}</td></tr>`).join('')
-    || '<tr><td colspan="7" style="text-align:center;color:var(--gris2);padding:18px">Todavía no hay cargas.</td></tr>';
+    || '<tr><td colspan="8" style="text-align:center;color:var(--gris2);padding:18px">Todavía no hay cargas.</td></tr>';
 });
 
 /* ═════ Descargar Excel de lo filtrado ═════ */
