@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Equipos en alquiler · JJC</title>
+<link rel="icon" href="/img/logo-jjc.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/estilo.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="/comun.js"></script>
+<style>
+.contenido{max-width:1400px}
+[hidden]{display:none !important}
+.barra-sup{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.barra-sup .acciones{margin:0}
+.cifras{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:16px}
+.cifra{background:var(--papel);border:1px solid var(--linea);border-radius:12px;padding:12px 14px;border-top:3px solid var(--azul);cursor:pointer;text-align:left;font:inherit}
+.cifra:hover{border-color:#2f5bd0}
+.cifra b{display:block;font:600 24px/1.1 'Barlow',sans-serif;color:var(--azul)}
+.cifra span{font-size:12.5px;color:var(--gris2)}
+.cifra.ambar{border-top-color:var(--ambar)}.cifra.ambar b{color:var(--ambar)}
+.cifra.rojo{border-top-color:var(--rojo)}.cifra.rojo b{color:var(--rojo)}
+.cifra.verde{border-top-color:var(--verde)}.cifra.verde b{color:var(--verde)}
+.filtros{display:grid;grid-template-columns:1fr 220px;gap:10px;margin-bottom:8px}
+.filtros input,.filtros select{width:100%;padding:10px 12px;font:400 15px 'Barlow',sans-serif;border:1px solid #b9c6d4;border-radius:10px;background:#fff}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.chips button{border:1px solid var(--linea);background:#fff;border-radius:99px;padding:6px 12px;font:600 13.5px 'Barlow',sans-serif;color:var(--gris);cursor:pointer}
+.chips button.activo{background:var(--azul);border-color:var(--azul);color:#fff}
+.contador{font-size:13.5px;color:var(--gris2);margin:0 0 8px}
+.tabla td,.tabla th{font-size:13.5px;padding:9px 10px}
+.tabla td.desc{min-width:220px}
+.tabla td.nw{white-space:nowrap}
+.tabla tbody tr{cursor:pointer}
+.tabla tbody tr:hover td{background:#f5f8fd}
+.fase{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;font-weight:600;color:var(--azul);background:#e3ebfb;border-radius:6px;padding:2px 6px;white-space:nowrap}
+.docs{display:flex;gap:4px}
+.doc{font:700 11px 'Barlow',sans-serif;border-radius:5px;padding:2px 5px;background:#fbe9e7;color:var(--rojo);white-space:nowrap}
+.doc.ok{background:#e5f4ea;color:var(--verde)}
+.etiqueta.ambar{background:#fdf3dd;color:var(--ambar)}
+.sub2{display:block;font-size:12px;color:var(--gris2)}
+/* modal */
+.modal.grande{width:min(760px,100%)}
+.rejilla2{display:grid;grid-template-columns:1fr 1fr;gap:12px 16px}
+.rejilla2 .ancho{grid-column:1/-1}
+.campo textarea{width:100%;padding:10px 12px;font:400 15px 'Barlow',sans-serif;border:1px solid #b9c6d4;border-radius:9px;min-height:64px;resize:vertical}
+.campo input:disabled,.campo select:disabled,.campo textarea:disabled{background:var(--campo);color:var(--tinta)}
+.tiempo{display:grid;grid-template-columns:90px 1fr;gap:8px}
+.calc{background:var(--campo);border-radius:9px;padding:9px 12px;font-size:14px;color:var(--gris)}
+.calc b{color:var(--azul)}
+.ranura{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;border:1px solid var(--linea);border-radius:10px;padding:10px 12px;margin-bottom:8px}
+.ranura b{font-weight:600;font-size:14.5px}
+.ranura small{display:block;color:var(--gris2);font-size:12.5px}
+.ranura .bts{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.ranura.ok{border-color:#b8dcc6;background:#f6fbf8}
+.ranura.pend{border-color:#f0d9a4;background:#fffaf0}
+.boton-linea{border:1px solid var(--linea);background:#fff;border-radius:7px;padding:5px 10px;font:600 13px 'Barlow',sans-serif;color:var(--azul);cursor:pointer;white-space:nowrap}
+.boton-linea:hover{background:var(--campo)}
+.boton-linea.rojo{color:var(--rojo)}
+h4{font:600 15px 'Barlow',sans-serif;color:var(--azul);margin:18px 0 8px}
+.hist{list-style:none;margin:0;padding:0;max-height:200px;overflow:auto;border:1px solid var(--linea);border-radius:10px}
+.hist li{padding:8px 12px;border-top:1px solid #eef1f5;font-size:13.5px}
+.hist li:first-child{border-top:0}
+.hist small{color:var(--gris2);display:block}
+@media(max-width:700px){
+  .filtros{grid-template-columns:1fr}
+  .rejilla2{grid-template-columns:1fr}
+  .ranura{grid-template-columns:1fr}
+  .ranura .bts{justify-content:flex-start}
+}
+</style>
+</head>
+<body>
+
+<header class="cabecera">
+  <img src="/img/marca-blanca.png" alt="JJC">
+  <div class="titulo"><small>ALMACÉN DE OBRA</small><b>Equipos en alquiler</b></div>
+  <div class="quien"><b id="quienNombre"></b><span id="quienRol"></span></div>
+  <a class="boton-cab" href="/">← Inicio</a>
+</header>
+
+<main class="contenido">
+  <div class="barra-sup">
+    <div><h2>Equipos en alquiler</h2><p class="sub" style="margin:0">Ingreso, tiempo de alquiler, vencimiento y documentos de cada equipo alquilado.</p></div>
+    <div class="acciones">
+      <button class="boton claro" id="btnExportar">⬇️ Descargar Excel</button>
+      <button class="boton" id="btnNuevo" hidden>＋ Registrar alquiler</button>
+    </div>
+  </div>
+
+  <div class="cifras" id="cifras"></div>
+
+  <div class="filtros">
+    <input id="fBuscar" type="search" placeholder="🔍 Buscar código, descripción, proveedor, solicitante o fase">
+    <select id="fFase"><option value="">Todas las fases</option></select>
+  </div>
+  <div class="chips" id="chips">
+    <button data-f="obra" class="activo">En obra</button>
+    <button data-f="porvencer">Por vencer (7 días)</button>
+    <button data-f="vencido">Vencidos</button>
+    <button data-f="devuelto">Devueltos</button>
+    <button data-f="faltan">Faltan documentos</button>
+    <button data-f="todos">Todos</button>
+  </div>
+  <div class="contador" id="contador"></div>
+  <div class="tabla-caja">
+    <table class="tabla">
+      <thead><tr><th>Código</th><th>Ingreso</th><th>Descripción</th><th>Fase / PEP</th><th>Proveedor</th><th>Tiempo</th><th>Vence</th><th>Solicitante</th><th>Documentos</th><th>Estado</th></tr></thead>
+      <tbody id="cuerpo"><tr><td colspan="10" style="padding:30px;text-align:center;color:var(--gris2)">Cargando…</td></tr></tbody>
+    </table>
+  </div>
+</main>
+
+<datalist id="dlFases"></datalist>
+<datalist id="dlProv"></datalist>
+<datalist id="dlSol"></datalist>
+
+<!-- Registrar / ver / editar -->
+<div class="velo" id="veloAlq">
+  <form class="modal grande" id="formAlq" novalidate>
+    <h3 id="aTitulo">Registrar alquiler</h3>
+    <div class="rejilla2">
+      <div class="campo"><label for="aIngreso">1. Fecha de ingreso del equipo</label><input type="date" id="aIngreso" required></div>
+      <div class="campo"><label for="aSalida">Fecha de salida (devolución)</label><input type="date" id="aSalida"><div class="nota">Déjalo vacío mientras el equipo siga en obra.</div></div>
+      <div class="campo ancho"><label for="aDesc">2. Descripción del alquiler</label><input id="aDesc" required placeholder="Grupo electrógeno 50 kW, torre de iluminación…"></div>
+      <div class="campo"><label for="aFase">3. Elemento PEP – Fase de proyecto</label><input id="aFase" list="dlFases" placeholder="P-0174.12.06.26" autocomplete="off"></div>
+      <div class="campo"><label for="aProv">4. Proveedor</label><input id="aProv" list="dlProv" required autocomplete="off"></div>
+      <div class="campo"><label for="aCant">5. Tiempo de alquiler</label>
+        <div class="tiempo"><input type="number" id="aCant" min="1" step="1" required inputmode="numeric">
+          <select id="aUnidad"><option value="dias">días</option><option value="semanas">semanas</option><option value="meses" selected>meses</option></select></div></div>
+      <div class="campo"><label for="aSol">6. Solicitante</label><input id="aSol" list="dlSol" required autocomplete="off"></div>
+      <div class="calc ancho" id="aCalc"></div>
+      <div class="campo ancho"><label for="aObs">Observaciones (opcional)</label><textarea id="aObs"></textarea></div>
+    </div>
+
+    <h4>Documentos</h4>
+    <div id="ranuras"></div>
+    <input type="file" id="archivo" accept="application/pdf,image/jpeg,image/png,image/webp" hidden>
+
+    <div id="bloqueHist" hidden><h4>Historial</h4><ul class="hist" id="aHist"></ul></div>
+    <div class="fallo" id="aFallo"></div>
+    <div class="acciones">
+      <button type="button" class="boton claro" id="aEliminar" hidden style="margin-right:auto;color:var(--rojo)">Eliminar</button>
+      <button type="button" class="boton claro" onclick="cerrarAlq()">Cerrar</button>
+      <button class="boton" id="aGuardar">Guardar</button>
+    </div>
+  </form>
+</div>
+
+<script>
+let yo, editor = false, lista = [], filtro = 'obra', abierto = null, pendientes = {}, tipoSubiendo = null;
+const DOCS = [
+  { k: 'guia_ingreso', n: 'Guía de remisión de ingreso', c: 'GR ING' },
+  { k: 'guia_salida', n: 'Guía de remisión de salida', c: 'GR SAL' },
+  { k: 'requerimiento', n: 'Requerimiento firmado – Marcobre', c: 'RQ' }
+];
+const UNID = { dias: ['día', 'días'], semanas: ['semana', 'semanas'], meses: ['mes', 'meses'] };
+const cerrarAlq = () => $('veloAlq').classList.remove('abierto');
+const hoyISO = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
+const aFecha = s => { if (!s) return null; const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d); };
+const fCorta = s => s ? aFecha(s).toLocaleDateString('es-PE', { day: '2-digit', month: 'short', year: 'numeric' }) : '—';
+const fechaHora = f => f ? new Date(f).toLocaleString('es-PE', { dateStyle: 'medium', timeStyle: 'short' }) : '';
+const dias = (a, b) => Math.round((aFecha(b) - aFecha(a)) / 864e5);
+const tiempoTxt = a => `${a.tiempo_cantidad} ${UNID[a.tiempo_unidad][a.tiempo_cantidad === 1 ? 0 : 1]}`;
+function vencePorTiempo(ing, cant, uni) {
+  if (!ing || !(cant > 0)) return null;
+  const d = aFecha(ing);
+  if (uni === 'dias') d.setDate(d.getDate() + cant);
+  else if (uni === 'semanas') d.setDate(d.getDate() + cant * 7);
+  else { const dia = d.getDate(); d.setMonth(d.getMonth() + cant); if (d.getDate() < dia) d.setDate(0); }
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+function estado(a) {
+  if (a.fecha_salida) return { k: 'devuelto', t: 'Devuelto', c: '' };
+  const r = dias(hoyISO(), a.fecha_vence);
+  if (r < 0) return { k: 'vencido', t: `Vencido hace ${-r} d`, c: 'rojo' };
+  if (r <= 7) return { k: 'porvencer', t: r === 0 ? 'Vence hoy' : `Vence en ${r} d`, c: 'ambar' };
+  return { k: 'obra', t: 'En obra', c: 'verde' };
+}
+const faltan = a => DOCS.filter(d => !a['doc_' + d.k] && !(d.k === 'guia_salida' && !a.fecha_salida));
+
+/* ═════ Datos ═════ */
+async function cargar() {
+  const { data, error } = await sb.from('alquileres').select('*').order('fecha_ingreso', { ascending: false }).order('id', { ascending: false });
+  if (error) { aviso(mensajeError(error), 'error'); return; }
+  lista = data;
+  const unicos = k => [...new Set(lista.map(a => a[k]).filter(Boolean))].sort();
+  const valFase = $('fFase').value;
+  $('fFase').innerHTML = '<option value="">Todas las fases</option>' + unicos('fase').map(f => `<option>${escapar(f)}</option>`).join('');
+  $('fFase').value = valFase;
+  $('dlProv').innerHTML = unicos('proveedor').map(v => `<option value="${escapar(v)}">`).join('');
+  $('dlSol').innerHTML = unicos('solicitante').map(v => `<option value="${escapar(v)}">`).join('');
+  pintar();
+}
+async function cargarFases() {
+  // sugerencias de fases a partir del stock de SAP
+  const fases = new Set(lista.map(a => a.fase).filter(Boolean));
+  for (let desde = 0; ; desde += 1000) {
+    const { data, error } = await sb.from('stock').select('fase').not('fase', 'is', null).range(desde, desde + 999);
+    if (error) break;
+    data.forEach(x => fases.add(x.fase));
+    if (data.length < 1000) break;
+  }
+  $('dlFases').innerHTML = [...fases].sort().map(f => `<option value="${escapar(f)}">`).join('');
+}
+
+function pintar() {
+  const est = lista.map(a => ({ a, e: estado(a) }));
+  const cuenta = k => est.filter(x => x.e.k === k).length;
+  const enObra = est.filter(x => x.e.k !== 'devuelto').length;
+  const sinDocs = lista.filter(a => faltan(a).length).length;
+  $('cifras').innerHTML = `
+    <button class="cifra verde" data-f="obra"><b>${enObra}</b><span>En obra</span></button>
+    <button class="cifra ambar" data-f="porvencer"><b>${cuenta('porvencer')}</b><span>Por vencer (7 días)</span></button>
+    <button class="cifra rojo" data-f="vencido"><b>${cuenta('vencido')}</b><span>Vencidos sin devolver</span></button>
+    <button class="cifra" data-f="devuelto"><b>${cuenta('devuelto')}</b><span>Devueltos</span></button>
+    <button class="cifra ${sinDocs ? 'ambar' : ''}" data-f="faltan"><b>${sinDocs}</b><span>Faltan documentos</span></button>`;
+
+  const q = $('fBuscar').value.trim().toLowerCase(), fase = $('fFase').value;
+  const vista = est.filter(({ a, e }) => {
+    if (filtro === 'obra' && e.k === 'devuelto') return false;
+    if (['porvencer', 'vencido', 'devuelto'].includes(filtro) && e.k !== filtro) return false;
+    if (filtro === 'faltan' && !faltan(a).length) return false;
+    if (fase && a.fase !== fase) return false;
+    if (q && !`${a.codigo} ${a.descripcion} ${a.proveedor} ${a.solicitante} ${a.fase || ''} ${a.observaciones || ''}`.toLowerCase().includes(q)) return false;
+    return true;
+  });
+  $('contador').textContent = `${vista.length} de ${lista.length} alquileres`;
+  $('cuerpo').innerHTML = vista.map(({ a, e }) => {
+    const usado = dias(a.fecha_ingreso, a.fecha_salida || hoyISO());
+    return `<tr data-id="${a.id}">
+      <td class="nw mono"><b>${a.codigo}</b></td>
+      <td class="nw">${fCorta(a.fecha_ingreso)}</td>
+      <td class="desc">${escapar(a.descripcion)}${a.observaciones ? `<span class="sub2">${escapar(a.observaciones)}</span>` : ''}</td>
+      <td>${a.fase ? `<span class="fase">${escapar(a.fase)}</span>` : '<span class="sub2">—</span>'}</td>
+      <td>${escapar(a.proveedor)}</td>
+      <td class="nw">${tiempoTxt(a)}<span class="sub2">${usado} d en obra</span></td>
+      <td class="nw">${fCorta(a.fecha_vence)}${a.fecha_salida ? `<span class="sub2">Salió ${fCorta(a.fecha_salida)}</span>` : ''}</td>
+      <td>${escapar(a.solicitante)}</td>
+      <td><div class="docs">${DOCS.map(d => `<span class="doc ${a['doc_' + d.k] ? 'ok' : ''}" title="${d.n}: ${a['doc_' + d.k] ? 'subido' : 'falta'}">${a['doc_' + d.k] ? '✓' : '✗'} ${d.c}</span>`).join('')}</div></td>
+      <td class="nw"><span class="etiqueta ${e.c}">${e.t}</span></td>
+    </tr>`;
+  }).join('') || `<tr><td colspan="10" style="padding:30px;text-align:center;color:var(--gris2)">${lista.length ? 'Ningún alquiler coincide.' : 'Todavía no hay alquileres registrados.'}</td></tr>`;
+}
+
+function elegirFiltro(f) {
+  filtro = f;
+  $('chips').querySelectorAll('button').forEach(b => b.classList.toggle('activo', b.dataset.f === f));
+  pintar();
+}
+$('chips').addEventListener('click', e => { const b = e.target.closest('button'); if (b) elegirFiltro(b.dataset.f); });
+$('cifras').addEventListener('click', e => { const b = e.target.closest('[data-f]'); if (b) elegirFiltro(b.dataset.f); });
+let espera; $('fBuscar').addEventListener('input', () => { clearTimeout(espera); espera = setTimeout(pintar, 150); });
+$('fFase').addEventListener('change', pintar);
+$('cuerpo').addEventListener('click', e => { const tr = e.target.closest('tr[data-id]'); if (tr) abrir(Number(tr.dataset.id)); });
+
+/* ═════ Formulario ═════ */
+const CAMPOS = ['aIngreso', 'aFase', 'aDesc', 'aProv', 'aCant', 'aUnidad', 'aSol', 'aSalida', 'aObs'];
+function abrir(id) {
+  abierto = id ? lista.find(a => a.id === id) : null;
+  pendientes = {};
+  const a = abierto || { fecha_ingreso: hoyISO(), tiempo_cantidad: 1, tiempo_unidad: 'meses' };
+  $('aTitulo').textContent = abierto ? `${a.codigo} · ${a.descripcion}` : 'Registrar alquiler';
+  $('aIngreso').value = a.fecha_ingreso || ''; $('aFase').value = a.fase || ''; $('aDesc').value = a.descripcion || '';
+  $('aProv').value = a.proveedor || ''; $('aCant').value = a.tiempo_cantidad || ''; $('aUnidad').value = a.tiempo_unidad;
+  $('aSol').value = a.solicitante || ''; $('aSalida').value = a.fecha_salida || ''; $('aObs').value = a.observaciones || '';
+  CAMPOS.forEach(c => $(c).disabled = !editor);
+  $('aGuardar').hidden = !editor;
+  $('aEliminar').hidden = !(abierto && yo.es_admin);
+  $('aFallo').textContent = '';
+  calc(); pintarRanuras();
+  $('bloqueHist').hidden = !abierto;
+  if (abierto) cargarHist();
+  $('veloAlq').classList.add('abierto');
+}
+function calc() {
+  const v = vencePorTiempo($('aIngreso').value, Number($('aCant').value), $('aUnidad').value);
+  if (!v) { $('aCalc').innerHTML = 'Completa la fecha de ingreso y el tiempo para calcular el vencimiento.'; return; }
+  const sal = $('aSalida').value, ref = sal || hoyISO(), usado = dias($('aIngreso').value, ref), resto = dias(hoyISO(), v);
+  $('aCalc').innerHTML = `Vence el <b>${fCorta(v)}</b> · ${sal ? `estuvo <b>${usado} días</b> en obra (salió ${fCorta(sal)})`
+    : `lleva <b>${Math.max(usado, 0)} días</b> en obra · ${resto >= 0 ? `quedan <b>${resto} días</b>` : `<b style="color:var(--rojo)">vencido hace ${-resto} días</b>`}`}`;
+}
+['aIngreso', 'aCant', 'aUnidad', 'aSalida'].forEach(c => $(c).addEventListener('input', calc));
+
+function pintarRanuras() {
+  $('ranuras').innerHTML = DOCS.map(d => {
+    const path = abierto?.['doc_' + d.k], pend = pendientes[d.k];
+    const estadoTxt = pend ? `Listo para subir: ${escapar(pend.name)}` : path ? 'Subido' : 'Falta';
+    return `<div class="ranura ${pend ? 'pend' : path ? 'ok' : ''}">
+      <div><b>${path || pend ? '✅' : '📄'} ${d.n}</b><small>${estadoTxt}</small></div>
+      <div class="bts">
+        ${path ? `<button type="button" class="boton-linea" data-ver="${d.k}">Ver</button>` : ''}
+        ${editor ? `<button type="button" class="boton-linea" data-subir="${d.k}">${path ? 'Reemplazar' : pend ? 'Cambiar' : 'Subir PDF o foto'}</button>` : ''}
+        ${editor && (path || pend) ? `<button type="button" class="boton-linea rojo" data-quitar="${d.k}">Quitar</button>` : ''}
+      </div></div>`;
+  }).join('');
+}
+$('ranuras').addEventListener('click', async e => {
+  const b = e.target.closest('button'); if (!b) return;
+  if (b.dataset.ver) return verDoc(abierto['doc_' + b.dataset.ver]);
+  if (b.dataset.subir) { tipoSubiendo = b.dataset.subir; $('archivo').value = ''; $('archivo').click(); return; }
+  if (b.dataset.quitar) {
+    const k = b.dataset.quitar;
+    if (pendientes[k]) { delete pendientes[k]; pintarRanuras(); return; }
+    if (!confirm('¿Quitar este documento?')) return;
+    const viejo = abierto['doc_' + k];
+    const { data, error } = await sb.rpc('documento_alquiler', { p_id: abierto.id, p_tipo: k, p_path: null });
+    if (error) { $('aFallo').textContent = mensajeError(error); return; }
+    await sb.storage.from('alquiler-docs').remove([viejo]);
+    actualizarLocal(data); pintarRanuras(); cargarHist(); aviso('Documento quitado');
+  }
+});
+$('archivo').addEventListener('change', async () => {
+  const f = $('archivo').files[0]; if (!f || !tipoSubiendo) return;
+  if (f.size > 10 * 1024 * 1024) { aviso('El archivo pasa de 10 MB', 'error'); return; }
+  if (!/^(application\/pdf|image\/(jpeg|png|webp))$/.test(f.type)) { aviso('Solo PDF o fotos (JPG, PNG)', 'error'); return; }
+  if (abierto) { await subirDoc(abierto.id, tipoSubiendo, f); pintarRanuras(); cargarHist(); }
+  else { pendientes[tipoSubiendo] = f; pintarRanuras(); }
+});
+async function subirDoc(id, tipo, f) {
+  const ext = f.type === 'application/pdf' ? 'pdf' : f.type.split('/')[1].replace('jpeg', 'jpg');
+  const path = `alquiler/${id}/${tipo}-${Date.now()}.${ext}`;
+  aviso('Subiendo documento…', 'info');
+  const up = await sb.storage.from('alquiler-docs').upload(path, f, { contentType: f.type });
+  if (up.error) { aviso('No se pudo subir: ' + mensajeError(up.error), 'error'); return false; }
+  const viejo = lista.find(a => a.id === id)?.['doc_' + tipo];
+  const { data, error } = await sb.rpc('documento_alquiler', { p_id: id, p_tipo: tipo, p_path: path });
+  if (error) { await sb.storage.from('alquiler-docs').remove([path]); aviso(mensajeError(error), 'error'); return false; }
+  if (viejo) await sb.storage.from('alquiler-docs').remove([viejo]);
+  actualizarLocal(data); aviso('Documento subido');
+  return true;
+}
+async function verDoc(path) {
+  const w = window.open('', '_blank');
+  const { data, error } = await sb.storage.from('alquiler-docs').createSignedUrl(path, 600);
+  if (error) { w?.close(); aviso(mensajeError(error), 'error'); return; }
+  if (w) w.location.href = data.signedUrl; else location.href = data.signedUrl;
+}
+function actualizarLocal(a) {
+  const i = lista.findIndex(x => x.id === a.id);
+  if (i >= 0) lista[i] = a; else lista.unshift(a);
+  if (abierto && abierto.id === a.id) abierto = a;
+  pintar();
+}
+async function cargarHist() {
+  const { data } = await sb.from('alquileres_historial').select('*').eq('alquiler_id', abierto.id).order('fecha', { ascending: false });
+  $('aHist').innerHTML = (data || []).map(h => `<li><b>${escapar(h.accion)}</b>${h.detalle ? ' · ' + escapar(h.detalle) : ''}<small>${fechaHora(h.fecha)} · ${escapar(h.por_nombre || '')}</small></li>`).join('') || '<li>Sin movimientos.</li>';
+}
+
+$('formAlq').addEventListener('submit', async e => {
+  e.preventDefault();
+  if (!editor) return;
+  const f = $('aFallo'); f.textContent = '';
+  const datos = { fecha_ingreso: $('aIngreso').value, descripcion: $('aDesc').value.trim(), fase: $('aFase').value.trim(),
+    proveedor: $('aProv').value.trim(), tiempo_cantidad: Number($('aCant').value), tiempo_unidad: $('aUnidad').value,
+    solicitante: $('aSol').value.trim(), fecha_salida: $('aSalida').value, observaciones: $('aObs').value.trim() };
+  if (!datos.fecha_ingreso) return f.textContent = 'Falta la fecha de ingreso.';
+  if (datos.descripcion.length < 3) return f.textContent = 'Escribe la descripción del alquiler.';
+  if (datos.proveedor.length < 2) return f.textContent = 'Falta el proveedor.';
+  if (!(datos.tiempo_cantidad >= 1) || !Number.isInteger(datos.tiempo_cantidad)) return f.textContent = 'El tiempo de alquiler debe ser un número entero mayor que 0.';
+  if (datos.solicitante.length < 2) return f.textContent = 'Falta el solicitante.';
+  if (datos.fecha_salida && datos.fecha_salida < datos.fecha_ingreso) return f.textContent = 'La fecha de salida no puede ser antes del ingreso.';
+  $('aGuardar').disabled = true; $('aGuardar').textContent = 'Guardando…';
+  const { data, error } = await sb.rpc('guardar_alquiler', { p_id: abierto?.id ?? null, p_datos: datos });
+  if (error) { $('aGuardar').disabled = false; $('aGuardar').textContent = 'Guardar'; f.textContent = mensajeError(error); return; }
+  const nuevo = !abierto;
+  actualizarLocal(data);
+  for (const [tipo, archivo] of Object.entries(pendientes)) await subirDoc(data.id, tipo, archivo);
+  pendientes = {};
+  $('aGuardar').disabled = false; $('aGuardar').textContent = 'Guardar';
+  cerrarAlq();
+  aviso(nuevo ? `${data.codigo} registrado` : 'Cambios guardados');
+  cargar();
+});
+$('btnNuevo').addEventListener('click', () => abrir(null));
+$('aEliminar').addEventListener('click', async () => {
+  if (!confirm(`¿Eliminar ${abierto.codigo} y sus documentos? No se puede deshacer.`)) return;
+  const { error } = await sb.rpc('eliminar_alquiler', { p_id: abierto.id });
+  if (error) { $('aFallo').textContent = mensajeError(error); return; }
+  lista = lista.filter(a => a.id !== abierto.id); cerrarAlq(); pintar(); aviso('Alquiler eliminado');
+});
+
+/* ═════ Excel ═════ */
+$('btnExportar').addEventListener('click', () => {
+  if (!lista.length) { aviso('No hay alquileres para descargar', 'info'); return; }
+  const filas = lista.map(a => ({
+    'Código': a.codigo, 'Fecha de ingreso': aFecha(a.fecha_ingreso), 'Descripción del alquiler': a.descripcion, 'Elemento PEP / Fase': a.fase || '',
+    'Proveedor': a.proveedor, 'Tiempo de alquiler': tiempoTxt(a), 'Fecha de vencimiento': aFecha(a.fecha_vence), 'Solicitante': a.solicitante,
+    'Fecha de salida': a.fecha_salida ? aFecha(a.fecha_salida) : '', 'Días en obra': dias(a.fecha_ingreso, a.fecha_salida || hoyISO()),
+    'Estado': estado(a).t, 'Guía remisión ingreso': a.doc_guia_ingreso ? 'Sí' : 'No', 'Guía remisión salida': a.doc_guia_salida ? 'Sí' : 'No',
+    'Requerimiento firmado Marcobre': a.doc_requerimiento ? 'Sí' : 'No', 'Observaciones': a.observaciones || '' }));
+  const hoja = XLSX.utils.json_to_sheet(filas, { cellDates: true, dateNF: 'dd/mm/yyyy' });
+  hoja['!cols'] = [10, 13, 40, 18, 24, 14, 14, 22, 13, 10, 18, 12, 12, 14, 30].map(wch => ({ wch }));
+  hoja['!autofilter'] = { ref: hoja['!ref'] };
+  const libro = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(libro, hoja, 'Alquileres');
+  XLSX.writeFile(libro, `Equipos_en_alquiler_${hoyISO()}.xlsx`);
+});
+
+/* ═════ Arranque ═════ */
+(async () => {
+  yo = await exigirSesion();
+  editor = yo.rol === 'almacen' || yo.es_admin;
+  $('quienNombre').textContent = yo.nombre;
+  $('quienRol').textContent = ROLES[yo.rol] + (yo.es_admin ? ' · Administrador' : '');
+  $('btnNuevo').hidden = !editor;
+  await cargar();
+  cargarFases();
+})();
+</script>
+</body>
+</html>
