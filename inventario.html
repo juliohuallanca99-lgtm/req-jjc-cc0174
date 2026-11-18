@@ -40,7 +40,7 @@
 .cifra.mas{border-top-color:var(--verde)}.cifra.mas b{color:var(--verde)}
 .cifra.menos{border-top-color:var(--rojo)}.cifra.menos b{color:var(--rojo)}
 .cifra.pend{border-top-color:var(--ambar)}.cifra.pend b{color:var(--ambar)}
-.herr{position:sticky;top:var(--alto-cab,61px);z-index:6;background:var(--fondo);padding:8px 0 10px;display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end}
+.herr{position:sticky;top:var(--alto-cab,61px);z-index:6;background:var(--fondo);padding:8px 0 10px;display:grid;grid-template-columns:1fr minmax(170px,auto) auto;gap:10px;align-items:end}
 .herr input,.herr select{width:100%;padding:11px 13px;font:400 16px 'Barlow',sans-serif;border:1px solid #b9c6d4;border-radius:10px;background:#fff}
 .herr input:focus,.herr select:focus{outline:none;border-color:#2f5bd0;box-shadow:0 0 0 3px rgba(47,91,208,.16)}
 .chips{display:flex;gap:6px;flex-wrap:wrap;grid-column:1/-1}
@@ -49,7 +49,7 @@
 .contador{font-size:13.5px;color:var(--gris2);margin:2px 0 8px}
 
 .filas{background:var(--papel);border:1px solid var(--linea);border-radius:12px;overflow:hidden}
-.cab,.fila{display:grid;grid-template-columns:96px minmax(200px,1fr) 52px 170px 92px 120px 92px 130px;gap:10px;align-items:center;padding:9px 12px}
+.cab,.fila{display:grid;grid-template-columns:92px minmax(190px,1fr) 128px 48px 160px 86px 116px 86px 124px;gap:10px;align-items:center;padding:9px 12px}
 .cab{background:var(--azul);color:#fff;font:600 12px 'Barlow',sans-serif;letter-spacing:.06em;text-transform:uppercase}
 .cab .n,.fila .n{text-align:right}
 .fila{border-top:1px solid #eef1f5;font-size:14px;transition:background .6s}
@@ -57,6 +57,8 @@
 .fila.flash{background:#fff4c9;transition:none}
 .fila .cod{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px}
 .fila .desc small{display:block;color:var(--gris2);font-size:12px}
+.fase{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;font-weight:600;color:var(--azul);background:#e3ebfb;border-radius:6px;padding:3px 7px;justify-self:start;white-space:nowrap}
+.fase.vacia{background:none;color:#b4bcc6;font-weight:400}
 .fila input{width:100%;padding:8px 10px;font:400 15px 'Barlow',sans-serif;border:1px solid #b9c6d4;border-radius:8px;background:#fff}
 .fila input.fis{text-align:right;font-weight:600;font-size:16px}
 .fila input:focus{outline:none;border-color:#2f5bd0;box-shadow:0 0 0 3px rgba(47,91,208,.16)}
@@ -70,15 +72,15 @@
 .et{display:none;font-size:11px;font-weight:600;color:var(--gris2);text-transform:uppercase;letter-spacing:.05em}
 @media(max-width:900px){
   .cab{display:none}
-  .fila{grid-template-columns:1fr 1fr 1fr;grid-template-areas:"cod cod dif" "desc desc desc" "ubi ubi ubi" "sis fis fis" "quien quien quien";gap:6px 10px;padding:12px 14px}
-  .fila .cod{grid-area:cod}.fila .desc{grid-area:desc}.fila .und{display:none}.fila .ubi{grid-area:ubi}
+  .herr{grid-template-columns:1fr}
+  .fila{grid-template-columns:1fr 1fr 1fr;grid-template-areas:"cod fase dif" "desc desc desc" "ubi ubi ubi" "sis fis fis" "quien quien quien";gap:6px 10px;padding:12px 14px}
+  .fila .cod{grid-area:cod}.fila .fase{grid-area:fase}.fila .desc{grid-area:desc}.fila .und{display:none}.fila .ubi{grid-area:ubi}
   .fila .sis{grid-area:sis}.fila .fisc{grid-area:fis}.fila .dif{grid-area:dif}.fila .quien{grid-area:quien}
   .fila .sis,.fila .fisc{text-align:left}
   .et{display:block}
   .und-m{display:inline;color:var(--gris2);font-size:13px}
   .fila .sis b{font-size:18px}
-  .herr{grid-template-columns:1fr}
-  .herr select{display:none}
+  .herr #fOrden{display:none}
   .chips{flex-wrap:nowrap;overflow-x:auto;padding-bottom:2px}
   .chips button{white-space:nowrap}
   .cifras{grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
@@ -135,8 +137,10 @@
 
     <div class="herr">
       <input id="fBuscar" type="search" placeholder="🔍 Buscar código, descripción, ubicación o usuario" autocomplete="off">
+      <select id="fFase" title="Fase de proyecto"><option value="">Todas las fases</option></select>
       <select id="fOrden" title="Ordenar">
         <option value="ubi">Ordenar por ubicación</option>
+        <option value="fase">Ordenar por fase</option>
         <option value="desc">Ordenar por descripción</option>
         <option value="cod">Ordenar por código</option>
         <option value="rec">Últimos contados</option>
@@ -152,7 +156,7 @@
     </div>
     <div class="contador" id="contador"></div>
     <div class="filas">
-      <div class="cab"><span>Código</span><span>Descripción</span><span>Und</span><span>Ubicación</span><span class="n">Cant. sistema</span><span class="n">Cant. física</span><span class="n">Diferencia</span><span>Contado por</span></div>
+      <div class="cab"><span>Código</span><span>Descripción</span><span>Fase</span><span>Und</span><span>Ubicación</span><span class="n">Cant. sistema</span><span class="n">Cant. física</span><span class="n">Diferencia</span><span>Contado por</span></div>
       <div id="cuerpo"></div>
     </div>
     <button class="boton claro mas-btn" id="btnMas" hidden>Mostrar más</button>
@@ -257,6 +261,9 @@ async function verDetalle(id) {
     const mp = new Map(pr.map(p => [p.stock_id, Number(p.precio) || 0]));
     lineas = ls.map(l => ({ ...l, ...l.stock, stock: undefined, precio: mp.get(l.stock_id) ?? null }));
     porId = new Map(lineas.map(l => [l.id, l]));
+    const fases = [...new Set(lineas.map(l => l.fase || ''))].sort();
+    $('fFase').innerHTML = '<option value="">Todas las fases</option>' +
+      fases.map(f => `<option value="${f ? escapar(f) : '__vacio__'}">${f ? escapar(f) : '(sin fase)'}</option>`).join('');
     pintarCabecera();
     aplicar();
     conectar();
@@ -295,7 +302,7 @@ function pintarCifras() {
 }
 
 function aplicar() {
-  const q = $('fBuscar').value.trim().toLowerCase(), orden = $('fOrden').value;
+  const q = $('fBuscar').value.trim().toLowerCase(), orden = $('fOrden').value, fase = $('fFase').value;
   filtrado = lineas.filter(l => {
     const c = l.cantidad_fisica != null;
     if (filtro === 'pend' && c) return false;
@@ -303,13 +310,15 @@ function aplicar() {
     if (filtro === 'dif' && !(c && Number(l.diferencia) !== 0)) return false;
     if (filtro === 'mas' && !(c && l.diferencia > 0)) return false;
     if (filtro === 'menos' && !(c && l.diferencia < 0)) return false;
-    if (q && !`${l.material} ${l.descripcion} ${l.ubicacion || ''} ${l.usuario || ''} ${l.lote || ''}`.toLowerCase().includes(q)) return false;
+    if (fase && (l.fase || '__vacio__') !== fase) return false;
+    if (q && !`${l.material} ${l.descripcion} ${l.fase || ''} ${l.ubicacion || ''} ${l.usuario || ''} ${l.lote || ''}`.toLowerCase().includes(q)) return false;
     return true;
   });
   const cmp = {
     ubi: (a, b) => (a.ubicacion || '￿').localeCompare(b.ubicacion || '￿') || a.descripcion.localeCompare(b.descripcion),
-    desc: (a, b) => a.descripcion.localeCompare(b.descripcion) || a.material.localeCompare(b.material),
-    cod: (a, b) => a.material.localeCompare(b.material),
+    desc: (a, b) => a.descripcion.localeCompare(b.descripcion) || a.material.localeCompare(b.material) || (a.fase || '').localeCompare(b.fase || ''),
+    cod: (a, b) => a.material.localeCompare(b.material) || (a.fase || '').localeCompare(b.fase || ''),
+    fase: (a, b) => (a.fase || '\uffff').localeCompare(b.fase || '\uffff') || a.descripcion.localeCompare(b.descripcion),
     rec: (a, b) => (b.contado_en || '').localeCompare(a.contado_en || '')
   }[orden];
   filtrado.sort(cmp);
@@ -324,6 +333,7 @@ function htmlFila(l) {
   return `<div class="fila ${c ? 'contada' : ''}" data-id="${l.id}">
     <span class="cod">${escapar(l.material)}</span>
     <span class="desc">${escapar(l.descripcion)}<small>${[l.lote && 'Lote ' + l.lote, l.usuario].filter(Boolean).map(escapar).join(' · ')}</small></span>
+    <span class="fase ${l.fase ? '' : 'vacia'}" title="Fase de proyecto">${l.fase ? escapar(l.fase) : 'Sin fase'}</span>
     <span class="und">${escapar(l.unidad || '')}</span>
     <span class="ubi"><span class="et">Ubicación</span><input class="u" value="${escapar(l.ubicacion || '')}" placeholder="Ubicación" ${dis} autocomplete="off"></span>
     <span class="sis n"><span class="et">Sistema</span><b>${num(l.cantidad_sistema)}</b> <span class="und-m">${escapar(l.unidad || '')}</span></span>
@@ -460,6 +470,7 @@ document.addEventListener('visibilitychange', async () => {
 let espera;
 $('fBuscar').addEventListener('input', () => { clearTimeout(espera); espera = setTimeout(aplicar, 200); });
 $('fOrden').addEventListener('change', aplicar);
+$('fFase').addEventListener('change', aplicar);
 $('chips').addEventListener('click', e => {
   const b = e.target.closest('button'); if (!b) return;
   filtro = b.dataset.f;
