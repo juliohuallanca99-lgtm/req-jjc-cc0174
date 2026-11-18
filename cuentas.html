@@ -91,6 +91,7 @@
         <div style="display:flex;gap:6px"><input id="e_clave" autocomplete="off" style="flex:1" placeholder="Dejar vacío para no cambiar"><button type="button" class="boton claro" onclick="$('e_clave').value=generarClave()">Generar</button></div></div>
       <label class="marcar"><input type="checkbox" id="e_admin"> Administrador del sistema</label>
       <label class="marcar"><input type="checkbox" id="e_activo"> Cuenta activa</label>
+      <label class="marcar"><input type="checkbox" id="e_contar"> Puede contar inventario físico</label>
     </div>
     <div class="fallo" id="falloEditar"></div>
     <div class="acciones">
@@ -159,7 +160,7 @@ async function cargar() {
       <td>${escapar(c.nombre)}${c.id === yo.id ? ' <span class="etiqueta">tú</span>' : ''}</td>
       <td>${escapar(c.correo || '—')}</td>
       <td>${escapar(c.cargo || '—')}</td>
-      <td><span class="etiqueta azul">${escapar(ROLES[c.rol] || c.rol)}</span>${c.es_admin ? ' <span class="etiqueta">Admin</span>' : ''}</td>
+      <td><span class="etiqueta azul">${escapar(ROLES[c.rol] || c.rol)}</span>${c.es_admin ? ' <span class="etiqueta">Admin</span>' : ''}${c.puede_contar && c.rol !== 'almacen' && !c.es_admin ? ' <span class="etiqueta verde">Cuenta inventario</span>' : ''}</td>
       <td>${c.activo ? '<span class="etiqueta verde">Activa</span>' : '<span class="etiqueta rojo">Desactivada</span>'}</td>
       <td>${fecha(c.ultimo_acceso)}</td>
       <td><button class="boton claro" style="padding:6px 12px" onclick="editar('${c.id}')">Editar</button></td>
@@ -192,7 +193,7 @@ function editar(id) {
   editando = cuentas.find(c => c.id === id);
   $('e_usuario').textContent = editando.usuario || '';
   $('e_nombre').value = editando.nombre; $('e_cargo').value = editando.cargo || ''; $('e_correo').value = editando.correo || '';
-  $('e_rol').value = editando.rol; $('e_admin').checked = editando.es_admin; $('e_activo').checked = editando.activo;
+  $('e_rol').value = editando.rol; $('e_admin').checked = editando.es_admin; $('e_activo').checked = editando.activo; $('e_contar').checked = !!editando.puede_contar;
   $('e_clave').value = ''; $('falloEditar').textContent = '';
   $('veloEditar').classList.add('abierto');
 }
@@ -203,7 +204,7 @@ $('formEditar').addEventListener('submit', async e => {
   const { error } = await sb.rpc('editar_cuenta', {
     p_id: editando.id, p_nombre: $('e_nombre').value, p_cargo: $('e_cargo').value, p_rol: $('e_rol').value,
     p_admin: $('e_admin').checked, p_activo: $('e_activo').checked, p_clave_nueva: clave || null,
-    p_correo: $('e_correo').value || null });
+    p_correo: $('e_correo').value || null, p_puede_contar: $('e_contar').checked });
   $('btnEditar').disabled = false;
   if (error) { $('falloEditar').textContent = mensajeError(error); return; }
   $('veloEditar').classList.remove('abierto');

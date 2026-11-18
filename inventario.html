@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Inventario físico · JJC</title>
+<link rel="icon" href="/img/logo-jjc.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/estilo.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="/comun.js"></script>
+<style>
+.contenido{max-width:1300px}
+[hidden]{display:none !important}
+.barra-sup{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.barra-sup .acciones{margin:0}
+.boton.peligro{background:#fff;color:var(--rojo);border:1px solid #e8b4ae}.boton.peligro:hover{background:#fbe9e7}
+
+/* lista de inventarios */
+.invs{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+.inv{background:var(--papel);border:1px solid var(--linea);border-radius:14px;padding:16px 18px;text-decoration:none;color:inherit;display:flex;flex-direction:column;gap:8px;transition:border-color .15s,box-shadow .15s}
+.inv:hover{border-color:#2f5bd0;box-shadow:0 8px 24px -14px rgba(0,31,98,.5)}
+.inv b{font:600 18px 'Barlow',sans-serif;color:var(--azul)}
+.inv small{color:var(--gris2);font-size:13px}
+.progreso{height:9px;background:#e6ebf2;border-radius:99px;overflow:hidden}
+.progreso i{display:block;height:100%;background:var(--verde);border-radius:99px;transition:width .3s}
+
+/* detalle */
+.en-vivo{display:inline-flex;align-items:center;gap:7px;background:#e5f4ea;color:var(--verde);border-radius:99px;padding:4px 12px;font-size:13.5px;font-weight:600}
+.en-vivo::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--verde);animation:late 1.6s infinite}
+.en-vivo.caido{background:#fdf3dd;color:var(--ambar)}.en-vivo.caido::before{background:var(--ambar);animation:none}
+@keyframes late{50%{opacity:.25}}
+.cifras{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin:14px 0}
+.cifra{background:var(--papel);border:1px solid var(--linea);border-radius:12px;padding:12px 14px;border-top:3px solid var(--azul)}
+.cifra b{display:block;font:600 24px/1.1 'Barlow',sans-serif;color:var(--azul)}
+.cifra span{font-size:12.5px;color:var(--gris2)}
+.cifra.mas{border-top-color:var(--verde)}.cifra.mas b{color:var(--verde)}
+.cifra.menos{border-top-color:var(--rojo)}.cifra.menos b{color:var(--rojo)}
+.cifra.pend{border-top-color:var(--ambar)}.cifra.pend b{color:var(--ambar)}
+.herr{position:sticky;top:var(--alto-cab,61px);z-index:6;background:var(--fondo);padding:8px 0 10px;display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end}
+.herr input,.herr select{width:100%;padding:11px 13px;font:400 16px 'Barlow',sans-serif;border:1px solid #b9c6d4;border-radius:10px;background:#fff}
+.herr input:focus,.herr select:focus{outline:none;border-color:#2f5bd0;box-shadow:0 0 0 3px rgba(47,91,208,.16)}
+.chips{display:flex;gap:6px;flex-wrap:wrap;grid-column:1/-1}
+.chips button{border:1px solid var(--linea);background:#fff;border-radius:99px;padding:6px 12px;font:600 13.5px 'Barlow',sans-serif;color:var(--gris);cursor:pointer}
+.chips button.activo{background:var(--azul);border-color:var(--azul);color:#fff}
+.contador{font-size:13.5px;color:var(--gris2);margin:2px 0 8px}
+
+.filas{background:var(--papel);border:1px solid var(--linea);border-radius:12px;overflow:hidden}
+.cab,.fila{display:grid;grid-template-columns:96px minmax(200px,1fr) 52px 170px 92px 120px 92px 130px;gap:10px;align-items:center;padding:9px 12px}
+.cab{background:var(--azul);color:#fff;font:600 12px 'Barlow',sans-serif;letter-spacing:.06em;text-transform:uppercase}
+.cab .n,.fila .n{text-align:right}
+.fila{border-top:1px solid #eef1f5;font-size:14px;transition:background .6s}
+.fila.contada{background:#f6fbf8}
+.fila.flash{background:#fff4c9;transition:none}
+.fila .cod{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px}
+.fila .desc small{display:block;color:var(--gris2);font-size:12px}
+.fila input{width:100%;padding:8px 10px;font:400 15px 'Barlow',sans-serif;border:1px solid #b9c6d4;border-radius:8px;background:#fff}
+.fila input.fis{text-align:right;font-weight:600;font-size:16px}
+.fila input:focus{outline:none;border-color:#2f5bd0;box-shadow:0 0 0 3px rgba(47,91,208,.16)}
+.fila input:disabled{background:var(--campo);color:var(--tinta)}
+.fila input.guardando{border-color:var(--ambar)}
+.fila input.error{border-color:var(--rojo);background:#fff6f5}
+.dif{font-weight:700;text-align:right;font-variant-numeric:tabular-nums}
+.dif.mas{color:var(--verde)}.dif.menos{color:var(--rojo)}.dif.cero{color:var(--gris2)}
+.quien{font-size:12.5px;color:var(--gris2);line-height:1.3}
+.und-m{display:none}
+.et{display:none;font-size:11px;font-weight:600;color:var(--gris2);text-transform:uppercase;letter-spacing:.05em}
+@media(max-width:900px){
+  .cab{display:none}
+  .fila{grid-template-columns:1fr 1fr 1fr;grid-template-areas:"cod cod dif" "desc desc desc" "ubi ubi ubi" "sis fis fis" "quien quien quien";gap:6px 10px;padding:12px 14px}
+  .fila .cod{grid-area:cod}.fila .desc{grid-area:desc}.fila .und{display:none}.fila .ubi{grid-area:ubi}
+  .fila .sis{grid-area:sis}.fila .fisc{grid-area:fis}.fila .dif{grid-area:dif}.fila .quien{grid-area:quien}
+  .fila .sis,.fila .fisc{text-align:left}
+  .et{display:block}
+  .und-m{display:inline;color:var(--gris2);font-size:13px}
+  .fila .sis b{font-size:18px}
+  .herr{grid-template-columns:1fr}
+  .herr select{display:none}
+  .chips{flex-wrap:nowrap;overflow-x:auto;padding-bottom:2px}
+  .chips button{white-space:nowrap}
+  .cifras{grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
+  .cifra{padding:8px 10px}.cifra b{font-size:18px}.cifra span{font-size:11.5px}
+  .barra-sup{gap:8px;margin-bottom:10px}.barra-sup h2{font-size:20px}.barra-sup .sub{font-size:13px}
+  .barra-sup .acciones{width:100%;justify-content:flex-start}
+  .en-vivo{font-size:12.5px}
+}
+.mas-btn{display:block;margin:14px auto 0}
+.modal .campo{margin-bottom:12px}
+.solo-lectura{background:#fdf3dd;border:1px solid #f0d9a4;border-left:4px solid var(--ambar);border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:14px}
+</style>
+</head>
+<body>
+
+<header class="cabecera">
+  <img src="/img/marca-blanca.png" alt="JJC">
+  <div class="titulo"><small>ALMACÉN DE OBRA</small><b>Inventario físico</b></div>
+  <div class="quien"><b id="quienNombre"></b><span id="quienRol"></span></div>
+  <a class="boton-cab" id="btnVolver" href="/">← Inicio</a>
+</header>
+
+<main class="contenido">
+
+  <!-- ═════ Lista ═════ -->
+  <section id="vLista" hidden>
+    <div class="barra-sup">
+      <div><h2>Inventarios</h2><p class="sub" style="margin:0">Cada inventario congela la cantidad del sistema de un almacén de obra; el equipo cuenta en físico a la vez.</p></div>
+      <div class="acciones">
+        <a class="boton claro" href="/stock" style="text-decoration:none">📦 Stock</a>
+        <button class="boton" id="btnNuevo" hidden>＋ Nuevo inventario</button>
+      </div>
+    </div>
+    <div class="invs" id="listaInv"><p class="sub">Cargando…</p></div>
+  </section>
+
+  <!-- ═════ Detalle ═════ -->
+  <section id="vDetalle" hidden>
+    <div class="barra-sup">
+      <div>
+        <h2 id="dNombre"></h2>
+        <p class="sub" style="margin:0" id="dSub"></p>
+      </div>
+      <div class="acciones">
+        <span class="en-vivo" id="enVivo">Conectando…</span>
+        <button class="boton claro" id="btnExportar">⬇️ Excel</button>
+        <button class="boton peligro" id="btnEliminar" hidden>Eliminar</button>
+        <button class="boton" id="btnCerrar" hidden>Cerrar inventario</button>
+      </div>
+    </div>
+    <div class="solo-lectura" id="avisoLectura" hidden></div>
+    <div class="progreso" style="height:12px"><i id="barra" style="width:0"></i></div>
+    <div class="cifras" id="cifras"></div>
+
+    <div class="herr">
+      <input id="fBuscar" type="search" placeholder="🔍 Buscar código, descripción, ubicación o usuario" autocomplete="off">
+      <select id="fOrden" title="Ordenar">
+        <option value="ubi">Ordenar por ubicación</option>
+        <option value="desc">Ordenar por descripción</option>
+        <option value="cod">Ordenar por código</option>
+        <option value="rec">Últimos contados</option>
+      </select>
+      <div class="chips" id="chips">
+        <button data-f="pend" class="activo">Pendientes</button>
+        <button data-f="cont">Contados</button>
+        <button data-f="dif">Con diferencia</button>
+        <button data-f="mas">Sobrantes (+)</button>
+        <button data-f="menos">Faltantes (−)</button>
+        <button data-f="todos">Todos</button>
+      </div>
+    </div>
+    <div class="contador" id="contador"></div>
+    <div class="filas">
+      <div class="cab"><span>Código</span><span>Descripción</span><span>Und</span><span>Ubicación</span><span class="n">Cant. sistema</span><span class="n">Cant. física</span><span class="n">Diferencia</span><span>Contado por</span></div>
+      <div id="cuerpo"></div>
+    </div>
+    <button class="boton claro mas-btn" id="btnMas" hidden>Mostrar más</button>
+  </section>
+</main>
+
+<!-- Nuevo inventario -->
+<div class="velo" id="veloNuevo">
+  <form class="modal" id="formNuevo">
+    <h3>Nuevo inventario</h3>
+    <div class="campo"><label for="nAlm">Almacén de obra</label><select id="nAlm" required></select></div>
+    <div class="campo"><label for="nNombre">Nombre</label><input id="nNombre" required maxlength="120"></div>
+    <p class="sub" style="margin:0">Se toma la cantidad actual del sistema de cada línea con stock de ese almacén. Si después cargas SAP, este inventario no cambia.</p>
+    <div class="fallo" id="nFallo"></div>
+    <div class="acciones">
+      <button type="button" class="boton claro" onclick="cerrarModal('veloNuevo')">Cancelar</button>
+      <button class="boton" id="nCrear">Abrir inventario</button>
+    </div>
+  </form>
+</div>
+
+<script>
+let yo, editor = false, contador = false, precios = false;
+let almacenes = [], inv = null, lineas = [], porId = new Map(), filtrado = [], mostrar = 120, filtro = 'pend', canal = null;
+
+const num = (n, d = 3) => n == null ? '' : Number(n).toLocaleString('es-PE', { maximumFractionDigits: d });
+const soles = n => 'S/ ' + Number(n || 0).toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const fechaHora = f => f ? new Date(f).toLocaleString('es-PE', { dateStyle: 'medium', timeStyle: 'short' }) : '—';
+const hora = f => f ? new Date(f).toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' }) : '';
+const cerrarModal = id => $(id).classList.remove('abierto');
+const nombreAlm = id => almacenes.find(a => a.id === id)?.nombre || '—';
+const signo = d => d > 0 ? '+' + num(d) : d < 0 ? '−' + num(-d) : '0';
+const claseDif = d => d == null ? '' : d > 0 ? 'mas' : d < 0 ? 'menos' : 'cero';
+
+async function traerTodo(consulta) {
+  const filas = [];
+  for (let desde = 0; ; desde += 1000) {
+    const { data, error } = await consulta().range(desde, desde + 999);
+    if (error) throw error;
+    filas.push(...data);
+    if (data.length < 1000) return filas;
+  }
+}
+
+/* ═════════════ Lista de inventarios ═════════════ */
+async function verLista() {
+  $('vLista').hidden = false; $('vDetalle').hidden = true;
+  $('btnVolver').href = '/'; $('btnVolver').textContent = '← Inicio';
+  $('btnNuevo').hidden = !editor;
+  const { data, error } = await sb.from('inventarios').select('*').order('creado_en', { ascending: false }).limit(40);
+  if (error) { $('listaInv').innerHTML = `<p class="fallo">${escapar(mensajeError(error))}</p>`; return; }
+  if (!data.length) { $('listaInv').innerHTML = `<p class="sub">Todavía no hay inventarios.${editor ? ' Abre el primero con «Nuevo inventario».' : ''}</p>`; return; }
+  const cuentas = await Promise.all(data.map(i => sb.from('inventario_lineas').select('id', { count: 'exact', head: true })
+    .eq('inventario_id', i.id).not('cantidad_fisica', 'is', null)));
+  $('listaInv').innerHTML = data.map((i, k) => {
+    const c = cuentas[k].count || 0, pct = i.lineas ? Math.round(c * 100 / i.lineas) : 0;
+    return `<a class="inv" href="?id=${i.id}">
+      <div style="display:flex;justify-content:space-between;gap:8px;align-items:start">
+        <b>${escapar(i.nombre)}</b>
+        ${i.estado === 'abierto' ? '<span class="etiqueta verde">Abierto</span>' : '<span class="etiqueta">Cerrado</span>'}
+      </div>
+      <span class="etiqueta azul" style="align-self:start">${escapar(nombreAlm(i.almacen_obra_id))}</span>
+      <div class="progreso"><i style="width:${pct}%"></i></div>
+      <small>${num(c, 0)} de ${num(i.lineas, 0)} líneas contadas (${pct}%)</small>
+      <small>Abierto ${fechaHora(i.creado_en)} por ${escapar(i.creado_nombre || '—')}${i.cerrado_en ? `<br>Cerrado ${fechaHora(i.cerrado_en)} por ${escapar(i.cerrado_nombre || '—')}` : ''}</small>
+    </a>`;
+  }).join('');
+}
+
+$('btnNuevo').addEventListener('click', () => {
+  $('nAlm').innerHTML = '<option value="">— Elige —</option>' + almacenes.filter(a => a.activo).map(a => `<option value="${a.id}">${escapar(a.nombre)}</option>`).join('');
+  const f = new Date();
+  $('nNombre').value = `Inventario ${f.toLocaleDateString('es-PE', { day: '2-digit', month: 'short', year: 'numeric' })}`;
+  $('nFallo').textContent = '';
+  $('veloNuevo').classList.add('abierto');
+});
+$('formNuevo').addEventListener('submit', async e => {
+  e.preventDefault();
+  if (!$('nAlm').value) { $('nFallo').textContent = 'Elige el almacén de obra.'; return; }
+  $('nCrear').disabled = true; $('nCrear').textContent = 'Abriendo…';
+  const { data, error } = await sb.rpc('abrir_inventario', { p_almacen: Number($('nAlm').value), p_nombre: $('nNombre').value });
+  $('nCrear').disabled = false; $('nCrear').textContent = 'Abrir inventario';
+  if (error) { $('nFallo').textContent = mensajeError(error); return; }
+  location.href = '?id=' + data.id;
+});
+
+/* ═════════════ Detalle / conteo ═════════════ */
+async function verDetalle(id) {
+  $('vLista').hidden = true; $('vDetalle').hidden = false;
+  $('btnVolver').href = '/inventario'; $('btnVolver').textContent = '← Inventarios';
+  try {
+    const r = await sb.from('inventarios').select('*').eq('id', id).maybeSingle();
+    if (r.error) throw r.error;
+    if (!r.data) { aviso('Inventario no encontrado', 'error'); location.replace('/inventario'); return; }
+    inv = r.data;
+    const [ls, pr] = await Promise.all([
+      traerTodo(() => sb.from('inventario_lineas')
+        .select('id,stock_id,cantidad_sistema,cantidad_fisica,diferencia,ubicacion,contado_nombre,contado_en,veces,stock(material,descripcion,unidad,lote,fase,usuario)')
+        .eq('inventario_id', id).order('id')),
+      precios ? traerTodo(() => sb.from('stock_precios').select('stock_id,precio')) : Promise.resolve([])
+    ]);
+    const mp = new Map(pr.map(p => [p.stock_id, Number(p.precio) || 0]));
+    lineas = ls.map(l => ({ ...l, ...l.stock, stock: undefined, precio: mp.get(l.stock_id) ?? null }));
+    porId = new Map(lineas.map(l => [l.id, l]));
+    pintarCabecera();
+    aplicar();
+    conectar();
+  } catch (e) { aviso(mensajeError(e), 'error'); }
+}
+
+function abierto() { return inv && inv.estado === 'abierto'; }
+function puedeContar() { return contador && abierto(); }
+
+function pintarCabecera() {
+  $('dNombre').textContent = inv.nombre;
+  $('dSub').textContent = `${nombreAlm(inv.almacen_obra_id)} · abierto ${fechaHora(inv.creado_en)} por ${inv.creado_nombre || '—'}` +
+    (inv.cerrado_en ? ` · cerrado ${fechaHora(inv.cerrado_en)} por ${inv.cerrado_nombre || '—'}` : '');
+  $('btnCerrar').hidden = !(editor && abierto());
+  $('btnEliminar').hidden = !(editor && abierto() && !lineas.some(l => l.veces > 0));
+  const av = $('avisoLectura');
+  if (!abierto()) { av.hidden = false; av.textContent = 'Este inventario está cerrado. Solo se puede consultar y descargar.'; }
+  else if (!contador) { av.hidden = false; av.textContent = 'Puedes ver el avance en vivo. Para contar, pide al administrador el permiso «Puede contar inventario físico».'; }
+  else av.hidden = true;
+}
+
+function pintarCifras() {
+  const cont = lineas.filter(l => l.cantidad_fisica != null);
+  const mas = cont.filter(l => l.diferencia > 0), menos = cont.filter(l => l.diferencia < 0);
+  const pct = lineas.length ? cont.length * 100 / lineas.length : 0;
+  $('barra').style.width = pct.toFixed(1) + '%';
+  const val = arr => arr.reduce((s, l) => s + Number(l.diferencia) * (l.precio || 0), 0);
+  $('cifras').innerHTML = `
+    <div class="cifra"><b>${num(cont.length, 0)} / ${num(lineas.length, 0)}</b><span>Contadas (${pct.toFixed(0)}%)</span></div>
+    <div class="cifra pend"><b>${num(lineas.length - cont.length, 0)}</b><span>Pendientes</span></div>
+    <div class="cifra"><b>${num(cont.length - mas.length - menos.length, 0)}</b><span>Exactas</span></div>
+    <div class="cifra mas"><b>${num(mas.length, 0)}</b><span>Sobrantes (+)</span></div>
+    <div class="cifra menos"><b>${num(menos.length, 0)}</b><span>Faltantes (−)</span></div>
+    ${precios ? `<div class="cifra mas"><b>${soles(val(mas))}</b><span>Valor sobrante</span></div>
+                 <div class="cifra menos"><b>${soles(-val(menos))}</b><span>Valor faltante</span></div>` : ''}`;
+}
+
+function aplicar() {
+  const q = $('fBuscar').value.trim().toLowerCase(), orden = $('fOrden').value;
+  filtrado = lineas.filter(l => {
+    const c = l.cantidad_fisica != null;
+    if (filtro === 'pend' && c) return false;
+    if (filtro === 'cont' && !c) return false;
+    if (filtro === 'dif' && !(c && Number(l.diferencia) !== 0)) return false;
+    if (filtro === 'mas' && !(c && l.diferencia > 0)) return false;
+    if (filtro === 'menos' && !(c && l.diferencia < 0)) return false;
+    if (q && !`${l.material} ${l.descripcion} ${l.ubicacion || ''} ${l.usuario || ''} ${l.lote || ''}`.toLowerCase().includes(q)) return false;
+    return true;
+  });
+  const cmp = {
+    ubi: (a, b) => (a.ubicacion || '￿').localeCompare(b.ubicacion || '￿') || a.descripcion.localeCompare(b.descripcion),
+    desc: (a, b) => a.descripcion.localeCompare(b.descripcion) || a.material.localeCompare(b.material),
+    cod: (a, b) => a.material.localeCompare(b.material),
+    rec: (a, b) => (b.contado_en || '').localeCompare(a.contado_en || '')
+  }[orden];
+  filtrado.sort(cmp);
+  mostrar = 120;
+  pintarCifras();
+  pintarFilas();
+}
+
+function htmlFila(l) {
+  const dis = puedeContar() ? '' : 'disabled';
+  const c = l.cantidad_fisica != null;
+  return `<div class="fila ${c ? 'contada' : ''}" data-id="${l.id}">
+    <span class="cod">${escapar(l.material)}</span>
+    <span class="desc">${escapar(l.descripcion)}<small>${[l.lote && 'Lote ' + l.lote, l.usuario].filter(Boolean).map(escapar).join(' · ')}</small></span>
+    <span class="und">${escapar(l.unidad || '')}</span>
+    <span class="ubi"><span class="et">Ubicación</span><input class="u" value="${escapar(l.ubicacion || '')}" placeholder="Ubicación" ${dis} autocomplete="off"></span>
+    <span class="sis n"><span class="et">Sistema</span><b>${num(l.cantidad_sistema)}</b> <span class="und-m">${escapar(l.unidad || '')}</span></span>
+    <span class="fisc n"><span class="et">Físico</span><input class="fis" inputmode="decimal" value="${c ? num(l.cantidad_fisica).replace(/,/g, '') : ''}" placeholder="—" ${dis} autocomplete="off"></span>
+    <span class="dif ${claseDif(c ? Number(l.diferencia) : null)}">${c ? signo(Number(l.diferencia)) : ''}</span>
+    <span class="quien">${c ? `${escapar(l.contado_nombre || '')}<br>${hora(l.contado_en)}${l.veces > 1 ? ` · ${l.veces} veces` : ''}` : ''}</span>
+  </div>`;
+}
+
+function pintarFilas() {
+  const vista = filtrado.slice(0, mostrar);
+  $('cuerpo').innerHTML = vista.map(htmlFila).join('') ||
+    `<div style="padding:30px;text-align:center;color:var(--gris2)">${filtro === 'pend' && !$('fBuscar').value ? '🎉 No quedan líneas pendientes.' : 'Ninguna línea coincide.'}</div>`;
+  $('contador').textContent = `Mostrando ${num(vista.length, 0)} de ${num(filtrado.length, 0)} líneas`;
+  $('btnMas').hidden = filtrado.length <= mostrar;
+}
+
+/* Actualiza una fila en pantalla sin perder lo que alguien está escribiendo */
+function refrescarFila(l, destello) {
+  const el = $('cuerpo').querySelector(`.fila[data-id="${l.id}"]`);
+  if (!el) return;
+  const activo = el.contains(document.activeElement) ? document.activeElement : null;
+  if (activo) {
+    // solo actualiza lo que no se está editando
+    const tmp = document.createElement('div'); tmp.innerHTML = htmlFila(l);
+    const nueva = tmp.firstElementChild;
+    for (const sel of ['.dif', '.quien', '.sis']) el.querySelector(sel).replaceWith(nueva.querySelector(sel));
+    el.className = nueva.className;
+    if (!activo.classList.contains('u')) el.querySelector('.u').value = l.ubicacion || '';
+    if (!activo.classList.contains('fis')) el.querySelector('.fis').value = nueva.querySelector('.fis').value;
+  } else {
+    el.outerHTML = htmlFila(l);
+  }
+  if (destello) {
+    const e2 = $('cuerpo').querySelector(`.fila[data-id="${l.id}"]`);
+    e2.classList.add('flash'); setTimeout(() => e2.classList.remove('flash'), 900);
+  }
+}
+
+/* ── Guardar un conteo ── */
+const leerNum = t => { t = String(t).trim().replace(/\s/g, ''); if (t === '') return null; t = t.replace(',', '.'); const n = Number(t); return isFinite(n) && n >= 0 ? n : NaN; };
+async function guardar(fila) {
+  const l = porId.get(Number(fila.dataset.id));
+  const iFis = fila.querySelector('.fis'), iUbi = fila.querySelector('.u');
+  const cant = leerNum(iFis.value), ubi = iUbi.value.trim();
+  if (Number.isNaN(cant)) { iFis.classList.add('error'); aviso('Cantidad no válida', 'error'); return; }
+  const cambioCant = cant !== (l.cantidad_fisica == null ? null : Number(l.cantidad_fisica));
+  const cambioUbi = ubi && ubi !== (l.ubicacion || '');
+  if (!cambioCant && !cambioUbi) return;
+  // ubicación sola, sin cantidad todavía: se guarda junto con la cantidad actual
+  iFis.classList.remove('error'); iFis.classList.add('guardando'); iUbi.classList.add('guardando');
+  const { data, error } = await sb.rpc('registrar_conteo', { p_linea: l.id, p_cantidad: cant, p_ubicacion: ubi || null });
+  iFis.classList.remove('guardando'); iUbi.classList.remove('guardando');
+  if (error) { iFis.classList.add('error'); aviso(mensajeError(error), 'error'); return; }
+  Object.assign(l, { cantidad_fisica: data.cantidad_fisica, diferencia: data.diferencia, ubicacion: data.ubicacion,
+    contado_nombre: data.contado_nombre, contado_en: data.contado_en, veces: data.veces });
+  refrescarFila(l, false);
+  pintarCifras();
+}
+$('cuerpo').addEventListener('change', e => {
+  const fila = e.target.closest('.fila'); if (!fila || !puedeContar()) return;
+  // Ubicación escrita antes de contar: se guarda junto con la cantidad;
+  // si la persona sale de la fila sin contar, se guarda sola.
+  if (e.target.classList.contains('u') && !fila.querySelector('.fis').value.trim()) {
+    setTimeout(() => { if (!fila.contains(document.activeElement)) guardar(fila); }, 250);
+    return;
+  }
+  guardar(fila);
+});
+$('cuerpo').addEventListener('focusout', e => {
+  const fila = e.target.closest('.fila'); if (!fila || !puedeContar()) return;
+  setTimeout(() => {
+    if (fila.isConnected && !fila.contains(document.activeElement) && !fila.querySelector('.fis').value.trim()) {
+      const l = porId.get(Number(fila.dataset.id)), u = fila.querySelector('.u').value.trim();
+      if (u && u !== (l.ubicacion || '')) guardar(fila);
+    }
+  }, 300);
+});
+$('cuerpo').addEventListener('keydown', e => {
+  if (e.key !== 'Enter' || !e.target.matches('input')) return;
+  e.preventDefault();
+  const fila = e.target.closest('.fila');
+  if (e.target.classList.contains('u')) { fila.querySelector('.fis').focus(); fila.querySelector('.fis').select(); return; }
+  // Enter en cantidad: guarda y pasa a la siguiente línea
+  e.target.blur();
+  const sig = fila.nextElementSibling?.querySelector('.fis');
+  if (sig) { sig.focus(); sig.select(); }
+});
+$('cuerpo').addEventListener('focusin', e => { if (e.target.matches('input')) e.target.select?.(); });
+
+/* ── Tiempo real ── */
+function conectar() {
+  if (canal) sb.removeChannel(canal);
+  canal = sb.channel('inventario-' + inv.id, { config: { presence: { key: yo.id } } });
+  canal
+    .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'inventario_lineas', filter: 'inventario_id=eq.' + inv.id }, ({ new: n }) => {
+      const l = porId.get(n.id); if (!l) return;
+      const deOtro = n.contado_en !== l.contado_en || n.ubicacion !== l.ubicacion || String(n.cantidad_fisica) !== String(l.cantidad_fisica);
+      Object.assign(l, { cantidad_fisica: n.cantidad_fisica, diferencia: n.diferencia, ubicacion: n.ubicacion,
+        contado_nombre: n.contado_nombre, contado_en: n.contado_en, veces: n.veces });
+      if (deOtro) { refrescarFila(l, true); pintarCifras(); }
+    })
+    .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'inventarios', filter: 'id=eq.' + inv.id }, ({ new: n }) => {
+      const cerro = inv.estado === 'abierto' && n.estado === 'cerrado';
+      inv = n; pintarCabecera();
+      if (cerro) { aviso(`${n.cerrado_nombre || 'Almacén'} cerró el inventario`, 'info'); pintarFilas(); }
+    })
+    .on('presence', { event: 'sync' }, pintarPresencia)
+    .subscribe(async estado => {
+      if (estado === 'SUBSCRIBED') { await canal.track({ nombre: yo.nombre.split(' ').slice(0, 2).join(' ') }); pintarPresencia(); }
+      else if (estado === 'CHANNEL_ERROR' || estado === 'TIMED_OUT' || estado === 'CLOSED') {
+        $('enVivo').className = 'en-vivo caido'; $('enVivo').textContent = 'Sin conexión en vivo — reconectando…';
+      }
+    });
+}
+function pintarPresencia() {
+  const est = canal.presenceState();
+  const nombres = [...new Set(Object.values(est).map(v => v[0]?.nombre).filter(Boolean))];
+  $('enVivo').className = 'en-vivo';
+  $('enVivo').textContent = nombres.length > 1 ? `En vivo · ${nombres.length} personas: ${nombres.join(', ')}` : 'En vivo';
+  $('enVivo').title = nombres.join('\n');
+}
+// al volver a la pestaña (celular bloqueado), trae lo que cambió mientras tanto
+document.addEventListener('visibilitychange', async () => {
+  if (document.visibilityState !== 'visible' || !inv) return;
+  const desde = new Date(Date.now() - 10 * 60 * 1000).toISOString();
+  const { data } = await sb.from('inventario_lineas').select('id,cantidad_fisica,diferencia,ubicacion,contado_nombre,contado_en,veces')
+    .eq('inventario_id', inv.id).gte('contado_en', desde);
+  (data || []).forEach(n => { const l = porId.get(n.id); if (l && n.contado_en !== l.contado_en) { Object.assign(l, n); refrescarFila(l, true); } });
+  pintarCifras();
+});
+
+/* ── Filtros ── */
+let espera;
+$('fBuscar').addEventListener('input', () => { clearTimeout(espera); espera = setTimeout(aplicar, 200); });
+$('fOrden').addEventListener('change', aplicar);
+$('chips').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  filtro = b.dataset.f;
+  $('chips').querySelectorAll('button').forEach(x => x.classList.toggle('activo', x === b));
+  aplicar();
+});
+$('btnMas').addEventListener('click', () => { mostrar += 200; pintarFilas(); });
+
+/* ── Cerrar / eliminar ── */
+$('btnCerrar').addEventListener('click', async () => {
+  const pend = lineas.filter(l => l.cantidad_fisica == null).length;
+  if (!confirm(`¿Cerrar «${inv.nombre}»?${pend ? `\n\nQuedan ${pend} líneas sin contar.` : ''}\n\nYa nadie podrá modificar los conteos.`)) return;
+  const { data, error } = await sb.rpc('cerrar_inventario', { p_id: inv.id });
+  if (error) { aviso(mensajeError(error), 'error'); return; }
+  inv = data; pintarCabecera(); pintarFilas(); aviso('Inventario cerrado');
+});
+$('btnEliminar').addEventListener('click', async () => {
+  if (!confirm(`¿Eliminar «${inv.nombre}»? Todavía no tiene conteos.`)) return;
+  const { error } = await sb.rpc('eliminar_inventario', { p_id: inv.id });
+  if (error) { aviso(mensajeError(error), 'error'); return; }
+  location.href = '/inventario';
+});
+
+/* ── Excel ── */
+$('btnExportar').addEventListener('click', () => {
+  const orden = [...lineas].sort((a, b) => (a.ubicacion || '￿').localeCompare(b.ubicacion || '￿') || a.descripcion.localeCompare(b.descripcion));
+  const filas = orden.map(l => {
+    const c = l.cantidad_fisica != null;
+    const f = { 'Material': l.material, 'Descripción': l.descripcion, 'Unidad': l.unidad || '', 'Lote': l.lote || '', 'Fase': l.fase || '',
+      'Usuario': l.usuario || '', 'Ubicación': l.ubicacion || '', 'Cant. sistema': Number(l.cantidad_sistema),
+      'Cant. física': c ? Number(l.cantidad_fisica) : '', 'Diferencia': c ? Number(l.diferencia) : '',
+      'Resultado': !c ? 'Pendiente' : l.diferencia > 0 ? 'Sobrante' : l.diferencia < 0 ? 'Faltante' : 'Exacto',
+      'Contado por': l.contado_nombre || '', 'Fecha conteo': l.contado_en ? new Date(l.contado_en).toLocaleString('es-PE') : '' };
+    if (precios) { f['Precio (S/)'] = l.precio ?? ''; f['Valor diferencia (S/)'] = c && l.precio != null ? +(Number(l.diferencia) * l.precio).toFixed(2) : ''; }
+    return f;
+  });
+  const hoja = XLSX.utils.json_to_sheet(filas);
+  hoja['!cols'] = [11, 44, 7, 11, 18, 18, 18, 12, 12, 11, 11, 22, 18, 11, 15].map(wch => ({ wch }));
+  hoja['!autofilter'] = { ref: hoja['!ref'] };
+  const libro = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(libro, hoja, 'Inventario');
+  XLSX.writeFile(libro, `${inv.nombre.replace(/[\\/:*?"<>|]/g, '-')} - ${nombreAlm(inv.almacen_obra_id).replace(/[\\/:*?"<>|]/g, '-')}.xlsx`);
+});
+
+/* La barra de búsqueda queda pegada justo debajo de la cabecera */
+const ajustarCab = () => document.documentElement.style.setProperty('--alto-cab', document.querySelector('.cabecera').offsetHeight + 'px');
+new ResizeObserver(ajustarCab).observe(document.querySelector('.cabecera')); ajustarCab();
+
+/* ═════ Arranque ═════ */
+(async () => {
+  yo = await exigirSesion();
+  editor = yo.rol === 'almacen' || yo.es_admin;
+  contador = editor || yo.puede_contar;
+  precios = editor || ['gerencia_jjc', 'gerencia_marcobre'].includes(yo.rol);
+  $('quienNombre').textContent = yo.nombre;
+  $('quienRol').textContent = ROLES[yo.rol] + (yo.es_admin ? ' · Administrador' : '');
+  const a = await sb.from('almacenes_obra').select('*').order('nombre');
+  almacenes = a.data || [];
+  const id = Number(new URLSearchParams(location.search).get('id'));
+  if (id) verDetalle(id); else verLista();
+})();
+</script>
+</body>
+</html>
