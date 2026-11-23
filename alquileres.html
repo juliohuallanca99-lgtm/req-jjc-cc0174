@@ -37,7 +37,7 @@
 .tabla tbody tr{cursor:pointer}
 .tabla tbody tr:hover td{background:#f5f8fd}
 .fase{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;font-weight:600;color:var(--azul);background:#e3ebfb;border-radius:6px;padding:2px 6px;white-space:nowrap}
-.docs{display:flex;gap:4px}
+.docs{display:flex;gap:4px;flex-wrap:wrap;max-width:150px}
 .doc{font:700 11px 'Barlow',sans-serif;border-radius:5px;padding:2px 5px;background:#fbe9e7;color:var(--rojo);white-space:nowrap}
 .doc.ok{background:#e5f4ea;color:var(--verde)}
 .etiqueta.ambar{background:#fdf3dd;color:var(--ambar)}
@@ -65,7 +65,33 @@ h4{font:600 15px 'Barlow',sans-serif;color:var(--azul);margin:18px 0 8px}
 .hist li{padding:8px 12px;border-top:1px solid #eef1f5;font-size:13.5px}
 .hist li:first-child{border-top:0}
 .hist small{color:var(--gris2);display:block}
+/* alerta */
+.alerta{background:#fff4e5;border:1px solid #f3c98b;border-left:5px solid var(--ambar);border-radius:12px;padding:12px 16px;margin-bottom:14px}
+.alerta.roja{background:#fdeeec;border-color:#efb7b0;border-left-color:var(--rojo)}
+.alerta b.t{display:block;font-size:15.5px;color:var(--tinta);margin-bottom:6px}
+.alerta ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:4px}
+.alerta li{font-size:14px;cursor:pointer;padding:3px 0}
+.alerta li:hover{text-decoration:underline}
+.alerta li .etiqueta{margin-right:6px}
+.sit{font-size:13px;white-space:nowrap}
+.sit b{font-weight:600}
+.doc.neutro{background:#eef1f5;color:var(--gris2)}
+/* fotos */
+.fotos{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.foto{position:relative;aspect-ratio:4/3;border-radius:10px;overflow:hidden;background:var(--campo);border:1px dashed #b9c6d4;display:grid;place-items:center;color:var(--gris2);font-size:12.5px;text-align:center}
+.foto img{width:100%;height:100%;object-fit:cover;cursor:zoom-in;display:block}
+.foto.llena{border-style:solid;border-color:var(--linea)}
+.foto .x{position:absolute;top:5px;right:5px;width:26px;height:26px;border-radius:50%;border:0;background:rgba(0,0,0,.6);color:#fff;font-size:15px;line-height:1;cursor:pointer}
+.foto .pend{position:absolute;left:5px;bottom:5px;background:var(--ambar);color:#fff;font-size:11px;font-weight:600;padding:2px 6px;border-radius:5px}
+.fotos-bts{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.miniat{display:flex;gap:3px}
+.miniat img{width:34px;height:26px;object-fit:cover;border-radius:4px;display:block}
+.visor{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:80;display:none;align-items:center;justify-content:center;padding:16px}
+.visor.abierto{display:flex}
+.visor img{max-width:100%;max-height:100%;border-radius:8px}
+.visor button{position:absolute;top:14px;right:14px;background:#fff;border:0;border-radius:8px;padding:8px 14px;font:600 15px 'Barlow',sans-serif;cursor:pointer}
 @media(max-width:700px){
+  .fotos{grid-template-columns:repeat(2,1fr)}
   .filtros{grid-template-columns:1fr}
   .rejilla2{grid-template-columns:1fr}
   .ranura{grid-template-columns:1fr}
@@ -91,6 +117,7 @@ h4{font:600 15px 'Barlow',sans-serif;color:var(--azul);margin:18px 0 8px}
     </div>
   </div>
 
+  <div class="alerta" id="alerta" hidden></div>
   <div class="cifras" id="cifras"></div>
 
   <div class="filtros">
@@ -99,7 +126,7 @@ h4{font:600 15px 'Barlow',sans-serif;color:var(--azul);margin:18px 0 8px}
   </div>
   <div class="chips" id="chips">
     <button data-f="obra" class="activo">En obra</button>
-    <button data-f="porvencer">Por vencer (7 días)</button>
+    <button data-f="porvencer">Por vencer</button>
     <button data-f="vencido">Vencidos</button>
     <button data-f="devuelto">Devueltos</button>
     <button data-f="faltan">Faltan documentos</button>
@@ -108,8 +135,8 @@ h4{font:600 15px 'Barlow',sans-serif;color:var(--azul);margin:18px 0 8px}
   <div class="contador" id="contador"></div>
   <div class="tabla-caja">
     <table class="tabla">
-      <thead><tr><th>Código</th><th>Ingreso</th><th>Descripción</th><th>Fase / PEP</th><th>Proveedor</th><th>Tiempo</th><th>Vence</th><th>Solicitante</th><th>Documentos</th><th>Estado</th></tr></thead>
-      <tbody id="cuerpo"><tr><td colspan="10" style="padding:30px;text-align:center;color:var(--gris2)">Cargando…</td></tr></tbody>
+      <thead><tr><th>Código</th><th>Ingreso</th><th>Descripción</th><th>Fase / PEP</th><th>Proveedor</th><th>Tiempo</th><th>Vence</th><th>Solicitante</th><th>Situación</th><th>Documentos</th><th>Estado</th></tr></thead>
+      <tbody id="cuerpo"><tr><td colspan="11" style="padding:30px;text-align:center;color:var(--gris2)">Cargando…</td></tr></tbody>
     </table>
   </div>
 </main>
@@ -117,6 +144,8 @@ h4{font:600 15px 'Barlow',sans-serif;color:var(--azul);margin:18px 0 8px}
 <datalist id="dlFases"></datalist>
 <datalist id="dlProv"></datalist>
 <datalist id="dlSol"></datalist>
+<datalist id="dlAsig"></datalist>
+<div class="visor" id="visor"><button type="button" onclick="this.parentElement.classList.remove('abierto')">✕ Cerrar</button><img id="visorImg" alt=""></div>
 
 <!-- Registrar / ver / editar -->
 <div class="velo" id="veloAlq">
@@ -124,7 +153,8 @@ h4{font:600 15px 'Barlow',sans-serif;color:var(--azul);margin:18px 0 8px}
     <h3 id="aTitulo">Registrar alquiler</h3>
     <div class="rejilla2">
       <div class="campo"><label for="aIngreso">1. Fecha de ingreso del equipo</label><input type="date" id="aIngreso" required></div>
-      <div class="campo"><label for="aSalida">Fecha de salida (devolución)</label><input type="date" id="aSalida"><div class="nota">Déjalo vacío mientras el equipo siga en obra.</div></div>
+      <div class="campo"><label for="aAviso">Avisarme antes de que venza</label>
+        <div class="tiempo"><input type="number" id="aAviso" min="1" max="60" step="1" value="7" inputmode="numeric"><select disabled><option>días antes</option></select></div></div>
       <div class="campo ancho"><label for="aDesc">2. Descripción del alquiler</label><input id="aDesc" required placeholder="Grupo electrógeno 50 kW, torre de iluminación…"></div>
       <div class="campo"><label for="aFase">3. Elemento PEP – Fase de proyecto</label><input id="aFase" list="dlFases" placeholder="P-0174.12.06.26" autocomplete="off"></div>
       <div class="campo"><label for="aProv">4. Proveedor</label><input id="aProv" list="dlProv" required autocomplete="off"></div>
@@ -132,9 +162,22 @@ h4{font:600 15px 'Barlow',sans-serif;color:var(--azul);margin:18px 0 8px}
         <div class="tiempo"><input type="number" id="aCant" min="1" step="1" required inputmode="numeric">
           <select id="aUnidad"><option value="dias">días</option><option value="semanas">semanas</option><option value="meses" selected>meses</option></select></div></div>
       <div class="campo"><label for="aSol">6. Solicitante</label><input id="aSol" list="dlSol" required autocomplete="off"></div>
+      <div class="campo"><label for="aSit">Situación del equipo</label>
+        <select id="aSit"><option value="almacen">En almacén</option><option value="asignado">Asignado a…</option><option value="devuelto">Devuelto al proveedor</option></select></div>
+      <div class="campo" id="cAsig" hidden><label for="aAsig">Asignado a (personal a cargo)</label><input id="aAsig" list="dlAsig" autocomplete="off" placeholder="Nombre de quien lo tiene"></div>
+      <div class="campo" id="cSalida" hidden><label for="aSalida">Fecha de salida (devolución)</label><input type="date" id="aSalida"></div>
       <div class="calc ancho" id="aCalc"></div>
       <div class="campo ancho"><label for="aObs">Observaciones (opcional)</label><textarea id="aObs"></textarea></div>
     </div>
+
+    <h4>Fotos del equipo <span class="sub2" style="display:inline;font-weight:400" id="fotosCuenta"></span></h4>
+    <div class="fotos" id="fotos"></div>
+    <div class="fotos-bts" id="fotosBts">
+      <button type="button" class="boton-linea" id="btnCamara">📷 Tomar foto</button>
+      <button type="button" class="boton-linea" id="btnGaleria">🖼️ Subir desde archivo</button>
+    </div>
+    <input type="file" id="inCamara" accept="image/*" capture="environment" hidden>
+    <input type="file" id="inGaleria" accept="image/*" multiple hidden>
 
     <h4>Documentos</h4>
     <div id="ranuras"></div>
@@ -152,6 +195,8 @@ h4{font:600 15px 'Barlow',sans-serif;color:var(--azul);margin:18px 0 8px}
 
 <script>
 let yo, editor = false, lista = [], filtro = 'obra', abierto = null, pendientes = {}, tipoSubiendo = null;
+let fotos = new Map(), fotosPend = [], urls = new Map();
+const SIT = { almacen: 'En almacén', asignado: 'Asignado', devuelto: 'Devuelto' };
 const DOCS = [
   { k: 'guia_ingreso', n: 'Guía de remisión de ingreso', c: 'GR ING' },
   { k: 'guia_salida', n: 'Guía de remisión de salida', c: 'GR SAL' },
@@ -174,24 +219,31 @@ function vencePorTiempo(ing, cant, uni) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 function estado(a) {
-  if (a.fecha_salida) return { k: 'devuelto', t: 'Devuelto', c: '' };
+  if (a.situacion === 'devuelto') return { k: 'devuelto', t: 'Devuelto', c: '' };
   const r = dias(hoyISO(), a.fecha_vence);
   if (r < 0) return { k: 'vencido', t: `Vencido hace ${-r} d`, c: 'rojo' };
-  if (r <= 7) return { k: 'porvencer', t: r === 0 ? 'Vence hoy' : `Vence en ${r} d`, c: 'ambar' };
+  if (r <= (a.aviso_dias ?? 7)) return { k: 'porvencer', t: r === 0 ? 'Vence hoy' : `Vence en ${r} d`, c: 'ambar' };
   return { k: 'obra', t: 'En obra', c: 'verde' };
 }
-const faltan = a => DOCS.filter(d => !a['doc_' + d.k] && !(d.k === 'guia_salida' && !a.fecha_salida));
+// la guía de salida solo se exige cuando el equipo se devuelve
+const exigible = (a, k) => k !== 'guia_salida' || a.situacion === 'devuelto';
+const faltan = a => DOCS.filter(d => !a['doc_' + d.k] && exigible(a, d.k));
+const sitTxt = a => a.situacion === 'asignado' ? `Asignado a <b>${escapar(a.asignado_a)}</b>` : SIT[a.situacion] || '';
 
 /* ═════ Datos ═════ */
 async function cargar() {
   const { data, error } = await sb.from('alquileres').select('*').order('fecha_ingreso', { ascending: false }).order('id', { ascending: false });
   if (error) { aviso(mensajeError(error), 'error'); return; }
   lista = data;
+  const fr = await sb.from('alquiler_fotos').select('*').order('id');
+  fotos = new Map();
+  (fr.data || []).forEach(f => { if (!fotos.has(f.alquiler_id)) fotos.set(f.alquiler_id, []); fotos.get(f.alquiler_id).push(f); });
   const unicos = k => [...new Set(lista.map(a => a[k]).filter(Boolean))].sort();
   const valFase = $('fFase').value;
   $('fFase').innerHTML = '<option value="">Todas las fases</option>' + unicos('fase').map(f => `<option>${escapar(f)}</option>`).join('');
   $('fFase').value = valFase;
   $('dlProv').innerHTML = unicos('proveedor').map(v => `<option value="${escapar(v)}">`).join('');
+  $('dlAsig').innerHTML = unicos('asignado_a').map(v => `<option value="${escapar(v)}">`).join('');
   $('dlSol').innerHTML = unicos('solicitante').map(v => `<option value="${escapar(v)}">`).join('');
   pintar();
 }
@@ -214,18 +266,28 @@ function pintar() {
   const sinDocs = lista.filter(a => faltan(a).length).length;
   $('cifras').innerHTML = `
     <button class="cifra verde" data-f="obra"><b>${enObra}</b><span>En obra</span></button>
-    <button class="cifra ambar" data-f="porvencer"><b>${cuenta('porvencer')}</b><span>Por vencer (7 días)</span></button>
+    <button class="cifra ambar" data-f="porvencer"><b>${cuenta('porvencer')}</b><span>Por vencer</span></button>
     <button class="cifra rojo" data-f="vencido"><b>${cuenta('vencido')}</b><span>Vencidos sin devolver</span></button>
     <button class="cifra" data-f="devuelto"><b>${cuenta('devuelto')}</b><span>Devueltos</span></button>
     <button class="cifra ${sinDocs ? 'ambar' : ''}" data-f="faltan"><b>${sinDocs}</b><span>Faltan documentos</span></button>`;
 
+  const avisos = est.filter(x => x.e.k === 'vencido' || x.e.k === 'porvencer')
+    .sort((x, y) => x.a.fecha_vence.localeCompare(y.a.fecha_vence));
+  const al = $('alerta');
+  al.hidden = !avisos.length;
+  if (avisos.length) {
+    const nv = avisos.filter(x => x.e.k === 'vencido').length;
+    al.className = 'alerta' + (nv ? ' roja' : '');
+    al.innerHTML = `<b class="t">⚠️ ${avisos.length === 1 ? '1 equipo necesita atención' : avisos.length + ' equipos necesitan atención'}: pide la ampliación o coordina la devolución</b>
+      <ul>${avisos.map(({ a, e }) => `<li data-id="${a.id}"><span class="etiqueta ${e.c}">${e.t}</span><b>${a.codigo}</b> · ${escapar(a.descripcion)} · ${escapar(a.proveedor)} · vence ${fCorta(a.fecha_vence)}${a.situacion === 'asignado' ? ` · a cargo de ${escapar(a.asignado_a)}` : ''}</li>`).join('')}</ul>`;
+  }
   const q = $('fBuscar').value.trim().toLowerCase(), fase = $('fFase').value;
   const vista = est.filter(({ a, e }) => {
     if (filtro === 'obra' && e.k === 'devuelto') return false;
     if (['porvencer', 'vencido', 'devuelto'].includes(filtro) && e.k !== filtro) return false;
     if (filtro === 'faltan' && !faltan(a).length) return false;
     if (fase && a.fase !== fase) return false;
-    if (q && !`${a.codigo} ${a.descripcion} ${a.proveedor} ${a.solicitante} ${a.fase || ''} ${a.observaciones || ''}`.toLowerCase().includes(q)) return false;
+    if (q && !`${a.codigo} ${a.descripcion} ${a.proveedor} ${a.solicitante} ${a.asignado_a || ''} ${a.fase || ''} ${a.observaciones || ''}`.toLowerCase().includes(q)) return false;
     return true;
   });
   $('contador').textContent = `${vista.length} de ${lista.length} alquileres`;
@@ -240,10 +302,13 @@ function pintar() {
       <td class="nw">${tiempoTxt(a)}<span class="sub2">${usado} d en obra</span></td>
       <td class="nw">${fCorta(a.fecha_vence)}${a.fecha_salida ? `<span class="sub2">Salió ${fCorta(a.fecha_salida)}</span>` : ''}</td>
       <td>${escapar(a.solicitante)}</td>
-      <td><div class="docs">${DOCS.map(d => `<span class="doc ${a['doc_' + d.k] ? 'ok' : ''}" title="${d.n}: ${a['doc_' + d.k] ? 'subido' : 'falta'}">${a['doc_' + d.k] ? '✓' : '✗'} ${d.c}</span>`).join('')}</div></td>
+      <td class="sit">${sitTxt(a)}</td>
+      <td><div class="docs">${DOCS.map(d => { const ok = a['doc_' + d.k], ex = exigible(a, d.k);
+        return `<span class="doc ${ok ? 'ok' : ex ? '' : 'neutro'}" title="${d.n}: ${ok ? 'subido' : ex ? 'falta' : 'se sube cuando el equipo se devuelve'}">${ok ? '✓' : ex ? '✗' : '–'} ${d.c}</span>`; }).join('')}
+        <span class="doc ${(fotos.get(a.id) || []).length ? 'ok' : 'neutro'}" title="Fotos del equipo">📷 ${(fotos.get(a.id) || []).length}/4</span></div></td>
       <td class="nw"><span class="etiqueta ${e.c}">${e.t}</span></td>
     </tr>`;
-  }).join('') || `<tr><td colspan="10" style="padding:30px;text-align:center;color:var(--gris2)">${lista.length ? 'Ningún alquiler coincide.' : 'Todavía no hay alquileres registrados.'}</td></tr>`;
+  }).join('') || `<tr><td colspan="11" style="padding:30px;text-align:center;color:var(--gris2)">${lista.length ? 'Ningún alquiler coincide.' : 'Todavía no hay alquileres registrados.'}</td></tr>`;
 }
 
 function elegirFiltro(f) {
@@ -255,23 +320,27 @@ $('chips').addEventListener('click', e => { const b = e.target.closest('button')
 $('cifras').addEventListener('click', e => { const b = e.target.closest('[data-f]'); if (b) elegirFiltro(b.dataset.f); });
 let espera; $('fBuscar').addEventListener('input', () => { clearTimeout(espera); espera = setTimeout(pintar, 150); });
 $('fFase').addEventListener('change', pintar);
+$('alerta').addEventListener('click', e => { const li = e.target.closest('li[data-id]'); if (li) abrir(Number(li.dataset.id)); });
 $('cuerpo').addEventListener('click', e => { const tr = e.target.closest('tr[data-id]'); if (tr) abrir(Number(tr.dataset.id)); });
 
 /* ═════ Formulario ═════ */
-const CAMPOS = ['aIngreso', 'aFase', 'aDesc', 'aProv', 'aCant', 'aUnidad', 'aSol', 'aSalida', 'aObs'];
+const CAMPOS = ['aIngreso', 'aFase', 'aDesc', 'aProv', 'aCant', 'aUnidad', 'aSol', 'aSalida', 'aObs', 'aSit', 'aAsig', 'aAviso'];
 function abrir(id) {
   abierto = id ? lista.find(a => a.id === id) : null;
-  pendientes = {};
-  const a = abierto || { fecha_ingreso: hoyISO(), tiempo_cantidad: 1, tiempo_unidad: 'meses' };
+  pendientes = {}; fotosPend = [];
+  const a = abierto || { fecha_ingreso: hoyISO(), tiempo_cantidad: 1, tiempo_unidad: 'meses', situacion: 'almacen', aviso_dias: 7 };
   $('aTitulo').textContent = abierto ? `${a.codigo} · ${a.descripcion}` : 'Registrar alquiler';
   $('aIngreso').value = a.fecha_ingreso || ''; $('aFase').value = a.fase || ''; $('aDesc').value = a.descripcion || '';
   $('aProv').value = a.proveedor || ''; $('aCant').value = a.tiempo_cantidad || ''; $('aUnidad').value = a.tiempo_unidad;
   $('aSol').value = a.solicitante || ''; $('aSalida').value = a.fecha_salida || ''; $('aObs').value = a.observaciones || '';
+  $('aSit').value = a.situacion || 'almacen'; $('aAsig').value = a.asignado_a || ''; $('aAviso').value = a.aviso_dias ?? 7;
+  verSituacion();
   CAMPOS.forEach(c => $(c).disabled = !editor);
   $('aGuardar').hidden = !editor;
   $('aEliminar').hidden = !(abierto && yo.es_admin);
   $('aFallo').textContent = '';
-  calc(); pintarRanuras();
+  calc(); pintarRanuras(); pintarFotos();
+  $('fotosBts').hidden = !editor;
   $('bloqueHist').hidden = !abierto;
   if (abierto) cargarHist();
   $('veloAlq').classList.add('abierto');
@@ -279,16 +348,98 @@ function abrir(id) {
 function calc() {
   const v = vencePorTiempo($('aIngreso').value, Number($('aCant').value), $('aUnidad').value);
   if (!v) { $('aCalc').innerHTML = 'Completa la fecha de ingreso y el tiempo para calcular el vencimiento.'; return; }
-  const sal = $('aSalida').value, ref = sal || hoyISO(), usado = dias($('aIngreso').value, ref), resto = dias(hoyISO(), v);
+  const sal = $('aSit').value === 'devuelto' ? $('aSalida').value : '', ref = sal || hoyISO(), usado = dias($('aIngreso').value, ref), resto = dias(hoyISO(), v);
   $('aCalc').innerHTML = `Vence el <b>${fCorta(v)}</b> · ${sal ? `estuvo <b>${usado} días</b> en obra (salió ${fCorta(sal)})`
     : `lleva <b>${Math.max(usado, 0)} días</b> en obra · ${resto >= 0 ? `quedan <b>${resto} días</b>` : `<b style="color:var(--rojo)">vencido hace ${-resto} días</b>`}`}`;
 }
 ['aIngreso', 'aCant', 'aUnidad', 'aSalida'].forEach(c => $(c).addEventListener('input', calc));
+function verSituacion() {
+  const s = $('aSit').value;
+  $('cAsig').hidden = s !== 'asignado';
+  $('cSalida').hidden = s !== 'devuelto';
+  if (s === 'devuelto' && !$('aSalida').value && editor) $('aSalida').value = hoyISO();
+  calc(); pintarRanuras();
+}
+$('aSit').addEventListener('change', () => { verSituacion(); if ($('aSit').value === 'asignado') $('aAsig').focus(); });
+
+/* ── Fotos (hasta 4) ── */
+async function comprimir(f) {
+  // reduce la foto a máx. 1600 px en JPG para que suba rápido desde obra
+  const img = await createImageBitmap(f).catch(() => null);
+  if (!img) return f;
+  const k = Math.min(1, 1600 / Math.max(img.width, img.height));
+  const c = document.createElement('canvas'); c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+  c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+  const b = await new Promise(r => c.toBlob(r, 'image/jpeg', 0.82));
+  return b ? new File([b], 'foto.jpg', { type: 'image/jpeg' }) : f;
+}
+async function firmarUrls(lst) {
+  const faltan = lst.map(f => f.path).filter(p => !urls.has(p));
+  if (faltan.length) {
+    const { data } = await sb.storage.from('alquiler-docs').createSignedUrls(faltan, 3600);
+    (data || []).forEach(d => d.signedUrl && urls.set(d.path, d.signedUrl));
+  }
+}
+async function pintarFotos() {
+  const guardadas = abierto ? (fotos.get(abierto.id) || []) : [];
+  await firmarUrls(guardadas);
+  const celdas = [
+    ...guardadas.map(f => `<div class="foto llena"><img src="${escapar(urls.get(f.path) || '')}" data-grande="${escapar(urls.get(f.path) || '')}" alt="Foto del equipo" title="${escapar(f.subido_nombre || '')} · ${fechaHora(f.fecha)}">${editor ? `<button type="button" class="x" data-quitar-foto="${f.id}" title="Quitar">×</button>` : ''}</div>`),
+    ...fotosPend.map((f, i) => `<div class="foto llena"><img src="${f.url}" data-grande="${f.url}" alt=""><span class="pend">Se sube al guardar</span><button type="button" class="x" data-quitar-pend="${i}">×</button></div>`)
+  ];
+  const n = celdas.length;
+  while (celdas.length < 4) celdas.push(`<div class="foto">${editor ? 'Foto ' + (celdas.length + 1) : 'Sin foto'}</div>`);
+  $('fotos').innerHTML = celdas.join('');
+  $('fotosCuenta').textContent = `(${n} de 4)`;
+  $('btnCamara').disabled = $('btnGaleria').disabled = n >= 4;
+}
+$('btnCamara').addEventListener('click', () => { $('inCamara').value = ''; $('inCamara').click(); });
+$('btnGaleria').addEventListener('click', () => { $('inGaleria').value = ''; $('inGaleria').click(); });
+async function agregarFotos(lista_) {
+  const ya = (abierto ? (fotos.get(abierto.id) || []).length : 0) + fotosPend.length;
+  let libres = 4 - ya;
+  const archivos = [...lista_].filter(f => f.type.startsWith('image/'));
+  if (archivos.length > libres) aviso(`Solo caben ${libres} foto${libres === 1 ? '' : 's'} más`, 'info');
+  for (const f of archivos.slice(0, libres)) {
+    const c = await comprimir(f);
+    if (abierto) await subirFoto(abierto.id, c);
+    else fotosPend.push({ file: c, url: URL.createObjectURL(c) });
+  }
+  pintarFotos();
+  if (abierto) cargarHist();
+}
+$('inCamara').addEventListener('change', () => agregarFotos($('inCamara').files));
+$('inGaleria').addEventListener('change', () => agregarFotos($('inGaleria').files));
+async function subirFoto(id, f) {
+  const path = `alquiler/${id}/foto-${Date.now()}-${Math.random().toString(36).slice(2, 6)}.jpg`;
+  const up = await sb.storage.from('alquiler-docs').upload(path, f, { contentType: 'image/jpeg' });
+  if (up.error) { aviso('No se pudo subir la foto: ' + mensajeError(up.error), 'error'); return; }
+  const { data, error } = await sb.rpc('foto_alquiler', { p_id: id, p_path: path });
+  if (error) { await sb.storage.from('alquiler-docs').remove([path]); aviso(mensajeError(error), 'error'); return; }
+  fotos.set(id, data); pintar(); aviso('Foto agregada');
+}
+$('fotos').addEventListener('click', async e => {
+  const img = e.target.closest('img[data-grande]');
+  if (img && !e.target.closest('.x')) { $('visorImg').src = img.dataset.grande; $('visor').classList.add('abierto'); return; }
+  const qp = e.target.closest('[data-quitar-pend]');
+  if (qp) { fotosPend.splice(Number(qp.dataset.quitarPend), 1); pintarFotos(); return; }
+  const qf = e.target.closest('[data-quitar-foto]');
+  if (qf) {
+    if (!confirm('¿Quitar esta foto?')) return;
+    const f = (fotos.get(abierto.id) || []).find(x => x.id === Number(qf.dataset.quitarFoto));
+    const { data, error } = await sb.rpc('foto_alquiler', { p_id: abierto.id, p_path: null, p_quitar: f.id });
+    if (error) { aviso(mensajeError(error), 'error'); return; }
+    await sb.storage.from('alquiler-docs').remove([f.path]);
+    fotos.set(abierto.id, data); pintar(); pintarFotos(); cargarHist(); aviso('Foto quitada');
+  }
+});
+$('visor').addEventListener('click', e => { if (e.target.id === 'visor') $('visor').classList.remove('abierto'); });
 
 function pintarRanuras() {
   $('ranuras').innerHTML = DOCS.map(d => {
     const path = abierto?.['doc_' + d.k], pend = pendientes[d.k];
-    const estadoTxt = pend ? `Listo para subir: ${escapar(pend.name)}` : path ? 'Subido' : 'Falta';
+    const espera = !path && !pend && d.k === 'guia_salida' && $('aSit').value !== 'devuelto';
+    const estadoTxt = pend ? `Listo para subir: ${escapar(pend.name)}` : path ? 'Subido' : espera ? 'Se sube cuando el equipo se devuelve al proveedor' : 'Falta';
     return `<div class="ranura ${pend ? 'pend' : path ? 'ok' : ''}">
       <div><b>${path || pend ? '✅' : '📄'} ${d.n}</b><small>${estadoTxt}</small></div>
       <div class="bts">
@@ -356,12 +507,16 @@ $('formAlq').addEventListener('submit', async e => {
   const f = $('aFallo'); f.textContent = '';
   const datos = { fecha_ingreso: $('aIngreso').value, descripcion: $('aDesc').value.trim(), fase: $('aFase').value.trim(),
     proveedor: $('aProv').value.trim(), tiempo_cantidad: Number($('aCant').value), tiempo_unidad: $('aUnidad').value,
-    solicitante: $('aSol').value.trim(), fecha_salida: $('aSalida').value, observaciones: $('aObs').value.trim() };
+    solicitante: $('aSol').value.trim(), fecha_salida: $('aSit').value === 'devuelto' ? $('aSalida').value : '', observaciones: $('aObs').value.trim(),
+    situacion: $('aSit').value, asignado_a: $('aSit').value === 'asignado' ? $('aAsig').value.trim() : '', aviso_dias: Number($('aAviso').value) || 7 };
   if (!datos.fecha_ingreso) return f.textContent = 'Falta la fecha de ingreso.';
   if (datos.descripcion.length < 3) return f.textContent = 'Escribe la descripción del alquiler.';
   if (datos.proveedor.length < 2) return f.textContent = 'Falta el proveedor.';
   if (!(datos.tiempo_cantidad >= 1) || !Number.isInteger(datos.tiempo_cantidad)) return f.textContent = 'El tiempo de alquiler debe ser un número entero mayor que 0.';
   if (datos.solicitante.length < 2) return f.textContent = 'Falta el solicitante.';
+  if (datos.situacion === 'asignado' && datos.asignado_a.length < 2) return f.textContent = 'Escribe a quién está asignado el equipo.';
+  if (datos.situacion === 'devuelto' && !datos.fecha_salida) return f.textContent = 'Pon la fecha de salida del equipo.';
+  if (!(datos.aviso_dias >= 1 && datos.aviso_dias <= 60)) return f.textContent = 'El aviso debe ser entre 1 y 60 días antes.';
   if (datos.fecha_salida && datos.fecha_salida < datos.fecha_ingreso) return f.textContent = 'La fecha de salida no puede ser antes del ingreso.';
   $('aGuardar').disabled = true; $('aGuardar').textContent = 'Guardando…';
   const { data, error } = await sb.rpc('guardar_alquiler', { p_id: abierto?.id ?? null, p_datos: datos });
@@ -369,7 +524,8 @@ $('formAlq').addEventListener('submit', async e => {
   const nuevo = !abierto;
   actualizarLocal(data);
   for (const [tipo, archivo] of Object.entries(pendientes)) await subirDoc(data.id, tipo, archivo);
-  pendientes = {};
+  for (const fp of fotosPend) await subirFoto(data.id, fp.file);
+  pendientes = {}; fotosPend = [];
   $('aGuardar').disabled = false; $('aGuardar').textContent = 'Guardar';
   cerrarAlq();
   aviso(nuevo ? `${data.codigo} registrado` : 'Cambios guardados');
@@ -378,7 +534,9 @@ $('formAlq').addEventListener('submit', async e => {
 $('btnNuevo').addEventListener('click', () => abrir(null));
 $('aEliminar').addEventListener('click', async () => {
   if (!confirm(`¿Eliminar ${abierto.codigo} y sus documentos? No se puede deshacer.`)) return;
+  const archivos = [...DOCS.map(d => abierto['doc_' + d.k]), ...(fotos.get(abierto.id) || []).map(f => f.path)].filter(Boolean);
   const { error } = await sb.rpc('eliminar_alquiler', { p_id: abierto.id });
+  if (!error && archivos.length) await sb.storage.from('alquiler-docs').remove(archivos);
   if (error) { $('aFallo').textContent = mensajeError(error); return; }
   lista = lista.filter(a => a.id !== abierto.id); cerrarAlq(); pintar(); aviso('Alquiler eliminado');
 });
@@ -389,11 +547,12 @@ $('btnExportar').addEventListener('click', () => {
   const filas = lista.map(a => ({
     'Código': a.codigo, 'Fecha de ingreso': aFecha(a.fecha_ingreso), 'Descripción del alquiler': a.descripcion, 'Elemento PEP / Fase': a.fase || '',
     'Proveedor': a.proveedor, 'Tiempo de alquiler': tiempoTxt(a), 'Fecha de vencimiento': aFecha(a.fecha_vence), 'Solicitante': a.solicitante,
-    'Fecha de salida': a.fecha_salida ? aFecha(a.fecha_salida) : '', 'Días en obra': dias(a.fecha_ingreso, a.fecha_salida || hoyISO()),
+    'Situación': a.situacion === 'asignado' ? 'Asignado a ' + a.asignado_a : SIT[a.situacion], 'Aviso (días antes)': a.aviso_dias,
+    'Fecha de salida': a.fecha_salida ? aFecha(a.fecha_salida) : '', 'Fotos': (fotos.get(a.id) || []).length, 'Días en obra': dias(a.fecha_ingreso, a.fecha_salida || hoyISO()),
     'Estado': estado(a).t, 'Guía remisión ingreso': a.doc_guia_ingreso ? 'Sí' : 'No', 'Guía remisión salida': a.doc_guia_salida ? 'Sí' : 'No',
     'Requerimiento firmado Marcobre': a.doc_requerimiento ? 'Sí' : 'No', 'Observaciones': a.observaciones || '' }));
   const hoja = XLSX.utils.json_to_sheet(filas, { cellDates: true, dateNF: 'dd/mm/yyyy' });
-  hoja['!cols'] = [10, 13, 40, 18, 24, 14, 14, 22, 13, 10, 18, 12, 12, 14, 30].map(wch => ({ wch }));
+  hoja['!cols'] = [10, 13, 40, 18, 24, 14, 14, 22, 24, 10, 13, 7, 10, 18, 12, 12, 14, 30].map(wch => ({ wch }));
   hoja['!autofilter'] = { ref: hoja['!ref'] };
   const libro = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(libro, hoja, 'Alquileres');
   XLSX.writeFile(libro, `Equipos_en_alquiler_${hoyISO()}.xlsx`);

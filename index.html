@@ -112,6 +112,7 @@
         <div class="icono">🏗️</div>
         <b>Equipos en alquiler</b>
         <span>Ingreso, vencimiento y documentos de equipos alquilados.</span>
+        <span id="alertaAlq" hidden><span class="etiqueta rojo" id="alertaAlqTxt"></span></span>
       </a>
       <div class="ficha inactiva" title="En construcción">
         <div class="icono">📋</div>
@@ -161,6 +162,23 @@ function mostrarInicio(p) {
   $('quienRol').textContent = ROLES[p.rol] + (p.es_admin ? ' · Administrador' : '');
   $('saludo').textContent = 'Hola, ' + p.nombre.split(' ')[0];
   $('fichaCuentas').hidden = !p.es_admin;
+  alertaAlquileres();
+}
+
+/* Aviso de equipos en alquiler por vencer o vencidos */
+async function alertaAlquileres() {
+  const { data } = await sb.from('alquileres').select('fecha_vence,aviso_dias').neq('situacion', 'devuelto');
+  if (!data) return;
+  const hoy = new Date(); hoy.setHours(0, 0, 0, 0);
+  let venc = 0, prox = 0;
+  data.forEach(a => {
+    const [y, m, d] = a.fecha_vence.split('-').map(Number);
+    const r = Math.round((new Date(y, m - 1, d) - hoy) / 864e5);
+    if (r < 0) venc++; else if (r <= a.aviso_dias) prox++;
+  });
+  if (!venc && !prox) return;
+  $('alertaAlqTxt').textContent = '⚠️ ' + [venc && `${venc} vencido${venc > 1 ? 's' : ''}`, prox && `${prox} por vencer`].filter(Boolean).join(' · ');
+  $('alertaAlq').hidden = false;
 }
 
 function mostrarIngreso() {
