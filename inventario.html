@@ -83,6 +83,8 @@
   .herr #fOrden{display:none}
   .chips{flex-wrap:nowrap;overflow-x:auto;padding-bottom:2px}
   .chips button{white-space:nowrap}
+  .cats{flex-wrap:nowrap;overflow-x:auto;padding-bottom:2px}
+  .cats button{white-space:nowrap}
   .cifras{grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
   .cifra{padding:8px 10px}.cifra b{font-size:18px}.cifra span{font-size:11.5px}
   .barra-sup{gap:8px;margin-bottom:10px}.barra-sup h2{font-size:20px}.barra-sup .sub{font-size:13px}
@@ -90,6 +92,17 @@
   .en-vivo{font-size:12.5px}
 }
 .mas-btn{display:block;margin:14px auto 0}
+.cats{display:flex;gap:6px;flex-wrap:wrap;grid-column:1/-1;align-items:center}
+.cats .tit{font:600 12px 'Barlow',sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--gris2);margin-right:2px}
+.cats button{border:1px solid #b9c6d4;background:#fff;border-radius:8px;padding:6px 11px;font:600 13.5px 'Barlow',sans-serif;color:var(--azul);cursor:pointer}
+.cats button small{font-weight:500;color:var(--gris2);margin-left:3px}
+.cats button.activo{background:#2f5bd0;border-color:#2f5bd0;color:#fff}
+.cats button.activo small{color:#dbe5ff}
+.cat{display:inline-block;margin-top:2px;font:600 10.5px 'Barlow',sans-serif;letter-spacing:.04em;text-transform:uppercase;color:#2f5bd0}
+.checks{display:grid;grid-template-columns:1fr 1fr;gap:6px 14px;margin-top:4px}
+.checks label{display:flex;align-items:center;gap:8px;font-size:14.5px;cursor:pointer;font-weight:400;margin:0}
+.checks input{width:17px;height:17px;accent-color:var(--azul)}
+.checks small{color:var(--gris2)}
 .modal .campo{margin-bottom:12px}
 .solo-lectura{background:#fdf3dd;border:1px solid #f0d9a4;border-left:4px solid var(--ambar);border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:14px}
 </style>
@@ -129,6 +142,7 @@
         <button class="boton claro" id="btnExportar">⬇️ Excel</button>
         <button class="boton peligro" id="btnEliminar" hidden>Eliminar</button>
         <button class="boton" id="btnCerrar" hidden>Cerrar inventario</button>
+        <button class="boton" id="btnReabrir" hidden>Reabrir inventario</button>
       </div>
     </div>
     <div class="solo-lectura" id="avisoLectura" hidden></div>
@@ -145,6 +159,7 @@
         <option value="cod">Ordenar por código</option>
         <option value="rec">Últimos contados</option>
       </select>
+      <div class="cats" id="cats"></div>
       <div class="chips" id="chips">
         <button data-f="pend" class="activo">Pendientes</button>
         <button data-f="cont">Contados</button>
@@ -169,6 +184,8 @@
     <h3>Nuevo inventario</h3>
     <div class="campo"><label for="nAlm">Almacén de obra</label><select id="nAlm" required></select></div>
     <div class="campo"><label for="nNombre">Nombre</label><input id="nNombre" required maxlength="120"></div>
+    <div class="campo"><label>¿Qué vas a inventariar?</label>
+      <div class="checks" id="nCats"><small>Elige primero el almacén.</small></div></div>
     <p class="sub" style="margin:0">Se toma la cantidad actual del sistema de cada línea con stock de ese almacén. Si después cargas SAP, este inventario no cambia.</p>
     <div class="fallo" id="nFallo"></div>
     <div class="acciones">
@@ -188,6 +205,11 @@ const fechaHora = f => f ? new Date(f).toLocaleString('es-PE', { dateStyle: 'med
 const hora = f => f ? new Date(f).toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' }) : '';
 const cerrarModal = id => $(id).classList.remove('abierto');
 const nombreAlm = id => almacenes.find(a => a.id === id)?.nombre || '—';
+const CATS = { '1': 'Materiales', '2': 'Repuestos', '3': 'EPP', '4': 'Petróleo', '6': 'Economatos' };
+const catDig = m => String(m || '').charAt(0);
+const catNombre = d => CATS[d] || `Otros (${d}…)`;
+const ORDEN_CAT = d => '12346'.includes(d) && d ? '12346'.indexOf(d) : 9 + Number(d || 0);
+let cat = '';
 const signo = d => d > 0 ? '+' + num(d) : d < 0 ? '−' + num(-d) : '0';
 const claseDif = d => d == null ? '' : d > 0 ? 'mas' : d < 0 ? 'menos' : 'cero';
 
@@ -218,7 +240,7 @@ async function verLista() {
         <b>${escapar(i.nombre)}</b>
         ${i.estado === 'abierto' ? '<span class="etiqueta verde">Abierto</span>' : '<span class="etiqueta">Cerrado</span>'}
       </div>
-      <span class="etiqueta azul" style="align-self:start">${escapar(nombreAlm(i.almacen_obra_id))}</span>
+      <span style="display:flex;gap:6px;flex-wrap:wrap"><span class="etiqueta azul">${escapar(nombreAlm(i.almacen_obra_id))}</span>${(i.categorias || []).map(d => `<span class="etiqueta">${escapar(catNombre(d))}</span>`).join('') || '<span class="etiqueta">Todas las categorías</span>'}</span>
       <div class="progreso"><i style="width:${pct}%"></i></div>
       <small>${num(c, 0)} de ${num(i.lineas, 0)} líneas contadas (${pct}%)</small>
       <small>Abierto ${fechaHora(i.creado_en)} por ${escapar(i.creado_nombre || '—')}${i.cerrado_en ? `<br>Cerrado ${fechaHora(i.cerrado_en)} por ${escapar(i.cerrado_nombre || '—')}` : ''}</small>
@@ -231,13 +253,32 @@ $('btnNuevo').addEventListener('click', () => {
   const f = new Date();
   $('nNombre').value = `Inventario ${f.toLocaleDateString('es-PE', { day: '2-digit', month: 'short', year: 'numeric' })}`;
   $('nFallo').textContent = '';
+  $('nCats').innerHTML = '<small>Elige primero el almacén.</small>';
   $('veloNuevo').classList.add('abierto');
+});
+$('nAlm').addEventListener('change', async () => {
+  const id = Number($('nAlm').value);
+  if (!id) { $('nCats').innerHTML = '<small>Elige primero el almacén.</small>'; return; }
+  $('nCats').innerHTML = '<small>Revisando stock…</small>';
+  const cuenta = {};
+  for (let desde = 0; ; desde += 1000) {
+    const { data, error } = await sb.from('stock').select('material').eq('almacen_obra_id', id).eq('en_sap', true).gt('cantidad', 0).range(desde, desde + 999);
+    if (error) { $('nCats').innerHTML = `<small>${escapar(mensajeError(error))}</small>`; return; }
+    data.forEach(x => { const d = catDig(x.material); cuenta[d] = (cuenta[d] || 0) + 1; });
+    if (data.length < 1000) break;
+  }
+  const ds = Object.keys(cuenta).sort((a, b) => ORDEN_CAT(a) - ORDEN_CAT(b));
+  $('nCats').innerHTML = ds.length ? ds.map(d => `<label><input type="checkbox" value="${d}" checked> ${escapar(catNombre(d))} <small>${d}xxxxxxx · ${num(cuenta[d], 0)}</small></label>`).join('')
+    : '<small>Este almacén no tiene stock.</small>';
 });
 $('formNuevo').addEventListener('submit', async e => {
   e.preventDefault();
   if (!$('nAlm').value) { $('nFallo').textContent = 'Elige el almacén de obra.'; return; }
+  const cajas = [...$('nCats').querySelectorAll('input')], marcadas = cajas.filter(c => c.checked).map(c => c.value);
+  if (cajas.length && !marcadas.length) { $('nFallo').textContent = 'Marca al menos una categoría.'; return; }
+  const p_categorias = marcadas.length === cajas.length ? null : marcadas;
   $('nCrear').disabled = true; $('nCrear').textContent = 'Abriendo…';
-  const { data, error } = await sb.rpc('abrir_inventario', { p_almacen: Number($('nAlm').value), p_nombre: $('nNombre').value });
+  const { data, error } = await sb.rpc('abrir_inventario', { p_almacen: Number($('nAlm').value), p_nombre: $('nNombre').value, p_categorias });
   $('nCrear').disabled = false; $('nCrear').textContent = 'Abrir inventario';
   if (error) { $('nFallo').textContent = mensajeError(error); return; }
   location.href = '?id=' + data.id;
@@ -264,36 +305,57 @@ async function verDetalle(id) {
     const fases = [...new Set(lineas.map(l => l.fase || ''))].sort();
     $('fFase').innerHTML = '<option value="">Todas las fases</option>' +
       fases.map(f => `<option value="${f ? escapar(f) : '__vacio__'}">${f ? escapar(f) : '(sin fase)'}</option>`).join('');
+    pintarCats();
     pintarCabecera();
     aplicar();
     conectar();
   } catch (e) { aviso(mensajeError(e), 'error'); }
 }
 
+function pintarCats() {
+  const cuenta = {};
+  lineas.forEach(l => { const d = catDig(l.material); cuenta[d] = (cuenta[d] || 0) + 1; });
+  const ds = Object.keys(cuenta).sort((a, b) => ORDEN_CAT(a) - ORDEN_CAT(b));
+  if (cat && !cuenta[cat]) cat = '';
+  $('cats').hidden = ds.length < 2;
+  $('cats').innerHTML = '<span class="tit">Categoría</span>' +
+    `<button data-c="" class="${cat ? '' : 'activo'}">Todas<small>${num(lineas.length, 0)}</small></button>` +
+    ds.map(d => `<button data-c="${d}" class="${cat === d ? 'activo' : ''}" title="Códigos ${d}xxxxxxx">${escapar(catNombre(d))}<small>${num(cuenta[d], 0)}</small></button>`).join('');
+}
+$('cats').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  cat = b.dataset.c; pintarCats(); aplicar();
+});
+// líneas que cuentan en las cifras: según categoría y fase elegidas
+const base = () => { const fase = $('fFase').value; return lineas.filter(l => (!cat || catDig(l.material) === cat) && (!fase || (l.fase || '__vacio__') === fase)); };
+
 function abierto() { return inv && inv.estado === 'abierto'; }
 function puedeContar() { return contador && abierto(); }
 
 function pintarCabecera() {
-  $('dNombre').textContent = inv.nombre;
+  $('dNombre').textContent = inv.nombre + (inv.categorias?.length ? ' · ' + inv.categorias.map(catNombre).join(', ') : '');
   $('dSub').textContent = `${nombreAlm(inv.almacen_obra_id)} · abierto ${fechaHora(inv.creado_en)} por ${inv.creado_nombre || '—'}` +
-    (inv.cerrado_en ? ` · cerrado ${fechaHora(inv.cerrado_en)} por ${inv.cerrado_nombre || '—'}` : '');
+    (inv.cerrado_en ? ` · cerrado ${fechaHora(inv.cerrado_en)} por ${inv.cerrado_nombre || '—'}` : '') +
+    (inv.eventos || []).filter(e => e.accion === 'Reabierto').map(e => ` · reabierto ${fechaHora(e.fecha)} por ${e.por}`).join('');
   $('btnCerrar').hidden = !(editor && abierto());
   $('btnEliminar').hidden = !(editor && abierto() && !lineas.some(l => l.veces > 0));
+  $('btnReabrir').hidden = !(editor && !abierto());
   const av = $('avisoLectura');
-  if (!abierto()) { av.hidden = false; av.textContent = 'Este inventario está cerrado. Solo se puede consultar y descargar.'; }
+  if (!abierto()) { av.hidden = false; av.textContent = 'Este inventario está cerrado. Solo se puede consultar y descargar.' + (editor ? ' Si se cerró por error, usa «Reabrir inventario».' : ''); }
   else if (!contador) { av.hidden = false; av.textContent = 'Puedes ver el avance en vivo. Para contar, pide al administrador el permiso «Puede contar inventario físico».'; }
   else av.hidden = true;
 }
 
 function pintarCifras() {
-  const cont = lineas.filter(l => l.cantidad_fisica != null);
+  const todas = base();
+  const cont = todas.filter(l => l.cantidad_fisica != null);
   const mas = cont.filter(l => l.diferencia > 0), menos = cont.filter(l => l.diferencia < 0);
-  const pct = lineas.length ? cont.length * 100 / lineas.length : 0;
+  const pct = todas.length ? cont.length * 100 / todas.length : 0;
   $('barra').style.width = pct.toFixed(1) + '%';
   const val = arr => arr.reduce((s, l) => s + Number(l.diferencia) * (l.precio || 0), 0);
   $('cifras').innerHTML = `
-    <div class="cifra"><b>${num(cont.length, 0)} / ${num(lineas.length, 0)}</b><span>Contadas (${pct.toFixed(0)}%)</span></div>
-    <div class="cifra pend"><b>${num(lineas.length - cont.length, 0)}</b><span>Pendientes</span></div>
+    <div class="cifra"><b>${num(cont.length, 0)} / ${num(todas.length, 0)}</b><span>Contadas (${pct.toFixed(0)}%)${cat ? ' · ' + escapar(catNombre(cat)) : ''}</span></div>
+    <div class="cifra pend"><b>${num(todas.length - cont.length, 0)}</b><span>Pendientes</span></div>
     <div class="cifra"><b>${num(cont.length - mas.length - menos.length, 0)}</b><span>Exactas</span></div>
     <div class="cifra mas"><b>${num(mas.length, 0)}</b><span>Sobrantes (+)</span></div>
     <div class="cifra menos"><b>${num(menos.length, 0)}</b><span>Faltantes (−)</span></div>
@@ -311,6 +373,7 @@ function aplicar() {
     if (filtro === 'mas' && !(c && l.diferencia > 0)) return false;
     if (filtro === 'menos' && !(c && l.diferencia < 0)) return false;
     if (fase && (l.fase || '__vacio__') !== fase) return false;
+    if (cat && catDig(l.material) !== cat) return false;
     if (q && !`${l.material} ${l.descripcion} ${l.fase || ''} ${l.ubicacion || ''} ${l.usuario || ''} ${l.lote || ''}`.toLowerCase().includes(q)) return false;
     return true;
   });
@@ -331,7 +394,7 @@ function htmlFila(l) {
   const dis = puedeContar() ? '' : 'disabled';
   const c = l.cantidad_fisica != null;
   return `<div class="fila ${c ? 'contada' : ''}" data-id="${l.id}">
-    <span class="cod">${escapar(l.material)}</span>
+    <span class="cod">${escapar(l.material)}<br><span class="cat">${escapar(catNombre(catDig(l.material)))}</span></span>
     <span class="desc">${escapar(l.descripcion)}<small>${[l.lote && 'Lote ' + l.lote, l.usuario].filter(Boolean).map(escapar).join(' · ')}</small></span>
     <span class="fase ${l.fase ? '' : 'vacia'}" title="Fase de proyecto">${l.fase ? escapar(l.fase) : 'Sin fase'}</span>
     <span class="und">${escapar(l.unidad || '')}</span>
@@ -440,6 +503,7 @@ function conectar() {
       const cerro = inv.estado === 'abierto' && n.estado === 'cerrado';
       inv = n; pintarCabecera();
       if (cerro) { aviso(`${n.cerrado_nombre || 'Almacén'} cerró el inventario`, 'info'); pintarFilas(); }
+      else if (n.estado === 'abierto' && !$('cuerpo').querySelector('.fis:not([disabled])') && puedeContar()) { aviso('El inventario fue reabierto', 'info'); pintarFilas(); }
     })
     .on('presence', { event: 'sync' }, pintarPresencia)
     .subscribe(async estado => {
@@ -487,6 +551,12 @@ $('btnCerrar').addEventListener('click', async () => {
   if (error) { aviso(mensajeError(error), 'error'); return; }
   inv = data; pintarCabecera(); pintarFilas(); aviso('Inventario cerrado');
 });
+$('btnReabrir').addEventListener('click', async () => {
+  if (!confirm(`¿Reabrir «${inv.nombre}»?\n\nLos conteos hechos se mantienen y el equipo podrá seguir contando.`)) return;
+  const { data, error } = await sb.rpc('reabrir_inventario', { p_id: inv.id });
+  if (error) { aviso(mensajeError(error), 'error'); return; }
+  inv = data; pintarCabecera(); pintarFilas(); aviso('Inventario reabierto');
+});
 $('btnEliminar').addEventListener('click', async () => {
   if (!confirm(`¿Eliminar «${inv.nombre}»? Todavía no tiene conteos.`)) return;
   const { error } = await sb.rpc('eliminar_inventario', { p_id: inv.id });
@@ -499,7 +569,7 @@ $('btnExportar').addEventListener('click', () => {
   const orden = [...lineas].sort((a, b) => (a.ubicacion || '￿').localeCompare(b.ubicacion || '￿') || a.descripcion.localeCompare(b.descripcion));
   const filas = orden.map(l => {
     const c = l.cantidad_fisica != null;
-    const f = { 'Material': l.material, 'Descripción': l.descripcion, 'Unidad': l.unidad || '', 'Lote': l.lote || '', 'Fase': l.fase || '',
+    const f = { 'Material': l.material, 'Categoría': catNombre(catDig(l.material)), 'Descripción': l.descripcion, 'Unidad': l.unidad || '', 'Lote': l.lote || '', 'Fase': l.fase || '',
       'Usuario': l.usuario || '', 'Ubicación': l.ubicacion || '', 'Cant. sistema': Number(l.cantidad_sistema),
       'Cant. física': c ? Number(l.cantidad_fisica) : '', 'Diferencia': c ? Number(l.diferencia) : '',
       'Resultado': !c ? 'Pendiente' : l.diferencia > 0 ? 'Sobrante' : l.diferencia < 0 ? 'Faltante' : 'Exacto',
@@ -508,7 +578,7 @@ $('btnExportar').addEventListener('click', () => {
     return f;
   });
   const hoja = XLSX.utils.json_to_sheet(filas);
-  hoja['!cols'] = [11, 44, 7, 11, 18, 18, 18, 12, 12, 11, 11, 22, 18, 11, 15].map(wch => ({ wch }));
+  hoja['!cols'] = [11, 13, 44, 7, 11, 18, 18, 18, 12, 12, 11, 11, 22, 18, 11, 15].map(wch => ({ wch }));
   hoja['!autofilter'] = { ref: hoja['!ref'] };
   const libro = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(libro, hoja, 'Inventario');
