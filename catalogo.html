@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Catálogo SAP · JJC</title>
+<link rel="icon" href="/img/logo-jjc.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/estilo.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="/comun.js"></script>
+<style>
+[hidden]{display:none !important}
+.barra-sup{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.barra-sup .acciones{margin:0}
+.buscador{display:grid;grid-template-columns:1fr 190px 170px;gap:10px;margin-bottom:10px}
+.buscador input,.buscador select{width:100%;padding:12px 14px;font:400 16px 'Barlow',sans-serif;border:1px solid #b9c6d4;border-radius:10px;background:#fff}
+.buscador input:focus{outline:none;border-color:#2f5bd0;box-shadow:0 0 0 3px rgba(47,91,208,.16)}
+.contador{font-size:13.5px;color:var(--gris2);margin:0 0 8px}
+.tabla td{font-size:14px}
+.tabla td.cod{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13.5px;font-weight:600;white-space:nowrap}
+.tabla tr.inactivo td{color:#9aa6b2}
+.cat{font:600 11px 'Barlow',sans-serif;letter-spacing:.04em;text-transform:uppercase;color:#2f5bd0}
+.copiar{border:1px solid var(--linea);background:#fff;border-radius:7px;padding:3px 8px;font:600 12px 'Barlow',sans-serif;color:var(--azul);cursor:pointer;margin-left:6px}
+.copiar:hover{background:var(--campo)}
+mark{background:#fff1b8;color:inherit;padding:0 1px;border-radius:2px}
+.info{font-size:13.5px;color:var(--gris2);margin:-8px 0 16px}
+.prev{background:var(--campo);border-radius:10px;padding:12px 14px;font-size:14.5px;line-height:1.7}
+.prev b{color:var(--azul)}
+.barra{height:12px;background:#e6ebf2;border-radius:99px;overflow:hidden;margin:12px 0 6px}
+.barra i{display:block;height:100%;width:0;background:var(--verde);transition:width .2s}
+.vacio{padding:34px;text-align:center;color:var(--gris2)}
+@media(max-width:700px){
+  .buscador{grid-template-columns:1fr 1fr}
+  .buscador input{grid-column:1/-1}
+  .tabla .col-grupo,.tabla .col-tipo{display:none}
+}
+</style>
+</head>
+<body>
+<header class="cabecera">
+  <img src="/img/marca-blanca.png" alt="JJC">
+  <div class="titulo"><small>ALMACÉN DE OBRA</small><b>Catálogo SAP</b></div>
+  <div class="quien"><b id="quienNombre"></b><span id="quienRol"></span></div>
+  <a class="boton-cab" href="/">← Inicio</a>
+</header>
+
+<main class="contenido">
+  <div class="barra-sup">
+    <div><h2>Catálogo de códigos SAP</h2><p class="sub" style="margin:0">Busca cualquier código de la matriz por número o por descripción.</p></div>
+    <div class="acciones">
+      <button class="boton" id="btnCargar" hidden>⬆️ Cargar matriz (Excel)</button>
+    </div>
+  </div>
+  <p class="info" id="infoCarga"></p>
+
+  <div class="buscador">
+    <input id="q" type="search" placeholder="🔍 Código o palabras de la descripción (ej. guante nitrilo)" autocomplete="off" autofocus>
+    <select id="fCat"><option value="">Todas las categorías</option></select>
+    <select id="fTipo"><option value="">Todos los tipos</option></select>
+  </div>
+  <div class="contador" id="contador"></div>
+  <div class="tabla-caja">
+    <table class="tabla">
+      <thead><tr><th>Código</th><th>Descripción</th><th>Unidad</th><th class="col-tipo">Tipo</th><th class="col-grupo">Grupo</th></tr></thead>
+      <tbody id="cuerpo"><tr><td colspan="5" class="vacio">Cargando…</td></tr></tbody>
+    </table>
+  </div>
+</main>
+
+<!-- Cargar matriz -->
+<div class="velo" id="veloCarga">
+  <div class="modal">
+    <h3>Cargar matriz de códigos SAP</h3>
+    <div id="cPaso1">
+      <p class="sub">Sube el Excel de la matriz (por ejemplo <b>MASTER_DE_CODIGOS_CC0174.xlsx</b>). Debe tener las columnas <b>Material</b>, <b>Descripción del material</b> y <b>Unidad medida base</b>; si trae <b>Tipo de material</b> y <b>Grupo de artículos</b> también se guardan.</p>
+      <input type="file" id="archivo" accept=".xlsx,.xls,.csv">
+    </div>
+    <div id="cPaso2" hidden>
+      <div class="prev" id="cPrev"></div>
+      <div class="barra" id="cBarraCaja" hidden><i id="cBarra"></i></div>
+      <div class="contador" id="cEstado"></div>
+    </div>
+    <div class="fallo" id="cFallo"></div>
+    <div class="acciones">
+      <button type="button" class="boton claro" id="cCerrar">Cerrar</button>
+      <button type="button" class="boton" id="cIr" hidden>Cargar al sistema</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const CATS = { '1': 'Materiales', '2': 'Repuestos', '3': 'EPP', '4': 'Petróleo', '6': 'Economatos' };
+const catNombre = d => CATS[d] || `Otros (${d}…)`;
+const num = n => Number(n || 0).toLocaleString('es-PE');
+const fechaHora = f => f ? new Date(f).toLocaleString('es-PE', { dateStyle: 'medium', timeStyle: 'short' }) : '';
+let yo, editor = false, filas = [], archivoNombre = '', busqueda = 0;
+
+/* ═════ Búsqueda (en el servidor: son más de 60 mil códigos) ═════ */
+function resaltar(t, palabras) {
+  let h = escapar(t);
+  palabras.forEach(p => { if (p) h = h.replace(new RegExp('(' + p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/&/g, '&amp;') + ')', 'ig'), '<mark>$1</mark>'); });
+  return h;
+}
+async function buscar() {
+  const id = ++busqueda;
+  const q = $('q').value.trim(), cat = $('fCat').value, tipo = $('fTipo').value;
+  let c = sb.from('catalogo_sap').select('codigo,descripcion,unidad,tipo_material,grupo,activo', { count: 'exact' });
+  let palabras = [];
+  if (/^\d+$/.test(q)) c = c.like('codigo', q + '%');
+  else if (q) { palabras = q.split(/\s+/).filter(Boolean).slice(0, 6); palabras.forEach(p => { c = c.ilike('descripcion', `%${p.replace(/[%_,()]/g, '')}%`); }); }
+  if (cat) c = c.like('codigo', cat + '%');
+  if (tipo) c = c.eq('tipo_material', tipo);
+  c = c.order('activo', { ascending: false }).order('codigo').limit(100);
+  const { data, error, count } = await c;
+  if (id !== busqueda) return;           // llegó una búsqueda más nueva
+  if (error) { $('cuerpo').innerHTML = `<tr><td colspan="5" class="vacio">${escapar(mensajeError(error))}</td></tr>`; return; }
+  $('contador').textContent = count ? `${num(count)} código${count === 1 ? '' : 's'}${count > 100 ? ' · mostrando los primeros 100, escribe más para afinar' : ''}` : '';
+  $('cuerpo').innerHTML = data.map(r => `<tr class="${r.activo ? '' : 'inactivo'}">
+      <td class="cod">${resaltar(r.codigo, /^\d+$/.test(q) ? [q] : [])}<button class="copiar" data-c="${escapar(r.codigo)}" title="Copiar código">Copiar</button><br><span class="cat">${escapar(catNombre(r.codigo[0]))}</span></td>
+      <td>${resaltar(r.descripcion, palabras)}${r.activo ? '' : ' <span class="etiqueta rojo">Ya no está en la matriz</span>'}</td>
+      <td>${escapar(r.unidad)}</td>
+      <td class="col-tipo">${escapar(r.tipo_material || '')}</td>
+      <td class="col-grupo">${escapar(r.grupo || '')}</td></tr>`).join('')
+    || `<tr><td colspan="5" class="vacio">${q || cat || tipo ? 'Ningún código coincide.' : 'El catálogo está vacío.' + (editor ? ' Usa «Cargar matriz».' : '')}</td></tr>`;
+}
+let espera;
+$('q').addEventListener('input', () => { clearTimeout(espera); espera = setTimeout(buscar, 250); });
+$('fCat').addEventListener('change', buscar);
+$('fTipo').addEventListener('change', buscar);
+$('cuerpo').addEventListener('click', async e => {
+  const b = e.target.closest('.copiar'); if (!b) return;
+  try { await navigator.clipboard.writeText(b.dataset.c); aviso('Código ' + b.dataset.c + ' copiado'); } catch { aviso(b.dataset.c, 'info'); }
+});
+
+async function infoCarga() {
+  const { data } = await sb.from('catalogo_cargas').select('*').not('fin', 'is', null).order('fin', { ascending: false }).limit(1);
+  const c = data?.[0];
+  const { count } = await sb.from('catalogo_sap').select('codigo', { count: 'exact', head: true }).eq('activo', true);
+  $('infoCarga').textContent = c ? `${num(count)} códigos vigentes · última carga ${fechaHora(c.fin)} (${c.archivo || 'archivo'}) por ${c.por_nombre || '—'}` : '';
+}
+
+/* ═════ Cargar matriz ═════ */
+const norm = s => String(s ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+const COLS = {
+  codigo: ['material', 'codigo', 'codigo sap', 'cod material'],
+  descripcion: ['descripcion del material', 'descripcion', 'texto breve de material', 'texto breve'],
+  unidad: ['unidad medida base', 'unidad de medida base', 'unidad', 'umb', 'um'],
+  tipo: ['tipo de material', 'tipo material', 'tipo'],
+  grupo: ['grupo de articulos', 'grupo articulos', 'grupo']
+};
+$('btnCargar').addEventListener('click', () => {
+  $('cPaso1').hidden = false; $('cPaso2').hidden = true; $('cIr').hidden = true; $('cFallo').textContent = '';
+  $('archivo').value = ''; $('cCerrar').disabled = false;
+  $('veloCarga').classList.add('abierto');
+});
+$('cCerrar').addEventListener('click', () => $('veloCarga').classList.remove('abierto'));
+$('archivo').addEventListener('change', async () => {
+  const f = $('archivo').files[0]; if (!f) return;
+  $('cFallo').textContent = ''; archivoNombre = f.name;
+  try {
+    $('cFallo').textContent = 'Leyendo el archivo…';
+    const libro = XLSX.read(await f.arrayBuffer(), { type: 'array', dense: true });
+    const hoja = libro.Sheets[libro.SheetNames[0]];
+    const tabla = XLSX.utils.sheet_to_json(hoja, { header: 1, raw: false, defval: '' });
+    let fila0 = tabla.findIndex(r => r.some(c => COLS.codigo.includes(norm(c))) && r.some(c => COLS.descripcion.includes(norm(c))));
+    if (fila0 < 0) throw new Error('No encuentro las columnas «Material» y «Descripción del material» en la primera hoja.');
+    const cab = tabla[fila0].map(norm), idx = {};
+    for (const [k, nombres] of Object.entries(COLS)) idx[k] = cab.findIndex(c => nombres.includes(c));
+    if (idx.unidad < 0) throw new Error('Falta la columna «Unidad medida base».');
+    const vistos = new Set(); let sinDesc = 0, repetidos = 0; const porCat = {};
+    filas = [];
+    for (const r of tabla.slice(fila0 + 1)) {
+      const codigo = String(r[idx.codigo] ?? '').trim();
+      if (!codigo) continue;
+      const descripcion = String(r[idx.descripcion] ?? '').trim();
+      if (!descripcion) { sinDesc++; continue; }
+      if (vistos.has(codigo)) { repetidos++; continue; }
+      vistos.add(codigo);
+      porCat[codigo[0]] = (porCat[codigo[0]] || 0) + 1;
+      filas.push({ codigo, descripcion, unidad: String(r[idx.unidad] ?? '').trim(),
+        tipo: idx.tipo >= 0 ? String(r[idx.tipo] ?? '').trim() : '', grupo: idx.grupo >= 0 ? String(r[idx.grupo] ?? '').trim() : '' });
+    }
+    if (!filas.length) throw new Error('El archivo no tiene códigos.');
+    const { count: actuales } = await sb.from('catalogo_sap').select('codigo', { count: 'exact', head: true }).eq('activo', true);
+    $('cFallo').textContent = '';
+    $('cPrev').innerHTML = `Archivo: <b>${escapar(f.name)}</b><br>
+      Códigos a cargar: <b>${num(filas.length)}</b>${sinDesc ? ` · sin descripción (se omiten): <b>${sinDesc}</b>` : ''}${repetidos ? ` · repetidos (se omiten): <b>${repetidos}</b>` : ''}<br>
+      ${Object.keys(porCat).sort().map(d => `${escapar(catNombre(d))}: <b>${num(porCat[d])}</b>`).join(' · ')}<br>
+      ${actuales ? `En el sistema hay <b>${num(actuales)}</b> códigos vigentes. Los que no estén en este archivo quedarán marcados como «ya no está en la matriz» (no se borran).` : 'Es la primera carga del catálogo.'}`;
+    $('cPaso1').hidden = true; $('cPaso2').hidden = false; $('cIr').hidden = false; $('cEstado').textContent = '';
+  } catch (e) { $('cFallo').textContent = e.message || mensajeError(e); }
+});
+$('cIr').addEventListener('click', async () => {
+  const carga = crypto.randomUUID(), BLOQUE = 2000;
+  $('cIr').hidden = true; $('cCerrar').disabled = true; $('cBarraCaja').hidden = false; $('cFallo').textContent = '';
+  let nuevas = 0, cambiadas = 0;
+  try {
+    for (let i = 0; i < filas.length; i += BLOQUE) {
+      let intento = 0;
+      for (;;) {
+        const { data, error } = await sb.rpc('cargar_catalogo', { p_carga: carga, p_archivo: archivoNombre, p_filas: filas.slice(i, i + BLOQUE) });
+        if (!error) { nuevas += data.nuevas; cambiadas += data.cambiadas; break; }
+        if (++intento >= 3) throw error;            // la señal de obra a veces se corta: reintenta
+        await new Promise(r => setTimeout(r, 1500 * intento));
+      }
+      const hecho = Math.min(i + BLOQUE, filas.length);
+      $('cBarra').style.width = (hecho * 100 / filas.length).toFixed(1) + '%';
+      $('cEstado').textContent = `Cargando… ${num(hecho)} de ${num(filas.length)}`;
+    }
+    const { data: fin, error } = await sb.rpc('terminar_catalogo', { p_carga: carga });
+    if (error) throw error;
+    $('cEstado').innerHTML = `✅ Listo: <b>${num(nuevas)}</b> nuevos · <b>${num(cambiadas)}</b> actualizados · <b>${num(fin.retiradas)}</b> ya no están en la matriz.`;
+    aviso('Catálogo cargado');
+    infoCarga(); llenarTipos(); buscar();
+  } catch (e) {
+    $('cFallo').textContent = 'Se detuvo la carga: ' + mensajeError(e) + '. Vuelve a intentarlo; lo ya cargado se conserva.';
+  }
+  $('cCerrar').disabled = false;
+});
+
+async function llenarTipos() {
+  const tipos = ['ZMAT', 'ZREP', 'ZEPP', 'ZSUM', 'ZSRV', 'ZACL', 'ZCOM'];
+  $('fTipo').innerHTML = '<option value="">Todos los tipos</option>' + tipos.map(t => `<option>${t}</option>`).join('');
+  $('fCat').innerHTML = '<option value="">Todas las categorías</option>' + Object.entries(CATS).map(([d, n]) => `<option value="${d}">${d}xxxxxxx · ${n}</option>`).join('');
+}
+
+(async () => {
+  yo = await exigirSesion();
+  editor = yo.rol === 'almacen' || yo.es_admin;
+  $('quienNombre').textContent = yo.nombre;
+  $('quienRol').textContent = ROLES[yo.rol] + (yo.es_admin ? ' · Administrador' : '');
+  $('btnCargar').hidden = !editor;
+  llenarTipos(); infoCarga(); buscar();
+})();
+</script>
+</body>
+</html>
