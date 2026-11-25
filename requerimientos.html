@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Requerimientos · JJC</title>
+<link rel="icon" href="/img/logo-jjc.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/estilo.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.js"></script>
+<script src="/comun.js"></script>
+<style>
+.contenido{max-width:1320px}
+[hidden]{display:none !important}
+.barra-sup{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.barra-sup .acciones{margin:0}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.chips button{border:1px solid var(--linea);background:#fff;border-radius:99px;padding:6px 12px;font:600 13.5px 'Barlow',sans-serif;color:var(--gris);cursor:pointer}
+.chips button.activo{background:var(--azul);border-color:var(--azul);color:#fff}
+.chips button .n{display:inline-block;min-width:20px;padding:0 6px;margin-left:4px;border-radius:99px;background:var(--rojo);color:#fff;font-size:12px}
+.buscar{width:100%;padding:10px 12px;font:400 15px 'Barlow',sans-serif;border:1px solid #b9c6d4;border-radius:10px;background:#fff;margin-bottom:10px}
+.tabla tbody tr{cursor:pointer}
+.tabla tbody tr:hover td{background:#f5f8fd}
+.tabla td{font-size:14px}
+.num-rq{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-weight:700;font-size:13.5px;white-space:nowrap}
+.pasos{display:flex;gap:3px;align-items:center}
+.pasos i{width:16px;height:6px;border-radius:3px;background:#dde3ec}
+.pasos i.ok{background:var(--verde)}
+.sub2{display:block;font-size:12px;color:var(--gris2)}
+.etiqueta.ambar{background:#fdf3dd;color:var(--ambar)}
+.vacio{padding:34px;text-align:center;color:var(--gris2)}
+
+/* ── hoja del requerimiento (formato P-0174) ── */
+.hoja{background:#fff;border:1px solid var(--linea);border-radius:14px;padding:22px;margin-bottom:16px}
+.hoja-cab{display:grid;grid-template-columns:auto 1fr auto;gap:18px;align-items:center;border-bottom:3px solid var(--azul);padding-bottom:14px;margin-bottom:16px}
+.hoja-cab img{height:46px}
+.hoja-cab h3{margin:0;font:700 22px 'Barlow',sans-serif;color:var(--azul);letter-spacing:.02em}
+.hoja-cab .rq{text-align:right}
+.hoja-cab .rq b{display:block;font:700 20px ui-monospace,Menlo,monospace;color:var(--azul)}
+.rej3{display:grid;grid-template-columns:repeat(4,1fr);gap:12px 16px}
+.rej3 .doble{grid-column:span 2}
+.campo input:disabled,.campo select:disabled,.campo textarea:disabled{background:var(--campo);color:var(--tinta);opacity:1}
+.campo textarea{width:100%;padding:10px 12px;font:400 15px 'Barlow',sans-serif;border:1px solid #b9c6d4;border-radius:9px;min-height:56px;resize:vertical}
+.marcas{display:flex;flex-wrap:wrap;gap:6px}
+.marcas label{display:flex;align-items:center;gap:6px;border:1px solid #b9c6d4;border-radius:8px;padding:6px 10px;font:600 13.5px 'Barlow',sans-serif;cursor:pointer;background:#fff;margin:0;color:var(--tinta)}
+.marcas label:has(input:checked){background:#e3ebfb;border-color:#2f5bd0;color:var(--azul)}
+.marcas input{accent-color:var(--azul)}
+.marcas.bloq label{cursor:default}
+.seccion{font:600 13px 'Barlow',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#2f5bd0;margin:18px 0 8px}
+
+.items{width:100%;border-collapse:collapse;font-size:13.5px;min-width:1050px}
+.items th{background:var(--azul);color:#fff;font:600 11.5px 'Barlow',sans-serif;letter-spacing:.05em;text-transform:uppercase;padding:8px 6px;text-align:left;white-space:nowrap}
+.items td{border-top:1px solid #eef1f5;padding:6px;vertical-align:top}
+.items td.n{text-align:right}
+.items input{width:100%;padding:7px 8px;font:400 14px 'Barlow',sans-serif;border:1px solid #c6d1dd;border-radius:7px;background:#fff}
+.items input:disabled{background:transparent;border-color:transparent;color:var(--tinta);padding-left:0}
+.items input.num{text-align:right}
+.items .desc-ro{padding:7px 0;line-height:1.3}
+.items .nuevo-chk{display:flex;align-items:center;gap:4px;font-size:11.5px;color:var(--gris2);margin-top:3px;cursor:pointer;white-space:nowrap}
+.items .acomp{font-weight:700;text-align:right;padding-top:13px}
+.items .stock-info{font-size:11px;color:var(--verde);margin-top:2px}
+.items .quitar{border:0;background:none;color:var(--rojo);font-size:18px;cursor:pointer;padding:4px 6px}
+.items-caja{overflow-x:auto;border:1px solid var(--linea);border-radius:10px}
+.ac{position:relative}
+.ac-lista{position:absolute;left:0;top:100%;z-index:30;background:#fff;border:1px solid #b9c6d4;border-radius:9px;box-shadow:0 12px 30px -10px rgba(0,20,60,.35);width:min(560px,80vw);max-height:300px;overflow:auto;margin-top:3px}
+.ac-lista div{padding:8px 10px;cursor:pointer;border-top:1px solid #f0f3f7;font-size:13.5px}
+.ac-lista div:first-child{border-top:0}
+.ac-lista div:hover,.ac-lista div.sel{background:#eef3ff}
+.ac-lista b{font-family:ui-monospace,Menlo,monospace;color:var(--azul);margin-right:6px}
+.ac-lista small{color:var(--gris2);margin-left:4px}
+
+/* firmas */
+.firmas{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
+.firma{border:1px solid var(--linea);border-radius:10px;padding:10px;text-align:center;min-height:150px;display:flex;flex-direction:column;gap:4px;background:#fff}
+.firma .rol{font:600 11.5px 'Barlow',sans-serif;letter-spacing:.05em;text-transform:uppercase;color:var(--gris2)}
+.firma img{height:58px;max-width:100%;object-fit:contain;margin:4px auto}
+.firma .vacia{height:58px;display:grid;place-items:center;color:#b4bcc6;font-size:12.5px}
+.firma b{font-size:13px;color:var(--tinta);line-height:1.2}
+.firma small{font-size:11.5px;color:var(--gris2)}
+.firma.ok{border-color:#b8dcc6;background:#f6fbf8}
+.firma.turno{border:2px solid var(--ambar);background:#fffaf0}
+.obs-caja{background:#fdeeec;border:1px solid #efb7b0;border-left:5px solid var(--rojo);border-radius:10px;padding:12px 16px;margin-bottom:14px;font-size:14.5px}
+.turno-caja{background:#fff4e5;border:1px solid #f3c98b;border-left:5px solid var(--ambar);border-radius:10px;padding:12px 16px;margin-bottom:14px;font-size:14.5px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.turno-caja .acciones{margin:0 0 0 auto}
+.boton.verde{background:var(--verde)}
+.boton.peligro{background:#fff;color:var(--rojo);border:1px solid #e8b4ae}
+.pie-acc{position:sticky;bottom:0;background:linear-gradient(180deg,rgba(238,242,247,0),var(--fondo) 30%);padding:16px 0 10px;display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;z-index:5}
+.huella{font:11px ui-monospace,Menlo,monospace;color:var(--gris2);word-break:break-all;margin-top:10px}
+
+/* modal de firma */
+.modal.firma-modal{width:min(620px,100%)}
+.pest{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.pest button{border:1px solid var(--linea);background:#fff;border-radius:8px;padding:7px 12px;font:600 13.5px 'Barlow',sans-serif;color:var(--gris);cursor:pointer}
+.pest button.activo{background:var(--azul);border-color:var(--azul);color:#fff}
+#lienzo{width:100%;height:200px;border:2px dashed #b9c6d4;border-radius:10px;background:#fff;touch-action:none;display:block;cursor:crosshair}
+.firma-prev{height:140px;border:1px solid var(--linea);border-radius:10px;display:grid;place-items:center;background:#fff}
+.firma-prev img{max-height:130px;max-width:95%}
+
+@media(max-width:900px){
+  .rej3{grid-template-columns:1fr 1fr}
+  .firmas{grid-template-columns:repeat(3,1fr)}
+  .hoja{padding:14px}
+  .hoja-cab{grid-template-columns:1fr auto}.hoja-cab img{display:none}
+}
+@media(max-width:560px){ .firmas{grid-template-columns:repeat(2,1fr)} .rej3{grid-template-columns:1fr} .rej3 .doble{grid-column:auto} }
+@media print{
+  @page{size:A4 landscape;margin:10mm}
+  body{background:#fff}
+  .cabecera,.barra-sup,.pie-acc,.turno-caja,.no-imprimir,#avisos{display:none !important}
+  .contenido{padding:0;max-width:none}
+  .hoja{border:0;padding:0}
+  .items-caja{overflow:visible;border:0}
+  .items{min-width:0;font-size:10.5px}
+  .items input{border:0;padding:0;background:none}
+  .firma{break-inside:avoid}
+  .campo select,.campo input{appearance:none;-webkit-appearance:none;background:none !important;border-color:#d6dde6}
+  #eObs:placeholder-shown{display:none}
+}
+</style>
+</head>
+<body>
+<header class="cabecera">
+  <img src="/img/marca-blanca.png" alt="JJC">
+  <div class="titulo"><small>ALMACÉN DE OBRA</small><b>Requerimientos</b></div>
+  <div class="quien"><b id="quienNombre"></b><span id="quienRol"></span></div>
+  <a class="boton-cab" id="btnVolver" href="/">← Inicio</a>
+</header>
+
+<main class="contenido">
+  <!-- ═════ LISTA ═════ -->
+  <section id="vLista" hidden>
+    <div class="barra-sup">
+      <div><h2>Requerimientos</h2><p class="sub" style="margin:0">Formato P-0174 con firmas en orden: Solicitante → Administración → Costos → Gerencia JJC → Gerencia Marcobre → Almacén.</p></div>
+      <div class="acciones"><a class="boton" href="?nuevo" style="text-decoration:none">＋ Nuevo requerimiento</a></div>
+    </div>
+    <div class="chips" id="chips">
+      <button data-f="turno" class="activo">Por firmar</button>
+      <button data-f="mios">Mis requerimientos</button>
+      <button data-f="en_firma">En firma</button>
+      <button data-f="observado">Observados</button>
+      <button data-f="aprobado">Aprobados</button>
+      <button data-f="todos">Todos</button>
+    </div>
+    <input class="buscar" id="fBuscar" type="search" placeholder="🔍 Buscar N° RQ, solicitante, PEP o material">
+    <div class="tabla-caja">
+      <table class="tabla">
+        <thead><tr><th>N° RQ</th><th>Fecha</th><th>Proyecto</th><th>Solicitante</th><th>Tipo</th><th>Ítems</th><th>Firmas</th><th>Estado</th></tr></thead>
+        <tbody id="cuerpo"><tr><td colspan="8" class="vacio">Cargando…</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ═════ DETALLE / EDITOR ═════ -->
+  <section id="vRq" hidden>
+    <div class="obs-caja" id="obsCaja" hidden></div>
+    <div class="turno-caja" id="turnoCaja" hidden>
+      <span id="turnoTxt"></span>
+      <div class="acciones">
+        <button class="boton peligro" id="btnObservar">Observar y devolver</button>
+        <button class="boton verde" id="btnFirmarTurno">✍️ Firmar</button>
+      </div>
+    </div>
+
+    <div class="hoja">
+      <div class="hoja-cab">
+        <img src="/img/logo-jjc.png" alt="JJC">
+        <div><h3 id="hTitulo">REQUERIMIENTO</h3><span class="sub2" id="hSub"></span></div>
+        <div class="rq"><span class="sub2">N° de requerimiento</span><b id="hNum">Borrador</b><span id="hEstado"></span></div>
+      </div>
+
+      <div class="rej3">
+        <div class="campo"><label for="eProy">Proyecto / Centro</label><select id="eProy"></select></div>
+        <div class="campo"><label for="eFecha">Fecha</label><input type="date" id="eFecha"></div>
+        <div class="campo"><label for="eAlm">Almacén</label><input id="eAlm" value="0001" maxlength="10"></div>
+        <div class="campo"><label for="eArea">Área solicitante</label>
+          <select id="eArea"><option value="">—</option><option value="CO">CONSTRUCCIÓN (CO)</option><option value="OT">OFICINA TÉCNICA (OT)</option></select></div>
+        <div class="campo doble"><label for="ePep">PEP / Fase de proyecto</label><input id="ePep" list="dlPep" autocomplete="off" placeholder="P-0174.12.06.26"></div>
+        <div class="campo doble"><label for="eTipoDesc">Tipo de material</label><input id="eTipoDesc" placeholder="EQUIPOS Y MATERIALES"></div>
+        <div class="campo"><label>Solicitante</label><input id="eSolic" disabled></div>
+        <div class="campo"><label for="eSolped">COD. SOLPED</label><input id="eSolped" placeholder="Lo registra Almacén"></div>
+        <div class="campo"><label for="eReserva">COD. RESERVA</label><input id="eReserva" placeholder="Lo registra Almacén"></div>
+        <div class="campo" style="align-self:end"><button type="button" class="boton claro no-imprimir" id="btnSolped" hidden>Guardar SOLPED / Reserva</button></div>
+      </div>
+
+      <div class="seccion">Marcar con «X» — clase SAP</div>
+      <div class="marcas" id="eClase"></div>
+      <div class="seccion">Tipo</div>
+      <div class="marcas" id="eCat"></div>
+
+      <div class="seccion">Materiales</div>
+      <div class="items-caja">
+        <table class="items">
+          <thead><tr><th style="width:34px">#</th><th style="width:70px">Partida</th><th style="width:130px">Código SAP</th><th>Descripción</th><th style="width:60px">Und.</th><th style="width:90px">Cantidad</th><th style="width:90px">Stock obra</th><th style="width:90px">A comprar</th><th style="width:130px">Fecha req. obra</th><th style="width:160px">Observación</th><th class="no-imprimir" style="width:34px"></th></tr></thead>
+          <tbody id="eItems"></tbody>
+        </table>
+      </div>
+      <button type="button" class="boton claro no-imprimir" id="btnItem" style="margin-top:10px">＋ Agregar material</button>
+      <div class="campo" style="margin-top:14px"><label for="eObs">Observaciones generales</label><textarea id="eObs"></textarea></div>
+
+      <div class="seccion">Firmas</div>
+      <div class="firmas" id="eFirmas"></div>
+      <div class="huella" id="eHuella"></div>
+    </div>
+
+    <div class="pie-acc" id="pieAcc">
+      <button class="boton peligro" id="btnEliminar" hidden>Eliminar borrador</button>
+      <button class="boton claro" id="btnImprimir">🖨️ Imprimir / PDF</button>
+      <button class="boton claro" id="btnGuardar" hidden>Guardar borrador</button>
+      <button class="boton verde" id="btnEnviar" hidden>✍️ Firmar y enviar a Administración</button>
+    </div>
+  </section>
+</main>
+
+<datalist id="dlPep"></datalist>
+
+<!-- Firma -->
+<div class="velo" id="veloFirma">
+  <div class="modal firma-modal">
+    <h3 id="fTitulo">Firmar</h3>
+    <div class="pest" id="fPest">
+      <button type="button" data-p="guardada" hidden>Mi firma guardada</button>
+      <button type="button" data-p="dibujar" class="activo">✍️ Dibujar</button>
+      <button type="button" data-p="foto">📷 Subir foto de mi firma</button>
+    </div>
+    <div id="pGuardada" hidden><div class="firma-prev"><img id="imgGuardada" alt=""></div></div>
+    <div id="pDibujar"><canvas id="lienzo"></canvas><div style="display:flex;justify-content:space-between;margin-top:6px"><span class="sub2">Firma con el dedo o el mouse dentro del recuadro.</span><button type="button" class="boton-cab" style="color:var(--azul);background:#fff;border-color:var(--linea)" id="btnLimpiar">Borrar</button></div></div>
+    <div id="pFoto" hidden>
+      <input type="file" id="inFirma" accept="image/*">
+      <p class="sub2" style="margin-top:6px">Toma una foto de tu firma en papel blanco, bien iluminada y recortada.</p>
+      <div class="firma-prev" style="margin-top:8px"><img id="imgFoto" alt=""></div>
+    </div>
+    <label class="marcar" style="margin-top:12px"><input type="checkbox" id="chkGuardar"> Guardar esta firma para la próxima vez</label>
+    <div class="campo" style="margin-top:10px"><label for="fObs">Comentario (opcional)</label><input id="fObs" maxlength="300"></div>
+    <p class="sub2" id="fAviso" style="margin-top:10px"></p>
+    <div class="fallo" id="fFallo"></div>
+    <div class="acciones">
+      <button type="button" class="boton claro" onclick="$('veloFirma').classList.remove('abierto')">Cancelar</button>
+      <button type="button" class="boton verde" id="btnConfirmarFirma">Firmar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Observar -->
+<div class="velo" id="veloObs">
+  <div class="modal">
+    <h3>Observar y devolver al solicitante</h3>
+    <p class="sub">El requerimiento vuelve al solicitante para que lo corrija. Las firmas que ya tenía se archivan y deberá firmarse de nuevo desde el inicio.</p>
+    <div class="campo"><label for="oMotivo">Motivo de la observación</label><textarea id="oMotivo" maxlength="500"></textarea></div>
+    <div class="fallo" id="oFallo"></div>
+    <div class="acciones">
+      <button type="button" class="boton claro" onclick="$('veloObs').classList.remove('abierto')">Cancelar</button>
+      <button type="button" class="boton peligro" id="btnConfirmarObs">Devolver con observación</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const CLASES = ['ZMAT', 'ZREP', 'ZEPP', 'ZCOM', 'ZCON', 'ZSUM', 'ZACT', 'ZENC', 'ZEQU', 'SERVICIO'];
+const TIPOS = [['MAT', 'MATERIALES'], ['SEG', 'SEGURIDAD'], ['HER', 'HERRAMIENTAS'], ['EQ M', 'EQ. MENORES']];
+let yo, etapas = [], proyectos = [], perfiles = new Map(), lista = [], filtro = 'turno';
+let rq = null, items = [], firmas = [], editable = false, firmaAccion = null, firmaGuardada = null;
+
+const hoyISO = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
+const fCorta = s => { if (!s) return '—'; const [y, m, d] = s.slice(0, 10).split('-').map(Number); return new Date(y, m - 1, d).toLocaleDateString('es-PE', { day: '2-digit', month: 'short', year: 'numeric' }); };
+const fechaHora = f => f ? new Date(f).toLocaleString('es-PE', { dateStyle: 'medium', timeStyle: 'short' }) : '';
+const num = (n, d = 2) => n == null || n === '' ? '' : Number(n).toLocaleString('es-PE', { maximumFractionDigits: d });
+const nombreDe = id => perfiles.get(id)?.nombre || '—';
+const etapaSig = r => etapas.find(e => e.orden === r.etapa + 1);
+const esMiTurno = r => r.estado === 'en_firma' && etapaSig(r)?.rol === yo.rol;
+const ESTADO = { borrador: ['Borrador', ''], en_firma: ['En firma', 'ambar'], observado: ['Observado', 'rojo'], aprobado: ['Aprobado', 'verde'] };
+
+/* ═════════════ LISTA ═════════════ */
+async function verLista() {
+  $('vLista').hidden = false; $('vRq').hidden = true;
+  $('btnVolver').href = '/'; $('btnVolver').textContent = '← Inicio';
+  const { data, error } = await sb.from('requerimientos')
+    .select('id,rq_num,fecha,proyecto_codigo,pep,estado,etapa,creado_por,categoria,observacion,creado_en,rq_items(count)')
+    .order('creado_en', { ascending: false }).limit(500);
+  if (error) { $('cuerpo').innerHTML = `<tr><td colspan="8" class="vacio">${escapar(mensajeError(error))}</td></tr>`; return; }
+  lista = data;
+  const turno = lista.filter(esMiTurno).length + lista.filter(r => r.creado_por === yo.id && r.estado === 'observado').length;
+  $('chips').querySelector('[data-f="turno"]').innerHTML = 'Por firmar' + (turno ? ` <span class="n">${turno}</span>` : '');
+  if (filtro === 'turno' && !turno) elegir('mios', false);
+  pintarLista();
+}
+function elegir(f, pintar = true) {
+  filtro = f;
+  $('chips').querySelectorAll('button').forEach(b => b.classList.toggle('activo', b.dataset.f === f));
+  if (pintar) pintarLista();
+}
+$('chips').addEventListener('click', e => { const b = e.target.closest('button'); if (b) elegir(b.dataset.f); });
+$('fBuscar').addEventListener('input', () => pintarLista());
+function pintarLista() {
+  const q = $('fBuscar').value.trim().toLowerCase();
+  const vista = lista.filter(r => {
+    if (filtro === 'turno' && !(esMiTurno(r) || (r.creado_por === yo.id && r.estado === 'observado'))) return false;
+    if (filtro === 'mios' && r.creado_por !== yo.id) return false;
+    if (['en_firma', 'observado', 'aprobado'].includes(filtro) && r.estado !== filtro) return false;
+    if (q && !`${r.rq_num || 'borrador'} ${nombreDe(r.creado_por)} ${r.pep || ''} ${r.proyecto_codigo}`.toLowerCase().includes(q)) return false;
+    if (r.estado === 'borrador' && r.creado_por !== yo.id) return false;   // los borradores son privados
+    return true;
+  });
+  $('cuerpo').innerHTML = vista.map(r => {
+    const [t, c] = ESTADO[r.estado] || [r.estado, ''];
+    const sig = etapaSig(r);
+    const nota = r.estado === 'en_firma' ? `Espera: ${sig?.nombre || ''}` : r.estado === 'observado' ? `Observado por ${r.observacion?.etapa || ''}` : '';
+    return `<tr data-id="${r.id}">
+      <td class="num-rq">${r.rq_num ? escapar(r.rq_num) : '<span class="sub2" style="display:inline">Borrador</span>'}</td>
+      <td style="white-space:nowrap">${fCorta(r.fecha)}</td>
+      <td>${escapar(r.proyecto_codigo)} <span class="sub2">${escapar(proyectos.find(p => p.codigo === r.proyecto_codigo)?.nombre || '')}</span></td>
+      <td>${escapar(nombreDe(r.creado_por))}</td>
+      <td>${(r.categoria || []).map(escapar).join(', ')}</td>
+      <td>${r.rq_items?.[0]?.count ?? ''}</td>
+      <td><div class="pasos">${etapas.map(e => `<i class="${e.orden <= r.etapa ? 'ok' : ''}" title="${escapar(e.nombre)}"></i>`).join('')}</div></td>
+      <td><span class="etiqueta ${esMiTurno(r) ? 'ambar' : c}">${esMiTurno(r) ? 'Te toca firmar' : t}</span><span class="sub2">${escapar(nota)}</span></td></tr>`;
+  }).join('') || `<tr><td colspan="8" class="vacio">${filtro === 'turno' ? 'No tienes requerimientos por firmar. 🎉' : 'No hay requerimientos aquí.'}</td></tr>`;
+}
+$('cuerpo').addEventListener('click', e => { const tr = e.target.closest('tr[data-id]'); if (tr) location.href = '?id=' + tr.dataset.id; });
+
+/* ═════════════ DETALLE / EDITOR ═════════════ */
+async function verRq(id) {
+  $('vLista').hidden = true; $('vRq').hidden = false;
+  $('btnVolver').href = '/requerimientos'; $('btnVolver').textContent = '← Requerimientos';
+  if (id) {
+    const [r, it, fi] = await Promise.all([
+      sb.from('requerimientos').select('*').eq('id', id).maybeSingle(),
+      sb.from('rq_items').select('*').eq('rq_id', id).order('num'),
+      sb.from('rq_firmas').select('*').eq('rq_id', id).order('orden')
+    ]);
+    if (r.error || !r.data) { aviso(r.error ? mensajeError(r.error) : 'Requerimiento no encontrado', 'error'); location.replace('/requerimientos'); return; }
+    rq = r.data; firmas = fi.data || [];
+    items = (it.data || []).map(i => ({ codigo: i.codigo_sap || '', descripcion: i.descripcion, unidad: i.unidad, nuevo: i.material_nuevo,
+      cantidad: i.cantidad, stock: i.stock, partida: i.partida || '', fecha_req: i.fecha_req || '', obs: i.obs || '' }));
+  } else {
+    rq = { id: null, estado: 'borrador', etapa: 0, creado_por: yo.id, proyecto_codigo: proyectos[0]?.codigo, fecha: hoyISO(), almacen: '0001',
+      clase_sap: [], categoria: [], area: '' };
+    items = [itemVacio()]; firmas = [];
+  }
+  editable = rq.creado_por === yo.id && rq.etapa === 0 && !rq.bloqueado;
+  pintarRq();
+}
+const itemVacio = () => ({ codigo: '', descripcion: '', unidad: '', nuevo: false, cantidad: '', stock: '', partida: '', fecha_req: '', obs: '' });
+
+function pintarRq() {
+  const proy = proyectos.find(p => p.codigo === rq.proyecto_codigo);
+  $('hTitulo').textContent = 'REQUERIMIENTO P-' + (rq.proyecto_codigo || '');
+  $('hSub').textContent = proy ? proy.nombre : '';
+  $('hNum').textContent = rq.rq_num || 'Borrador';
+  const [t, c] = ESTADO[rq.estado] || [rq.estado, ''];
+  $('hEstado').innerHTML = `<span class="etiqueta ${c}">${t}</span>`;
+  $('eProy').innerHTML = proyectos.map(p => `<option value="${p.codigo}">${p.codigo} — ${escapar(p.nombre)}</option>`).join('');
+  $('eProy').value = rq.proyecto_codigo || '';
+  $('eFecha').value = rq.fecha || ''; $('eAlm').value = rq.almacen || ''; $('eArea').value = rq.area || '';
+  $('ePep').value = rq.pep || ''; $('eTipoDesc').value = rq.tipo_desc || rq.tipo_material || ''; $('eObs').value = rq.obs || '';
+  $('eSolic').value = rq.id ? nombreDe(rq.creado_por) : yo.nombre;
+  $('eSolped').value = rq.solped || ''; $('eReserva').value = rq.reserva || '';
+  ['eProy', 'eFecha', 'eAlm', 'eArea', 'ePep', 'eTipoDesc', 'eObs'].forEach(i => $(i).disabled = !editable);
+  $('eProy').disabled = !editable || !!rq.rq_num;            // con número, el proyecto ya no cambia
+  const almacen = yo.rol === 'almacen' || yo.es_admin;
+  const solpedEditable = (editable) || (almacen && rq.id && rq.etapa > 0);
+  $('eSolped').disabled = $('eReserva').disabled = !solpedEditable;
+  $('btnSolped').hidden = !(almacen && rq.id && rq.etapa > 0);
+  $('eClase').className = 'marcas' + (editable ? '' : ' bloq');
+  $('eClase').innerHTML = CLASES.map(k => `<label><input type="checkbox" value="${k}" ${(rq.clase_sap || []).includes(k) ? 'checked' : ''} ${editable ? '' : 'disabled'}> ${k}</label>`).join('');
+  $('eCat').className = 'marcas' + (editable ? '' : ' bloq');
+  $('eCat').innerHTML = TIPOS.map(([k, n]) => `<label><input type="checkbox" value="${k}" ${(rq.categoria || []).includes(k) ? 'checked' : ''} ${editable ? '' : 'disabled'}> ${n} (${k})</label>`).join('');
+  cargarPeps();
+  pintarItems();
+  pintarFirmas();
+  // observación
+  const o = rq.observacion;
+  $('obsCaja').hidden = !(rq.estado === 'observado' && o);
+  if (o) $('obsCaja').innerHTML = `<b>Observado por ${escapar(o.etapa)} (${escapar(o.por)})</b> · ${fechaHora(o.fecha)}<br>${escapar(o.motivo)}${rq.creado_por === yo.id ? '<br><b>Corrige lo indicado y vuelve a firmar y enviar.</b>' : ''}`;
+  // turno de firma
+  const sig = etapaSig(rq);
+  $('turnoCaja').hidden = !esMiTurno(rq);
+  if (esMiTurno(rq)) $('turnoTxt').innerHTML = `<b>Te toca firmar</b> como ${escapar(sig.nombre)} (firma ${sig.orden} de ${etapas.length}).`;
+  // botones
+  $('btnGuardar').hidden = !editable;
+  $('btnEnviar').hidden = !editable;
+  $('btnEliminar').hidden = !(editable && rq.id && !rq.rq_num);
+  $('btnItem').hidden = !editable;
+  $('eHuella').textContent = rq.hash_contenido ? `Huella de seguridad (SHA-256): ${rq.hash_contenido} · cerrado ${fechaHora(rq.bloqueado_en)}` : '';
+}
+
+async function cargarPeps() {
+  if ($('dlPep').dataset.p === rq.proyecto_codigo) return;
+  $('dlPep').dataset.p = rq.proyecto_codigo;
+  const { data } = await sb.from('stock').select('fase').like('fase', `P-${rq.proyecto_codigo}%`).limit(1000);
+  $('dlPep').innerHTML = [...new Set((data || []).map(x => x.fase))].sort().map(f => `<option value="${escapar(f)}">`).join('');
+}
+$('eProy').addEventListener('change', () => { rq.proyecto_codigo = $('eProy').value; $('hTitulo').textContent = 'REQUERIMIENTO P-' + rq.proyecto_codigo; $('hSub').textContent = proyectos.find(p => p.codigo === rq.proyecto_codigo)?.nombre || ''; cargarPeps(); });
+
+/* ── Ítems ── */
+function pintarItems() {
+  const dis = editable ? '' : 'disabled';
+  $('eItems').innerHTML = items.map((it, i) => {
+    const acomp = Math.max(0, (Number(it.cantidad) || 0) - (Number(it.stock) || 0));
+    return `<tr data-i="${i}">
+      <td class="n" style="padding-top:13px">${i + 1}</td>
+      <td><input data-k="partida" value="${escapar(it.partida)}" ${dis}></td>
+      <td class="ac">${it.nuevo ? '<div class="desc-ro sub2" style="display:block">Sin código</div>' : `<input data-k="codigo" class="buscarSap" value="${escapar(it.codigo)}" placeholder="${editable ? 'Código o nombre' : ''}" autocomplete="off" ${dis}>`}
+        ${editable ? `<label class="nuevo-chk"><input type="checkbox" data-k="nuevo" ${it.nuevo ? 'checked' : ''}> Material nuevo</label>` : it.nuevo ? '<span class="etiqueta ambar">Nuevo</span>' : ''}</td>
+      <td class="ac">${it.nuevo && editable ? `<input data-k="descripcion" value="${escapar(it.descripcion)}" placeholder="Describe el material">`
+        : editable && !it.codigo ? `<input class="buscarSap" data-k="buscar" placeholder="Escribe para buscar en el catálogo SAP" autocomplete="off">`
+        : `<div class="desc-ro">${escapar(it.descripcion)}</div>`}</td>
+      <td>${it.nuevo && editable ? `<input data-k="unidad" value="${escapar(it.unidad)}" placeholder="UND">` : `<div class="desc-ro">${escapar(it.unidad)}</div>`}</td>
+      <td><input data-k="cantidad" class="num" inputmode="decimal" value="${escapar(it.cantidad)}" ${dis}></td>
+      <td><input data-k="stock" class="num" inputmode="decimal" value="${escapar(it.stock)}" ${dis}>${it.stockObra != null ? `<div class="stock-info">En obra: ${num(it.stockObra)}</div>` : ''}</td>
+      <td class="acomp">${num(acomp)}</td>
+      <td>${editable ? `<input data-k="fecha_req" type="date" value="${escapar(it.fecha_req)}">` : `<div class="desc-ro">${it.fecha_req ? fCorta(it.fecha_req) : ''}</div>`}</td>
+      <td><input data-k="obs" value="${escapar(it.obs)}" ${dis}></td>
+      <td class="no-imprimir">${editable ? `<button type="button" class="quitar" data-quitar="${i}" title="Quitar">×</button>` : ''}</td></tr>`;
+  }).join('') || `<tr><td colspan="11" class="vacio">Sin materiales.</td></tr>`;
+}
+$('eItems').addEventListener('input', e => {
+  const tr = e.target.closest('tr[data-i]'); if (!tr || !e.target.dataset.k) return;
+  const it = items[Number(tr.dataset.i)], k = e.target.dataset.k;
+  if (k === 'nuevo' || k === 'buscar') return;
+  if (k === 'codigo') {            // si cambia el código, se pierde el material elegido hasta volver a elegir
+    if (it.codigo && e.target.value.trim() !== it.codigo) { it.codigo = ''; it.descripcion = ''; it.unidad = ''; it.stockObra = null;
+      tr.querySelectorAll('.desc-ro').forEach(d => d.textContent = ''); }
+    return;
+  }
+  it[k] = e.target.value;
+  if (k === 'cantidad' || k === 'stock') tr.querySelector('.acomp').textContent = num(Math.max(0, (Number(it.cantidad) || 0) - (Number(it.stock) || 0)));
+});
+$('eItems').addEventListener('change', e => {
+  const tr = e.target.closest('tr[data-i]'); if (!tr) return;
+  const it = items[Number(tr.dataset.i)];
+  if (e.target.dataset.k === 'nuevo') {
+    it.nuevo = e.target.checked; it.codigo = ''; if (!it.nuevo) { it.descripcion = ''; it.unidad = ''; } it.stockObra = null;
+    pintarItems();
+  }
+});
+$('eItems').addEventListener('click', e => {
+  const q = e.target.closest('[data-quitar]'); if (!q) return;
+  items.splice(Number(q.dataset.quitar), 1); if (!items.length) items.push(itemVacio()); pintarItems();
+});
+$('btnItem').addEventListener('click', () => { items.push(itemVacio()); pintarItems(); $('eItems').querySelector('tr:last-child .buscarSap')?.focus(); });
+
+/* ── Buscador SAP (autocompletar) ── */
+let acCaja = null, acSel = -1, acRes = [], acTimer, acFila = null;
+function cerrarAc() { acCaja?.remove(); acCaja = null; acSel = -1; }
+async function buscarSap(input) {
+  const q = input.value.trim(); acFila = input.closest('tr');
+  if (q.length < 2) { cerrarAc(); return; }
+  let c = sb.from('catalogo_sap').select('codigo,descripcion,unidad').eq('activo', true);
+  if (/^\d+$/.test(q)) c = c.like('codigo', q + '%');
+  else q.split(/\s+/).filter(Boolean).slice(0, 5).forEach(p => { c = c.ilike('descripcion', `%${p.replace(/[%_,()]/g, '')}%`); });
+  const { data } = await c.order('codigo').limit(12);
+  if (document.activeElement !== input) return;
+  cerrarAc();
+  acRes = data || []; acSel = acRes.length ? 0 : -1;
+  acCaja = document.createElement('div'); acCaja.className = 'ac-lista';
+  acCaja.innerHTML = acRes.map((r, i) => `<div data-k="${i}" class="${i === 0 ? 'sel' : ''}"><b>${escapar(r.codigo)}</b>${escapar(r.descripcion)}<small>${escapar(r.unidad)}</small></div>`).join('')
+    || '<div style="cursor:default;color:var(--gris2)">No está en el catálogo. Marca «Material nuevo» para pedirlo sin código.</div>';
+  input.parentElement.appendChild(acCaja);
+}
+async function elegirSap(r) {
+  const it = items[Number(acFila.dataset.i)];
+  Object.assign(it, { codigo: r.codigo, descripcion: r.descripcion, unidad: r.unidad, nuevo: false });
+  cerrarAc();
+  // stock disponible en obra para ese código
+  const { data } = await sb.from('stock').select('cantidad').eq('material', r.codigo).eq('en_sap', true);
+  it.stockObra = (data || []).reduce((s, x) => s + Number(x.cantidad || 0), 0);
+  if (it.stock === '' || it.stock == null) it.stock = it.stockObra ? String(it.stockObra) : '0';
+  pintarItems();
+  const tr = $('eItems').querySelector(`tr[data-i="${items.indexOf(it)}"] input[data-k="cantidad"]`); tr?.focus();
+}
+$('eItems').addEventListener('input', e => {
+  if (!e.target.classList.contains('buscarSap')) return;
+  clearTimeout(acTimer); acTimer = setTimeout(() => buscarSap(e.target), 220);
+});
+$('eItems').addEventListener('keydown', e => {
+  if (!acCaja || !e.target.classList.contains('buscarSap')) return;
+  if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+    e.preventDefault(); acSel = Math.max(0, Math.min(acRes.length - 1, acSel + (e.key === 'ArrowDown' ? 1 : -1)));
+    acCaja.querySelectorAll('[data-k]').forEach((d, i) => d.classList.toggle('sel', i === acSel));
+  } else if (e.key === 'Enter' && acSel >= 0) { e.preventDefault(); elegirSap(acRes[acSel]); }
+  else if (e.key === 'Escape') cerrarAc();
+});
+document.addEventListener('mousedown', e => {
+  const d = e.target.closest('.ac-lista [data-k]');
+  if (d) { e.preventDefault(); elegirSap(acRes[Number(d.dataset.k)]); return; }
+  if (!e.target.closest('.ac-lista')) cerrarAc();
+});
+
+/* ── Guardar ── */
+function leerCab() {
+  return { proyecto: $('eProy').value, fecha: $('eFecha').value, almacen: $('eAlm').value, area: $('eArea').value,
+    pep: $('ePep').value, tipo_desc: $('eTipoDesc').value, obs: $('eObs').value,
+    clase_sap: [...$('eClase').querySelectorAll('input:checked')].map(c => c.value),
+    categoria: [...$('eCat').querySelectorAll('input:checked')].map(c => c.value) };
+}
+function validar(paraEnviar) {
+  const usados = items.filter(it => it.codigo || it.nuevo || it.cantidad);
+  for (const [i, it] of usados.entries()) {
+    const n = items.indexOf(it) + 1;
+    if (!it.nuevo && !it.codigo) return `Ítem ${n}: busca el código SAP o marca «Material nuevo».`;
+    if (it.nuevo && (!String(it.descripcion).trim() || !String(it.unidad).trim())) return `Ítem ${n}: escribe la descripción y la unidad del material nuevo.`;
+    if (!(Number(String(it.cantidad).replace(',', '.')) > 0)) return `Ítem ${n}: la cantidad debe ser mayor que 0.`;
+  }
+  if (paraEnviar) {
+    if (!usados.length) return 'Agrega al menos un material.';
+    if (!leerCab().clase_sap.length) return 'Marca al menos una clase SAP (ZMAT, ZREP…).';
+    if (!leerCab().categoria.length) return 'Marca el tipo (MATERIALES, SEGURIDAD…).';
+    if (!$('ePep').value.trim()) return 'Falta el PEP / fase de proyecto.';
+  }
+  return null;
+}
+async function guardar() {
+  const err = validar(false);
+  if (err) { aviso(err, 'error'); return null; }
+  const filas = items.filter(it => it.codigo || it.nuevo || it.cantidad).map(it => ({
+    codigo: it.nuevo ? '' : it.codigo, descripcion: it.descripcion, unidad: it.unidad, nuevo: !!it.nuevo,
+    cantidad: Number(String(it.cantidad).replace(',', '.')), stock: Number(String(it.stock || 0).replace(',', '.')) || 0,
+    partida: it.partida, fecha_req: it.fecha_req, obs: it.obs }));
+  const { data, error } = await sb.rpc('guardar_rq', { p_id: rq.id, p_cab: leerCab(), p_items: filas });
+  if (error) { aviso(mensajeError(error), 'error'); return null; }
+  const nuevo = !rq.id;
+  rq = data;
+  if (nuevo) history.replaceState(null, '', '?id=' + rq.id);
+  return rq;
+}
+$('btnGuardar').addEventListener('click', async () => {
+  $('btnGuardar').disabled = true;
+  const r = await guardar();
+  $('btnGuardar').disabled = false;
+  if (r) { aviso('Borrador guardado'); verRq(r.id); }
+});
+$('btnEliminar').addEventListener('click', async () => {
+  if (!confirm('¿Eliminar este borrador?')) return;
+  const { error } = await sb.from('requerimientos').delete().eq('id', rq.id);
+  if (error) { aviso(mensajeError(error), 'error'); return; }
+  location.href = '/requerimientos';
+});
+$('btnEnviar').addEventListener('click', async () => {
+  const err = validar(true); if (err) { aviso(err, 'error'); return; }
+  $('btnEnviar').disabled = true;
+  const r = await guardar();
+  $('btnEnviar').disabled = false;
+  if (!r) return;
+  abrirFirma('enviar');
+});
+$('btnSolped').addEventListener('click', async () => {
+  const { error } = await sb.from('requerimientos').update({ solped: $('eSolped').value.trim() || null, reserva: $('eReserva').value.trim() || null }).eq('id', rq.id);
+  if (error) { aviso(mensajeError(error), 'error'); return; }
+  aviso('SOLPED / Reserva guardados');
+});
+$('btnImprimir').addEventListener('click', () => window.print());
+
+/* ── Firmas ── */
+function pintarFirmas() {
+  $('eFirmas').innerHTML = etapas.map(e => {
+    const f = firmas.find(x => x.orden === e.orden);
+    const turno = rq.estado === 'en_firma' && e.orden === rq.etapa + 1 || (rq.etapa === 0 && e.orden === 1 && rq.estado !== 'aprobado');
+    return `<div class="firma ${f ? 'ok' : turno ? 'turno' : ''}">
+      <span class="rol">${e.orden}. ${escapar(e.nombre)}</span>
+      ${f ? `<img src="${f.firma_img}" alt="Firma de ${escapar(f.nombre)}">` : `<div class="vacia">${turno ? 'Pendiente' : '—'}</div>`}
+      ${f ? `<b>${escapar(f.nombre)}</b><small>${escapar(f.cargo || '')}</small><small>${fechaHora(f.firmado_en)}</small>${f.obs ? `<small>«${escapar(f.obs)}»</small>` : ''}` : ''}
+    </div>`;
+  }).join('');
+}
+$('btnFirmarTurno').addEventListener('click', () => abrirFirma('turno'));
+$('btnObservar').addEventListener('click', () => { $('oMotivo').value = ''; $('oFallo').textContent = ''; $('veloObs').classList.add('abierto'); $('oMotivo').focus(); });
+$('btnConfirmarObs').addEventListener('click', async () => {
+  const m = $('oMotivo').value.trim(); if (m.length < 5) { $('oFallo').textContent = 'Escribe el motivo.'; return; }
+  const { error } = await sb.rpc('observar', { p_rq: rq.id, p_motivo: m });
+  if (error) { $('oFallo').textContent = mensajeError(error); return; }
+  $('veloObs').classList.remove('abierto'); aviso('Requerimiento devuelto al solicitante'); verRq(rq.id);
+});
+
+/* ── Modal de firma: dibujar / foto / guardada ── */
+const lienzo = $('lienzo'); let ctx, trazado = false, hayTrazo = false, fotoFirma = null, pestana = 'dibujar';
+function prepararLienzo() {
+  const r = lienzo.getBoundingClientRect(), k = window.devicePixelRatio || 1;
+  lienzo.width = r.width * k; lienzo.height = r.height * k;
+  ctx = lienzo.getContext('2d'); ctx.scale(k, k);
+  ctx.lineWidth = 2.4; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = '#0b1f4d';
+  hayTrazo = false;
+}
+const pos = e => { const r = lienzo.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
+lienzo.addEventListener('pointerdown', e => { trazado = true; lienzo.setPointerCapture(e.pointerId); const [x, y] = pos(e); ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + .1, y + .1); ctx.stroke(); hayTrazo = true; });
+lienzo.addEventListener('pointermove', e => { if (!trazado) return; const [x, y] = pos(e); ctx.lineTo(x, y); ctx.stroke(); });
+['pointerup', 'pointercancel', 'pointerleave'].forEach(ev => lienzo.addEventListener(ev, () => trazado = false));
+$('btnLimpiar').addEventListener('click', prepararLienzo);
+
+function verPestana(p) {
+  pestana = p;
+  $('fPest').querySelectorAll('button').forEach(b => b.classList.toggle('activo', b.dataset.p === p));
+  $('pGuardada').hidden = p !== 'guardada'; $('pDibujar').hidden = p !== 'dibujar'; $('pFoto').hidden = p !== 'foto';
+  $('chkGuardar').closest('label').hidden = p === 'guardada';
+  if (p === 'dibujar') requestAnimationFrame(prepararLienzo);
+}
+$('fPest').addEventListener('click', e => { const b = e.target.closest('button'); if (b) verPestana(b.dataset.p); });
+
+// recorta los bordes en blanco y reduce la imagen de la firma
+function recortar(canvas, fondoClaro = 235) {
+  const c = canvas.getContext('2d'), { width: w, height: h } = canvas, d = c.getImageData(0, 0, w, h).data;
+  let x0 = w, y0 = h, x1 = 0, y1 = 0;
+  for (let y = 0; y < h; y += 2) for (let x = 0; x < w; x += 2) {
+    const i = (y * w + x) * 4, a = d[i + 3], v = (d[i] + d[i + 1] + d[i + 2]) / 3;
+    if (a > 20 && v < fondoClaro) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+  }
+  if (x1 <= x0 || y1 <= y0) return null;
+  const m = 8; x0 = Math.max(0, x0 - m); y0 = Math.max(0, y0 - m); x1 = Math.min(w, x1 + m); y1 = Math.min(h, y1 + m);
+  const k = Math.min(1, 600 / (x1 - x0), 220 / (y1 - y0));
+  const o = document.createElement('canvas'); o.width = Math.round((x1 - x0) * k); o.height = Math.round((y1 - y0) * k);
+  const oc = o.getContext('2d'); oc.fillStyle = '#fff'; oc.fillRect(0, 0, o.width, o.height);
+  oc.drawImage(canvas, x0, y0, x1 - x0, y1 - y0, 0, 0, o.width, o.height);
+  return o.toDataURL('image/png');
+}
+$('inFirma').addEventListener('change', async () => {
+  const f = $('inFirma').files[0]; if (!f) return;
+  const img = await createImageBitmap(f).catch(() => null);
+  if (!img) { aviso('No se pudo leer la imagen', 'error'); return; }
+  const k = Math.min(1, 1400 / Math.max(img.width, img.height));
+  const c = document.createElement('canvas'); c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+  const cx = c.getContext('2d'); cx.drawImage(img, 0, 0, c.width, c.height);
+  // aclara el fondo del papel para que quede limpio
+  const px = cx.getImageData(0, 0, c.width, c.height), d = px.data;
+  for (let i = 0; i < d.length; i += 4) { const v = (d[i] + d[i + 1] + d[i + 2]) / 3; if (v > 150) { d[i] = d[i + 1] = d[i + 2] = 255; } }
+  cx.putImageData(px, 0, 0);
+  fotoFirma = recortar(c, 200);
+  $('imgFoto').src = fotoFirma || '';
+  if (!fotoFirma) aviso('No se distingue la firma en la foto. Prueba con más luz.', 'error');
+});
+
+async function abrirFirma(accion) {
+  firmaAccion = accion;
+  const sig = accion === 'enviar' ? etapas[0] : etapaSig(rq);
+  $('fTitulo').textContent = `Firmar como ${sig.nombre}`;
+  $('fAviso').textContent = accion === 'enviar'
+    ? 'Al firmar, el requerimiento recibe su número y pasa a Administración. Ya no podrás editarlo salvo que te lo devuelvan con observación.'
+    : sig.orden === etapas.length ? 'Es la firma final: el requerimiento quedará cerrado y no se podrá modificar.' : `Después de tu firma pasa a ${etapas[sig.orden]?.nombre}.`;
+  $('fFallo').textContent = ''; $('fObs').value = ''; $('chkGuardar').checked = false; fotoFirma = null; $('imgFoto').removeAttribute('src'); $('inFirma').value = '';
+  const { data } = await sb.from('firmas_guardadas').select('firma_img').maybeSingle();
+  firmaGuardada = data?.firma_img || null;
+  $('fPest').querySelector('[data-p="guardada"]').hidden = !firmaGuardada;
+  if (firmaGuardada) $('imgGuardada').src = firmaGuardada;
+  $('veloFirma').classList.add('abierto');
+  verPestana(firmaGuardada ? 'guardada' : 'dibujar');
+}
+$('btnConfirmarFirma').addEventListener('click', async () => {
+  let img = pestana === 'guardada' ? firmaGuardada : pestana === 'foto' ? fotoFirma : (hayTrazo ? recortar(lienzo) : null);
+  if (!img) { $('fFallo').textContent = pestana === 'foto' ? 'Sube la foto de tu firma.' : 'Dibuja tu firma en el recuadro.'; return; }
+  const b = $('btnConfirmarFirma'); b.disabled = true; b.textContent = 'Firmando…';
+  const { data, error } = await sb.rpc('firmar', { p_rq: rq.id, p_firma_img: img, p_obs: $('fObs').value.trim() || null });
+  b.disabled = false; b.textContent = 'Firmar';
+  if (error) { $('fFallo').textContent = mensajeError(error); return; }
+  if ($('chkGuardar').checked && pestana !== 'guardada') {
+    await sb.from('firmas_guardadas').upsert({ perfil_id: yo.id, firma_img: img, actualizado_en: new Date().toISOString() });
+  }
+  $('veloFirma').classList.remove('abierto');
+  aviso(data.estado === 'aprobado' ? `${data.rq_num} aprobado y cerrado` : `${data.rq_num} firmado`);
+  verRq(rq.id);
+});
+
+/* ═════ Arranque ═════ */
+(async () => {
+  yo = await exigirSesion();
+  $('quienNombre').textContent = yo.nombre;
+  $('quienRol').textContent = ROLES[yo.rol] + (yo.es_admin ? ' · Administrador' : '');
+  const [e, p, pf] = await Promise.all([
+    sb.from('etapas').select('*').order('orden'),
+    sb.from('proyectos').select('*').eq('activo', true).order('codigo', { ascending: false }),
+    sb.from('perfiles').select('id,nombre,cargo,rol')
+  ]);
+  etapas = e.data || []; proyectos = p.data || [];
+  (pf.data || []).forEach(x => perfiles.set(x.id, x));
+  const qs = new URLSearchParams(location.search);
+  if (qs.has('nuevo')) verRq(null);
+  else if (qs.get('id')) verRq(qs.get('id'));
+  else verLista();
+})();
+</script>
+</body>
+</html>

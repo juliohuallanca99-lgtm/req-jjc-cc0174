@@ -119,12 +119,12 @@
         <b>Catálogo SAP</b>
         <span>Busca códigos de la matriz por número o descripción.</span>
       </a>
-      <div class="ficha inactiva" title="En construcción">
+      <a class="ficha" href="/requerimientos">
         <div class="icono">📋</div>
         <b>Requerimientos</b>
         <span>Crear, firmar y consultar requerimientos.</span>
-        <span><span class="etiqueta azul">Próximamente</span></span>
-      </div>
+        <span id="alertaRq" hidden><span class="etiqueta rojo" id="alertaRqTxt"></span></span>
+      </a>
       <a class="ficha" href="/cuentas" id="fichaCuentas" hidden>
         <div class="icono">👥</div>
         <b>Cuentas</b>
@@ -168,6 +168,21 @@ function mostrarInicio(p) {
   $('saludo').textContent = 'Hola, ' + p.nombre.split(' ')[0];
   $('fichaCuentas').hidden = !p.es_admin;
   alertaAlquileres();
+  alertaRequerimientos(p);
+}
+
+/* Requerimientos que esperan mi firma */
+async function alertaRequerimientos(p) {
+  const [{ data: et }, { data: rqs }] = await Promise.all([
+    sb.from('etapas').select('orden,rol'),
+    sb.from('requerimientos').select('etapa,estado,creado_por').in('estado', ['en_firma', 'observado'])
+  ]);
+  if (!et || !rqs) return;
+  const n = rqs.filter(r => (r.estado === 'en_firma' && et.find(e => e.orden === r.etapa + 1)?.rol === p.rol)
+                         || (r.estado === 'observado' && r.creado_por === p.id)).length;
+  if (!n) return;
+  $('alertaRqTxt').textContent = `✍️ ${n} por firmar o corregir`;
+  $('alertaRq').hidden = false;
 }
 
 /* Aviso de equipos en alquiler por vencer o vencidos */
