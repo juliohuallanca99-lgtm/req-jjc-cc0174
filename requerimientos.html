@@ -32,63 +32,115 @@
 .etiqueta.ambar{background:#fdf3dd;color:var(--ambar)}
 .vacio{padding:34px;text-align:center;color:var(--gris2)}
 
-/* ── hoja del requerimiento (formato P-0174) ── */
-.hoja{background:#fff;border:1px solid var(--linea);border-radius:14px;padding:22px;margin-bottom:16px}
-.hoja-cab{display:grid;grid-template-columns:auto 1fr auto;gap:18px;align-items:center;border-bottom:3px solid var(--azul);padding-bottom:14px;margin-bottom:16px}
-.hoja-cab img{height:46px}
-.hoja-cab h3{margin:0;font:700 22px 'Barlow',sans-serif;color:var(--azul);letter-spacing:.02em}
-.hoja-cab .rq{text-align:right}
-.hoja-cab .rq b{display:block;font:700 20px ui-monospace,Menlo,monospace;color:var(--azul)}
-.rej3{display:grid;grid-template-columns:repeat(4,1fr);gap:12px 16px}
-.rej3 .doble{grid-column:span 2}
-.campo input:disabled,.campo select:disabled,.campo textarea:disabled{background:var(--campo);color:var(--tinta);opacity:1}
-.campo textarea{width:100%;padding:10px 12px;font:400 15px 'Barlow',sans-serif;border:1px solid #b9c6d4;border-radius:9px;min-height:56px;resize:vertical}
-.marcas{display:flex;flex-wrap:wrap;gap:6px}
-.marcas label{display:flex;align-items:center;gap:6px;border:1px solid #b9c6d4;border-radius:8px;padding:6px 10px;font:600 13.5px 'Barlow',sans-serif;cursor:pointer;background:#fff;margin:0;color:var(--tinta)}
-.marcas label:has(input:checked){background:#e3ebfb;border-color:#2f5bd0;color:var(--azul)}
-.marcas input{accent-color:var(--azul)}
-.marcas.bloq label{cursor:default}
-.seccion{font:600 13px 'Barlow',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#2f5bd0;margin:18px 0 8px}
-
-.items{width:100%;border-collapse:collapse;font-size:13.5px;min-width:1050px}
-.items th{background:var(--azul);color:#fff;font:600 11.5px 'Barlow',sans-serif;letter-spacing:.05em;text-transform:uppercase;padding:8px 6px;text-align:left;white-space:nowrap}
-.items td{border-top:1px solid #eef1f5;padding:6px;vertical-align:top}
-.items td.n{text-align:right}
-.items input{width:100%;padding:7px 8px;font:400 14px 'Barlow',sans-serif;border:1px solid #c6d1dd;border-radius:7px;background:#fff}
-.items input:disabled{background:transparent;border-color:transparent;color:var(--tinta);padding-left:0}
-.items input.num{text-align:right}
-.items .desc-ro{padding:7px 0;line-height:1.3}
-.items .nuevo-chk{display:flex;align-items:center;gap:4px;font-size:11.5px;color:var(--gris2);margin-top:3px;cursor:pointer;white-space:nowrap}
-.items .acomp{font-weight:700;text-align:right;padding-top:13px}
-.items .stock-info{font-size:11px;color:var(--verde);margin-top:2px}
-.items .quitar{border:0;background:none;color:var(--rojo);font-size:18px;cursor:pointer;padding:4px 6px}
-.items-caja{overflow-x:auto;border:1px solid var(--linea);border-radius:10px}
-.ac{position:relative}
-.ac-lista{position:fixed;z-index:60;background:#fff;border:1px solid #b9c6d4;border-radius:10px;box-shadow:0 16px 40px -12px rgba(0,20,60,.45);overflow:auto}
-.ac-lista .pie{position:sticky;bottom:0;background:#f5f7fa;color:var(--gris2);font-size:12px;cursor:default;border-top:1px solid var(--linea)}
-.ac-lista div{padding:9px 12px;cursor:pointer;border-top:1px solid #f0f3f7;font-size:14px;line-height:1.3}
-.ac-lista div:first-child{border-top:0}
-.ac-lista div:hover,.ac-lista div.sel{background:#eef3ff}
-.ac-lista b{font-family:ui-monospace,Menlo,monospace;color:var(--azul);margin-right:6px}
-.ac-lista small{color:var(--gris2);margin-left:4px}
-
-/* firmas */
-.firmas{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
-.firma{border:1px solid var(--linea);border-radius:10px;padding:10px;text-align:center;min-height:150px;display:flex;flex-direction:column;gap:4px;background:#fff}
-.firma .rol{font:600 11.5px 'Barlow',sans-serif;letter-spacing:.05em;text-transform:uppercase;color:var(--gris2)}
-.firma img{height:58px;max-width:100%;object-fit:contain;margin:4px auto}
-.firma .vacia{height:58px;display:grid;place-items:center;color:#b4bcc6;font-size:12.5px}
-.firma b{font-size:13px;color:var(--tinta);line-height:1.2}
-.firma small{font-size:11.5px;color:var(--gris2)}
-.firma.ok{border-color:#b8dcc6;background:#f6fbf8}
-.firma.turno{border:2px solid var(--ambar);background:#fffaf0}
-.obs-caja{background:#fdeeec;border:1px solid #efb7b0;border-left:5px solid var(--rojo);border-radius:10px;padding:12px 16px;margin-bottom:14px;font-size:14.5px}
-.turno-caja{background:#fff4e5;border:1px solid #f3c98b;border-left:5px solid var(--ambar);border-radius:10px;padding:12px 16px;margin-bottom:14px;font-size:14.5px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+/* ══════ Hoja P-0174: réplica del formato Excel de JJC ══════ */
+:root{--xl-azul:#2f75b5;--xl-azul-claro:#dde6f1;--xl-rojo:#ff0000;--xl-verde:#00b050;--xl-verde-claro:#e2efda;--xl-linea:#1d1d1d;--xl-gris:#7f8a96}
+.mesa{background:#d9dde3;border-radius:12px;padding:18px;overflow-x:auto;margin-bottom:16px;box-shadow:inset 0 1px 3px rgba(0,0,0,.08)}
+.hoja{width:1180px;margin:0 auto;background:#fff;padding:18px 18px 14px;box-shadow:0 2px 0 #c2c8cf,0 10px 30px -12px rgba(0,20,60,.35);font:400 12px/1.25 'Barlow',sans-serif;color:#111}
+.hoja input,.hoja select,.hoja textarea{font:inherit;color:inherit}
+/* bloque superior: datos a la izquierda, cuadros de control a la derecha */
+.xl-sup{display:grid;grid-template-columns:1fr 430px;gap:10px 28px}
+.xl-titulo{display:flex;align-items:center;gap:14px;margin-bottom:12px}
+.xl-titulo img{height:34px}
+.xl-titulo h3{margin:0;border:1.5px solid var(--xl-linea);padding:3px 26px 3px 8px;font:700 19px 'Barlow',sans-serif;letter-spacing:.01em;color:#111}
+.xl-titulo .proy{font:600 12px 'Barlow',sans-serif;color:var(--xl-gris)}
+.xl-datos{display:grid;grid-template-columns:112px 150px 104px 1fr;gap:4px 8px;align-items:center}
+.xl-et{font:700 10.5px 'Barlow Condensed','Barlow',sans-serif;letter-spacing:.06em;color:#111;text-transform:uppercase;white-space:nowrap}
+.xl-et.der{text-align:right}
+.xl-val{background:var(--xl-azul-claro);color:#1f4e8c;font-weight:600;padding:3px 6px;min-height:22px;border:0;width:100%;border-radius:0}
+.xl-val:disabled{opacity:1;-webkit-text-fill-color:#1f4e8c}
+.xl-val.ancho{grid-column:2 / span 3}
+.xl-val.solic{color:#1f4e8c;text-transform:uppercase}
+select.xl-val{appearance:none;-webkit-appearance:none;cursor:pointer}
+select.xl-val:disabled{cursor:default}
+.xl-sep{grid-column:1/-1;height:8px}
+.xl-marcar{display:grid;grid-template-columns:112px max-content max-content;justify-content:start;gap:0 48px;margin-top:12px;align-items:start}
+.xl-cajas{display:grid;grid-template-columns:auto 50px;align-items:center}
+.xl-cajas span{font:700 10.5px 'Barlow Condensed','Barlow',sans-serif;letter-spacing:.06em;text-align:right;padding-right:6px}
+.xl-x{position:relative;height:19px;border:1.5px solid var(--xl-linea);border-top-width:0;display:block;cursor:pointer;margin:0}
+.xl-cajas .xl-x:first-of-type{border-top-width:1.5px}
+.xl-cajas label:first-of-type ~ label .xl-x{border-top-width:0}
+.xl-x input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.xl-x b{position:absolute;inset:0;display:grid;place-items:center;font:700 13px 'Barlow',sans-serif;color:#c00000}
+.xl-x input:not(:checked) + b{visibility:hidden}
+.xl-x input:focus-visible + b{visibility:visible;outline:2px solid #f0b400;outline-offset:-3px;color:transparent}
+.xl-x input:focus-visible:checked + b{color:#c00000}
+.bloq .xl-x,.bloq .xl-x input{cursor:default}
+/* cuadros de la derecha */
+.xl-fecha{display:grid;grid-template-columns:1fr 130px;margin-left:auto;width:200px;border:1.5px solid var(--xl-linea)}
+.xl-fecha span{background:var(--xl-azul);color:#fff;font:700 10.5px 'Barlow Condensed',sans-serif;letter-spacing:.06em;padding:4px 6px}
+.xl-fecha input{border:0;padding:2px 6px;font:600 14px 'Barlow',sans-serif;text-align:center;width:100%;background:#fff}
+.xl-nota{text-align:right;font:600 9px 'Barlow',sans-serif;color:#333;margin:10px 0 2px}
+.xl-tabla{width:100%;border-collapse:collapse;table-layout:fixed}
+.xl-tabla th{background:var(--xl-azul);color:#fff;font:700 9.5px 'Barlow Condensed',sans-serif;letter-spacing:.07em;padding:3px 4px;border:1px solid var(--xl-linea);text-transform:uppercase}
+.xl-tabla td{border:1px solid var(--xl-linea);padding:2px 5px;text-align:center;font-size:12.5px;height:22px;background:#fff}
+.xl-tabla td.big{font:600 14px 'Barlow',sans-serif;letter-spacing:.02em}
+.xl-tabla td.gris{background:#dbe5f1}
+.xl-tabla .rojo{background:var(--xl-rojo);color:#fff;text-align:left;font:700 10px 'Barlow Condensed',sans-serif;letter-spacing:.06em}
+.xl-tabla .verde{background:var(--xl-verde);color:#fff;text-align:left;font:700 10px 'Barlow Condensed',sans-serif;letter-spacing:.06em}
+.xl-tabla td.chico{font-size:10.5px;text-transform:uppercase}
+.xl-tabla select{border:0;background:transparent;width:100%;text-align:center;font-weight:600;appearance:none;-webkit-appearance:none;cursor:pointer}
+.xl-tabla select:disabled{cursor:default;-webkit-text-fill-color:#111;opacity:1}
+.xl-leyendas{display:grid;grid-template-columns:1fr;gap:8px;width:200px;margin-top:12px}
+.xl-ley{border-collapse:collapse;width:100%}
+.xl-ley td{border:1px solid var(--xl-linea);font:700 9.5px 'Barlow Condensed',sans-serif;letter-spacing:.06em;padding:1px 5px;height:16px}
+.xl-ley td:first-child{background:#000;color:#fff;width:64%}
+.xl-ley td:last-child{text-align:center;background:#fff;cursor:pointer}
+.xl-ley tr.sel td:last-child{background:#ffe699;color:#000}
+.bloq .xl-ley td:last-child{cursor:default}
+.xl-ley td{position:relative}
+.xl-ley input{position:absolute;opacity:0;pointer-events:none;left:0;top:0}
+.xl-ley td:has(input:focus-visible){outline:2px solid #f0b400;outline-offset:-2px}
+/* materiales */
+.xl-items-caja{margin-top:16px}
+.xl-items{width:100%;border-collapse:collapse;table-layout:fixed}
+.xl-items th{background:var(--xl-azul);color:#fff;font:700 9.5px/1.1 'Barlow Condensed',sans-serif;letter-spacing:.06em;text-transform:uppercase;padding:6px 3px;border:1px solid #1d3f66;text-align:center;vertical-align:middle}
+.xl-items th.st{background:var(--xl-rojo);border-color:#a00}
+.xl-items th.cp{background:var(--xl-verde);border-color:#00733a}
+.xl-items td{border:1px solid #9aa3ad;padding:0;height:26px;font-size:12px;text-align:center;vertical-align:middle;background:#fff;position:relative}
+.xl-items td.izq{text-align:left;padding:2px 6px}
+.xl-items td.cp{background:var(--xl-verde-claro);font-weight:700}
+.xl-items td.fuerte{font-weight:700;font-size:12.5px}
+.xl-items input{width:100%;height:auto;min-height:25px;border:0;background:transparent;padding:2px 5px;font:inherit;text-align:inherit;border-radius:0}
+.xl-items input:focus{outline:2px solid #217346;outline-offset:-2px;background:#fff}
+.xl-items input:disabled{-webkit-text-fill-color:#111;opacity:1}
+.xl-items input[type=date]{font-size:11px;padding:0 2px}
+.xl-items .desc{text-align:left}
+.xl-items .desc input{text-align:left}
+.xl-items .nuevo-chk{display:flex;align-items:center;justify-content:center;gap:3px;font-size:9.5px;color:var(--gris2);cursor:pointer;white-space:nowrap;padding:0 0 2px}
+.xl-items .nuevo-chk input{width:auto;min-height:0;height:auto}
+.xl-items .tag-nuevo{display:block;font:700 9px 'Barlow',sans-serif;color:#c55a11;text-transform:uppercase;letter-spacing:.04em}
+.xl-items .stock-info{display:block;font-size:9.5px;color:#217346;line-height:1;padding-bottom:2px}
+.xl-items .quitar{border:0;background:none;color:var(--rojo);font-size:16px;cursor:pointer;padding:0 4px;line-height:1}
+.xl-items tr.vacia td{height:22px}
+.xl-pie{display:flex;justify-content:space-between;align-items:center;margin-top:8px;gap:10px}
+.xl-obs{margin-top:10px;display:grid;grid-template-columns:112px 1fr;gap:8px;align-items:start}
+.xl-obs textarea{border:1px solid #9aa3ad;min-height:34px;padding:4px 6px;resize:vertical;width:100%;font-size:12px;border-radius:0}
+.xl-obs textarea:disabled{background:#fff;-webkit-text-fill-color:#111;opacity:1;resize:none}
+/* firmas al pie de la hoja */
+.xl-firmas{display:grid;grid-template-columns:repeat(6,1fr);border:1px solid var(--xl-linea);margin-top:14px}
+.xl-firma{border-left:1px solid var(--xl-linea);display:flex;flex-direction:column;text-align:center;min-height:118px}
+.xl-firma:first-child{border-left:0}
+.xl-firma .zona{flex:1;display:grid;place-items:center;padding:4px;min-height:62px}
+.xl-firma .zona img{max-height:56px;max-width:100%;object-fit:contain}
+.xl-firma .zona .pend{font-size:11px;color:#b4bcc6}
+.xl-firma .quien{border-top:1px solid var(--xl-linea);padding:3px 4px;font-size:10.5px;line-height:1.2;min-height:34px}
+.xl-firma .quien b{display:block;font-size:11px;text-transform:uppercase}
+.xl-firma .rol{background:var(--xl-azul);color:#fff;font:700 9.5px 'Barlow Condensed',sans-serif;letter-spacing:.06em;text-transform:uppercase;padding:4px 3px;border-top:1px solid var(--xl-linea)}
+.xl-firma.turno .zona{background:#fff8e1}
+.xl-firma.turno .zona .pend{color:#a56a00;font-weight:600}
+.huella{font:10px 'Barlow',sans-serif;color:#555;margin-top:6px;word-break:break-all}
+/* encabezado de estado sobre la hoja (fuera del formato) */
+.estado-rq{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:12px}
+.estado-rq .num{font:700 22px 'Barlow',sans-serif;color:var(--azul)}
+.estado-rq .pasos i{width:22px;height:7px}
+.estado-rq .sig{color:var(--gris2);font-size:14px}
+.obs-caja{background:#fdeeec;border:1px solid #efb7b0;border-left:5px solid var(--rojo);border-radius:10px;padding:12px 16px;margin-bottom:12px;font-size:14.5px}
+.turno-caja{background:#fff4e5;border:1px solid #f3c98b;border-left:5px solid var(--ambar);border-radius:10px;padding:12px 16px;margin-bottom:12px;font-size:14.5px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .turno-caja .acciones{margin:0 0 0 auto}
 .boton.verde{background:var(--verde)}
 .boton.peligro{background:#fff;color:var(--rojo);border:1px solid #e8b4ae}
 .pie-acc{position:sticky;bottom:0;background:linear-gradient(180deg,rgba(238,242,247,0),var(--fondo) 30%);padding:16px 0 10px;display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;z-index:5}
-.huella{font:11px ui-monospace,Menlo,monospace;color:var(--gris2);word-break:break-all;margin-top:10px}
+.pie-acc .ayuda{margin-right:auto;align-self:center;color:var(--gris2);font-size:13.5px}
 
 /* modal de firma */
 .modal.firma-modal{width:min(620px,100%)}
@@ -99,25 +151,23 @@
 .firma-prev{height:140px;border:1px solid var(--linea);border-radius:10px;display:grid;place-items:center;background:#fff}
 .firma-prev img{max-height:130px;max-width:95%}
 
-@media(max-width:900px){
-  .rej3{grid-template-columns:1fr 1fr}
-  .firmas{grid-template-columns:repeat(3,1fr)}
-  .hoja{padding:14px}
-  .hoja-cab{grid-template-columns:1fr auto}.hoja-cab img{display:none}
-}
-@media(max-width:560px){ .firmas{grid-template-columns:repeat(2,1fr)} .rej3{grid-template-columns:1fr} .rej3 .doble{grid-column:auto} }
+@media(max-width:700px){ .mesa{padding:8px;border-radius:8px} }
 @media print{
-  @page{size:A4 landscape;margin:10mm}
-  body{background:#fff}
-  .cabecera,.barra-sup,.pie-acc,.turno-caja,.no-imprimir,#avisos{display:none !important}
+  @page{size:A4 landscape;margin:7mm}
+  html,body{background:#fff !important}
+  .cabecera,.barra-sup,.pie-acc,.turno-caja,.obs-caja,.estado-rq,.no-imprimir,#avisos,.ac-lista{display:none !important}
   .contenido{padding:0;max-width:none}
-  .hoja{border:0;padding:0}
-  .items-caja{overflow:visible;border:0}
-  .items{min-width:0;font-size:10.5px}
-  .items input{border:0;padding:0;background:none}
-  .firma{break-inside:avoid}
-  .campo select,.campo input{appearance:none;-webkit-appearance:none;background:none !important;border-color:#d6dde6}
-  #eObs:placeholder-shown{display:none}
+  .mesa{background:none;padding:0;box-shadow:none;overflow:visible}
+  .hoja{box-shadow:none;padding:0;width:100%;zoom:.86}
+  .xl-items td,.xl-items tr.vacia td{height:18px}
+  .xl-items input{min-height:17px;padding:0 4px}
+  .xl-firma{min-height:96px}.xl-firma .zona{min-height:50px}
+  .xl-obs textarea{min-height:26px}
+  .xl-items thead{display:table-header-group}
+  .xl-items tr,.xl-firmas{break-inside:avoid}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .hoja ::placeholder{color:transparent}
+  .hoja input[type=date]::-webkit-calendar-picker-indicator{display:none}
 }
 </style>
 </head>
@@ -164,48 +214,83 @@
       </div>
     </div>
 
-    <div class="hoja">
-      <div class="hoja-cab">
-        <img src="/img/logo-jjc.png" alt="JJC">
-        <div><h3 id="hTitulo">REQUERIMIENTO</h3><span class="sub2" id="hSub"></span></div>
-        <div class="rq"><span class="sub2">N° de requerimiento</span><b id="hNum">Borrador</b><span id="hEstado"></span></div>
+    <div class="estado-rq">
+      <span class="num" id="hNum">Borrador</span>
+      <span id="hEstado"></span>
+      <div class="pasos" id="hPasos"></div>
+      <span class="sig" id="hSig"></span>
+    </div>
+
+    <div class="mesa">
+    <div class="hoja" id="hoja">
+      <div class="xl-sup">
+        <div>
+          <div class="xl-titulo"><img src="/img/logo-jjc.png" alt="JJC"><h3 id="hTitulo">REQUERIMIENTO P-0174</h3><span class="proy" id="hSub"></span></div>
+          <div class="xl-datos">
+            <span class="xl-et">Centro:</span>
+            <select class="xl-val" id="eProy" title="Proyecto"></select>
+            <span class="xl-et der">Cod. SOLPED:</span>
+            <div style="display:flex;gap:6px"><input class="xl-val" id="eSolped" style="max-width:180px" autocomplete="off"><button type="button" class="boton-linea no-imprimir" id="btnSolped" hidden>Guardar</button></div>
+            <span class="xl-et">Almacén:</span>
+            <input class="xl-val" id="eAlm" maxlength="10">
+            <span class="xl-et der">Cod. reserva:</span>
+            <input class="xl-val" id="eReserva" style="max-width:180px" autocomplete="off">
+            <span></span><span></span>
+            <span class="xl-et der">PEP:</span>
+            <input class="xl-val" id="ePep" list="dlPep" autocomplete="off" placeholder="P-0174.12.06.26" style="max-width:240px">
+            <div class="xl-sep"></div>
+            <span class="xl-et">Solicitante:</span>
+            <input class="xl-val solic ancho" id="eSolic" disabled>
+            <span class="xl-et">Tipo de material:</span>
+            <input class="xl-val ancho" id="eTipoDesc" placeholder="EQUIPOS Y MATERIALES">
+          </div>
+          <div class="xl-marcar">
+            <span class="xl-et" style="padding-top:2px">Marcar con «X»</span>
+            <div class="xl-cajas" id="eClaseA"></div>
+            <div class="xl-cajas" id="eClaseB"></div>
+          </div>
+          <div id="eClase" hidden></div>
+        </div>
+
+        <div>
+          <div class="xl-fecha"><span>FECHA:</span><input type="date" id="eFecha"></div>
+          <div class="xl-nota">rq. Correlativo x proyecto</div>
+          <table class="xl-tabla">
+            <thead><tr><th style="width:44%">Proyecto RQ</th><th>No.</th><th>Tipo</th><th>Solicitante</th></tr></thead>
+            <tbody><tr><td class="big" id="cProy">—</td><td class="big" id="cNo"></td><td class="gris chico" id="cTipo"></td><td class="gris"><select id="eArea" title="Área solicitante"><option value=""></option><option value="CO">CO</option><option value="OT">OT</option></select></td></tr></tbody>
+          </table>
+          <table class="xl-tabla" style="margin-top:12px">
+            <thead><tr><th style="width:52%;background:var(--xl-azul)"></th><th>Revisado por</th><th style="width:16%">Área</th></tr></thead>
+            <tbody>
+              <tr><td class="rojo">REVISIÓN STOCK EN OBRA &nbsp;JJC</td><td class="chico" id="cRevJjc"></td><td class="chico" id="cRevJjcArea"></td></tr>
+              <tr><td class="verde">REVISIÓN STOCK EN OBRA</td><td class="chico" id="cRevMb"></td><td class="chico" id="cRevMbArea"></td></tr>
+            </tbody>
+          </table>
+          <div class="xl-leyendas">
+            <table class="xl-ley" id="eCat"></table>
+            <table class="xl-ley" id="eAreaLey"><tbody><tr><td>CONSTRUCCIÓN</td><td data-area="CO">CO</td></tr><tr><td>OFICINA TÉCNICA</td><td data-area="OT">OT</td></tr></tbody></table>
+          </div>
+        </div>
       </div>
 
-      <div class="rej3">
-        <div class="campo"><label for="eProy">Proyecto / Centro</label><select id="eProy"></select></div>
-        <div class="campo"><label for="eFecha">Fecha</label><input type="date" id="eFecha"></div>
-        <div class="campo"><label for="eAlm">Almacén</label><input id="eAlm" value="0001" maxlength="10"></div>
-        <div class="campo"><label for="eArea">Área solicitante</label>
-          <select id="eArea"><option value="">—</option><option value="CO">CONSTRUCCIÓN (CO)</option><option value="OT">OFICINA TÉCNICA (OT)</option></select></div>
-        <div class="campo doble"><label for="ePep">PEP / Fase de proyecto</label><input id="ePep" list="dlPep" autocomplete="off" placeholder="P-0174.12.06.26"></div>
-        <div class="campo doble"><label for="eTipoDesc">Tipo de material</label><input id="eTipoDesc" placeholder="EQUIPOS Y MATERIALES"></div>
-        <div class="campo"><label>Solicitante</label><input id="eSolic" disabled></div>
-        <div class="campo"><label for="eSolped">COD. SOLPED</label><input id="eSolped" placeholder="Lo registra Almacén"></div>
-        <div class="campo"><label for="eReserva">COD. RESERVA</label><input id="eReserva" placeholder="Lo registra Almacén"></div>
-        <div class="campo" style="align-self:end"><button type="button" class="boton claro no-imprimir" id="btnSolped" hidden>Guardar SOLPED / Reserva</button></div>
-      </div>
-
-      <div class="seccion">Marcar con «X» — clase SAP</div>
-      <div class="marcas" id="eClase"></div>
-      <div class="seccion">Tipo</div>
-      <div class="marcas" id="eCat"></div>
-
-      <div class="seccion">Materiales</div>
-      <div class="items-caja">
-        <table class="items">
-          <thead><tr><th style="width:34px">#</th><th style="width:70px">Partida</th><th style="width:130px">Código SAP</th><th>Descripción</th><th style="width:60px">Und.</th><th style="width:90px">Cantidad</th><th style="width:90px">Stock obra</th><th style="width:90px">A comprar</th><th style="width:130px">Fecha req. obra</th><th style="width:160px">Observación</th><th class="no-imprimir" style="width:34px"></th></tr></thead>
+      <div class="xl-items-caja">
+        <table class="xl-items">
+          <colgroup><col style="width:32px"><col style="width:90px"><col style="width:30px"><col style="width:40px"><col style="width:36px"><col style="width:50px"><col style="width:80px"><col><col style="width:56px"><col style="width:40px"><col style="width:56px"><col style="width:56px"><col style="width:88px"><col style="width:96px"><col style="width:110px"><col class="no-imprimir" style="width:22px"></colgroup>
+          <thead><tr><th>Item</th><th>Proyecto</th><th>RQ<br>#</th><th>Tipo</th><th>Solic.</th><th>Partida<br>ppto</th><th>Código</th><th>Descripción</th><th>Cantidad</th><th>Und.</th><th class="st">Cantidad<br>stock</th><th class="cp">Cantidad<br>compra</th><th>Fecha req.<br>obra</th><th>Solicitante</th><th>Observación</th><th class="no-imprimir"></th></tr></thead>
           <tbody id="eItems"></tbody>
         </table>
+        <div class="xl-pie no-imprimir"><button type="button" class="boton claro" id="btnItem">＋ Agregar material</button><span class="sub2" id="itemsAyuda"></span></div>
       </div>
-      <button type="button" class="boton claro no-imprimir" id="btnItem" style="margin-top:10px">＋ Agregar material</button>
-      <div class="campo" style="margin-top:14px"><label for="eObs">Observaciones generales</label><textarea id="eObs"></textarea></div>
 
-      <div class="seccion">Firmas</div>
-      <div class="firmas" id="eFirmas"></div>
+      <div class="xl-obs"><span class="xl-et" style="padding-top:6px">Observaciones:</span><textarea id="eObs"></textarea></div>
+
+      <div class="xl-firmas" id="eFirmas"></div>
       <div class="huella" id="eHuella"></div>
+    </div>
     </div>
 
     <div class="pie-acc" id="pieAcc">
+      <span class="ayuda" id="pieAyuda"></span>
       <button class="boton peligro" id="btnEliminar" hidden>Eliminar borrador</button>
       <button class="boton claro" id="btnImprimir">🖨️ Imprimir / PDF</button>
       <button class="boton claro" id="btnGuardar" hidden>Guardar borrador</button>
@@ -344,14 +429,32 @@ async function verRq(id) {
 }
 const itemVacio = () => ({ codigo: '', descripcion: '', unidad: '', nuevo: false, cantidad: '', stock: '', partida: '', fecha_req: '', obs: '' });
 
+function correlativo(n) { return n ? String(Number(n.split('-').pop())) : ''; }
+function marcaClase(k, dis) {
+  return `<span>${k}</span><label class="xl-x" title="${k}"><input type="checkbox" value="${k}" ${(rq.clase_sap || []).includes(k) ? 'checked' : ''} ${dis}><b>X</b></label>`;
+}
+function pintarCabeceraDerecha() {
+  const cats = [...$('eCat').querySelectorAll('input:checked')].map(c => c.value);
+  $('cProy').textContent = rq.rq_num || 'BORRADOR';
+  $('cNo').textContent = correlativo(rq.rq_num);
+  $('cTipo').textContent = cats.join(' / ');
+  const area = $('eArea').value;
+  $('eAreaLey').querySelectorAll('tr').forEach(tr => tr.classList.toggle('sel', tr.querySelector('[data-area]').dataset.area === area));
+  const fAlm = firmas.find(f => f.orden === 6), fMb = firmas.find(f => f.orden === 5);
+  $('cRevJjc').textContent = fAlm ? fAlm.nombre : ''; $('cRevJjcArea').textContent = fAlm ? 'ALM' : '';
+  $('cRevMb').textContent = fMb ? fMb.nombre : ''; $('cRevMbArea').textContent = fMb ? 'MARCOBRE' : '';
+}
 function pintarRq() {
   const proy = proyectos.find(p => p.codigo === rq.proyecto_codigo);
   $('hTitulo').textContent = 'REQUERIMIENTO P-' + (rq.proyecto_codigo || '');
   $('hSub').textContent = proy ? proy.nombre : '';
-  $('hNum').textContent = rq.rq_num || 'Borrador';
+  $('hNum').textContent = rq.rq_num || (rq.id ? 'Borrador' : 'Nuevo requerimiento');
   const [t, c] = ESTADO[rq.estado] || [rq.estado, ''];
   $('hEstado').innerHTML = `<span class="etiqueta ${c}">${t}</span>`;
-  $('eProy').innerHTML = proyectos.map(p => `<option value="${p.codigo}">${p.codigo} — ${escapar(p.nombre)}</option>`).join('');
+  $('hPasos').innerHTML = etapas.map(e => `<i class="${e.orden <= rq.etapa ? 'ok' : ''}" title="${escapar(e.nombre)}"></i>`).join('');
+  const sig = etapaSig(rq);
+  $('hSig').textContent = rq.estado === 'aprobado' ? 'Las 6 firmas completas' : rq.estado === 'en_firma' ? `Firma ${rq.etapa} de ${etapas.length} · espera a ${sig?.nombre}` : '';
+  $('eProy').innerHTML = proyectos.map(p => `<option value="${p.codigo}" title="${escapar(p.nombre)}">${p.codigo}</option>`).join('');
   $('eProy').value = rq.proyecto_codigo || '';
   $('eFecha').value = rq.fecha || ''; $('eAlm').value = rq.almacen || ''; $('eArea').value = rq.area || '';
   $('ePep').value = rq.pep || ''; $('eTipoDesc').value = rq.tipo_desc || rq.tipo_material || ''; $('eObs').value = rq.obs || '';
@@ -360,22 +463,23 @@ function pintarRq() {
   ['eProy', 'eFecha', 'eAlm', 'eArea', 'ePep', 'eTipoDesc', 'eObs'].forEach(i => $(i).disabled = !editable);
   $('eProy').disabled = !editable || !!rq.rq_num;            // con número, el proyecto ya no cambia
   const almacen = yo.rol === 'almacen' || yo.es_admin;
-  const solpedEditable = (editable) || (almacen && rq.id && rq.etapa > 0);
+  const solpedEditable = editable || (almacen && rq.id && rq.etapa > 0);
   $('eSolped').disabled = $('eReserva').disabled = !solpedEditable;
+  $('eSolped').placeholder = $('eReserva').placeholder = solpedEditable && !editable ? 'Escribe y guarda' : '';
   $('btnSolped').hidden = !(almacen && rq.id && rq.etapa > 0);
-  $('eClase').className = 'marcas' + (editable ? '' : ' bloq');
-  $('eClase').innerHTML = CLASES.map(k => `<label><input type="checkbox" value="${k}" ${(rq.clase_sap || []).includes(k) ? 'checked' : ''} ${editable ? '' : 'disabled'}> ${k}</label>`).join('');
-  $('eCat').className = 'marcas' + (editable ? '' : ' bloq');
-  $('eCat').innerHTML = TIPOS.map(([k, n]) => `<label><input type="checkbox" value="${k}" ${(rq.categoria || []).includes(k) ? 'checked' : ''} ${editable ? '' : 'disabled'}> ${n} (${k})</label>`).join('');
+  const dis = editable ? '' : 'disabled';
+  $('hoja').classList.toggle('bloq', !editable);
+  $('eClaseA').innerHTML = CLASES.slice(0, 5).map(k => marcaClase(k, dis)).join('');
+  $('eClaseB').innerHTML = CLASES.slice(5).map(k => marcaClase(k, dis)).join('');
+  $('eCat').innerHTML = '<tbody>' + TIPOS.map(([k, n]) => `<tr class="${(rq.categoria || []).includes(k) ? 'sel' : ''}"><td>${n}</td><td><label style="display:block;cursor:inherit"><input type="checkbox" value="${k}" ${(rq.categoria || []).includes(k) ? 'checked' : ''} ${dis}>${k}</label></td></tr>`).join('') + '</tbody>';
+  pintarCabeceraDerecha();
   cargarPeps();
   pintarItems();
   pintarFirmas();
   // observación
   const o = rq.observacion;
   $('obsCaja').hidden = !(rq.estado === 'observado' && o);
-  if (o) $('obsCaja').innerHTML = `<b>Observado por ${escapar(o.etapa)} (${escapar(o.por)})</b> · ${fechaHora(o.fecha)}<br>${escapar(o.motivo)}${rq.creado_por === yo.id ? '<br><b>Corrige lo indicado y vuelve a firmar y enviar.</b>' : ''}`;
-  // turno de firma
-  const sig = etapaSig(rq);
+  if (o) $('obsCaja').innerHTML = `<b>Observado por ${escapar(o.etapa)} (${escapar(o.por)})</b>, ${fechaHora(o.fecha)}<br>${escapar(o.motivo)}${rq.creado_por === yo.id ? '<br><b>Corrige lo indicado y vuelve a firmar y enviar.</b>' : ''}`;
   $('turnoCaja').hidden = !esMiTurno(rq);
   if (esMiTurno(rq)) $('turnoTxt').innerHTML = `<b>Te toca firmar</b> como ${escapar(sig.nombre)} (firma ${sig.orden} de ${etapas.length}).`;
   // botones
@@ -383,8 +487,17 @@ function pintarRq() {
   $('btnEnviar').hidden = !editable;
   $('btnEliminar').hidden = !(editable && rq.id && !rq.rq_num);
   $('btnItem').hidden = !editable;
-  $('eHuella').textContent = rq.hash_contenido ? `Huella de seguridad (SHA-256): ${rq.hash_contenido} · cerrado ${fechaHora(rq.bloqueado_en)}` : '';
+  $('itemsAyuda').textContent = editable ? 'Escribe en «Descripción» o «Código» y elige de la lista. Si no existe en SAP, marca «Nuevo».' : '';
+  $('pieAyuda').textContent = editable ? 'Los cambios se guardan al pulsar «Guardar borrador» o al firmar.' : '';
+  $('eHuella').textContent = rq.hash_contenido ? `Huella de seguridad SHA-256: ${rq.hash_contenido} · cerrado el ${fechaHora(rq.bloqueado_en)}` : '';
 }
+// marcar tipo y área haciendo clic en la leyenda, como en el Excel
+$('eCat').addEventListener('change', e => { e.target.closest('tr').classList.toggle('sel', e.target.checked); pintarCabeceraDerecha(); pintarItems(); });
+$('eAreaLey').addEventListener('click', e => {
+  const td = e.target.closest('[data-area]'); if (!td || !editable) return;
+  $('eArea').value = $('eArea').value === td.dataset.area ? '' : td.dataset.area; pintarCabeceraDerecha(); pintarItems();
+});
+$('eArea').addEventListener('change', () => { pintarCabeceraDerecha(); pintarItems(); });
 
 async function cargarPeps() {
   if ($('dlPep').dataset.p === rq.proyecto_codigo) return;
@@ -392,29 +505,42 @@ async function cargarPeps() {
   const { data } = await sb.from('stock').select('fase').like('fase', `P-${rq.proyecto_codigo}%`).limit(1000);
   $('dlPep').innerHTML = [...new Set((data || []).map(x => x.fase))].sort().map(f => `<option value="${escapar(f)}">`).join('');
 }
-$('eProy').addEventListener('change', () => { rq.proyecto_codigo = $('eProy').value; $('hTitulo').textContent = 'REQUERIMIENTO P-' + rq.proyecto_codigo; $('hSub').textContent = proyectos.find(p => p.codigo === rq.proyecto_codigo)?.nombre || ''; cargarPeps(); });
+$('eProy').addEventListener('change', () => { rq.proyecto_codigo = $('eProy').value; $('hTitulo').textContent = 'REQUERIMIENTO P-' + rq.proyecto_codigo; $('hSub').textContent = proyectos.find(p => p.codigo === rq.proyecto_codigo)?.nombre || ''; cargarPeps(); pintarItems(); });
 
 /* ── Ítems ── */
 function pintarItems() {
   const dis = editable ? '' : 'disabled';
-  $('eItems').innerHTML = items.map((it, i) => {
-    const acomp = Math.max(0, (Number(it.cantidad) || 0) - (Number(it.stock) || 0));
+  const proyRq = rq.rq_num || (rq.proyecto_codigo ? 'P-' + rq.proyecto_codigo : '');
+  const tipo = [...$('eCat').querySelectorAll('input:checked')].map(c => c.value).join('/');
+  const area = $('eArea').value, solic = rq.id ? nombreDe(rq.creado_por) : yo.nombre;
+  const filas = items.map((it, i) => {
+    const acomp = Math.max(0, (Number(String(it.cantidad).replace(',', '.')) || 0) - (Number(String(it.stock).replace(',', '.')) || 0));
+    const cod = it.nuevo ? '<span class="tag-nuevo">Nuevo</span>'
+      : editable ? `<input data-k="codigo" class="buscarSap" value="${escapar(it.codigo)}" placeholder="Código" autocomplete="off">` : escapar(it.codigo);
+    const desc = it.nuevo && editable ? `<input data-k="descripcion" value="${escapar(it.descripcion)}" placeholder="Describe el material nuevo">`
+      : editable && !it.codigo ? `<input class="buscarSap" data-k="buscar" placeholder="Escribe para buscar en el catálogo SAP" autocomplete="off">`
+      : `<span style="display:block;padding:3px 6px">${escapar(it.descripcion)}</span>`;
     return `<tr data-i="${i}">
-      <td class="n" style="padding-top:13px">${i + 1}</td>
+      <td class="fuerte">${i + 1}</td>
+      <td class="fuerte" style="font-size:10px;white-space:nowrap;letter-spacing:-.01em">${escapar(proyRq)}</td>
+      <td class="fuerte">${escapar(correlativo(rq.rq_num))}</td>
+      <td class="fuerte">${escapar(tipo)}</td>
+      <td class="fuerte">${escapar(area)}</td>
       <td><input data-k="partida" value="${escapar(it.partida)}" ${dis}></td>
-      <td class="ac">${it.nuevo ? '<div class="desc-ro sub2" style="display:block">Sin código</div>' : `<input data-k="codigo" class="buscarSap" value="${escapar(it.codigo)}" placeholder="${editable ? 'Código o nombre' : ''}" autocomplete="off" ${dis}>`}
-        ${editable ? `<label class="nuevo-chk"><input type="checkbox" data-k="nuevo" ${it.nuevo ? 'checked' : ''}> Material nuevo</label>` : it.nuevo ? '<span class="etiqueta ambar">Nuevo</span>' : ''}</td>
-      <td class="ac">${it.nuevo && editable ? `<input data-k="descripcion" value="${escapar(it.descripcion)}" placeholder="Describe el material">`
-        : editable && !it.codigo ? `<input class="buscarSap" data-k="buscar" placeholder="Escribe para buscar en el catálogo SAP" autocomplete="off">`
-        : `<div class="desc-ro">${escapar(it.descripcion)}</div>`}</td>
-      <td>${it.nuevo && editable ? `<input data-k="unidad" value="${escapar(it.unidad)}" placeholder="UND">` : `<div class="desc-ro">${escapar(it.unidad)}</div>`}</td>
-      <td><input data-k="cantidad" class="num" inputmode="decimal" value="${escapar(it.cantidad)}" ${dis}></td>
-      <td><input data-k="stock" class="num" inputmode="decimal" value="${escapar(it.stock)}" ${dis}>${it.stockObra != null ? `<div class="stock-info">En obra: ${num(it.stockObra)}</div>` : ''}</td>
-      <td class="acomp">${num(acomp)}</td>
-      <td>${editable ? `<input data-k="fecha_req" type="date" value="${escapar(it.fecha_req)}">` : `<div class="desc-ro">${it.fecha_req ? fCorta(it.fecha_req) : ''}</div>`}</td>
-      <td><input data-k="obs" value="${escapar(it.obs)}" ${dis}></td>
-      <td class="no-imprimir">${editable ? `<button type="button" class="quitar" data-quitar="${i}" title="Quitar">×</button>` : ''}</td></tr>`;
-  }).join('') || `<tr><td colspan="11" class="vacio">Sin materiales.</td></tr>`;
+      <td class="ac">${cod}${editable ? `<label class="nuevo-chk no-imprimir"><input type="checkbox" data-k="nuevo" ${it.nuevo ? 'checked' : ''}>Nuevo</label>` : ''}</td>
+      <td class="desc ac">${desc}</td>
+      <td><input data-k="cantidad" inputmode="decimal" value="${escapar(it.cantidad)}" ${dis} style="text-align:center"></td>
+      <td>${it.nuevo && editable ? `<input data-k="unidad" value="${escapar(it.unidad)}" placeholder="UND" style="text-align:center">` : escapar(it.unidad)}</td>
+      <td><input data-k="stock" inputmode="decimal" value="${escapar(it.stock)}" ${dis} style="text-align:center">${it.stockObra != null ? `<span class="stock-info no-imprimir">obra: ${num(it.stockObra)}</span>` : ''}</td>
+      <td class="cp acomp">${num(acomp)}</td>
+      <td>${editable ? `<input data-k="fecha_req" type="date" value="${escapar(it.fecha_req)}">` : (it.fecha_req ? fCorta(it.fecha_req) : '')}</td>
+      <td class="izq" style="font-size:11px;text-transform:uppercase">${escapar(solic)}</td>
+      <td><input data-k="obs" value="${escapar(it.obs)}" ${dis} style="text-align:left"></td>
+      <td class="no-imprimir">${editable ? `<button type="button" class="quitar" data-quitar="${i}" title="Quitar material">×</button>` : ''}</td></tr>`;
+  });
+  // como en el Excel, siempre se ven al menos 12 filas numeradas
+  for (let k = items.length; k < 12; k++) filas.push(`<tr class="vacia"><td class="fuerte">${k + 1}</td>${'<td></td>'.repeat(10)}<td class="cp"></td><td></td><td></td><td></td><td class="no-imprimir"></td></tr>`);
+  $('eItems').innerHTML = filas.join('');
 }
 $('eItems').addEventListener('input', e => {
   const tr = e.target.closest('tr[data-i]'); if (!tr || !e.target.dataset.k) return;
@@ -515,7 +641,7 @@ document.addEventListener('mousedown', e => {
 function leerCab() {
   return { proyecto: $('eProy').value, fecha: $('eFecha').value, almacen: $('eAlm').value, area: $('eArea').value,
     pep: $('ePep').value, tipo_desc: $('eTipoDesc').value, obs: $('eObs').value,
-    clase_sap: [...$('eClase').querySelectorAll('input:checked')].map(c => c.value),
+    clase_sap: [...document.querySelectorAll('#eClaseA input:checked, #eClaseB input:checked')].map(c => c.value),
     categoria: [...$('eCat').querySelectorAll('input:checked')].map(c => c.value) };
 }
 function validar(paraEnviar) {
@@ -579,13 +705,14 @@ $('btnImprimir').addEventListener('click', () => window.print());
 function pintarFirmas() {
   $('eFirmas').innerHTML = etapas.map(e => {
     const f = firmas.find(x => x.orden === e.orden);
-    const turno = rq.estado === 'en_firma' && e.orden === rq.etapa + 1 || (rq.etapa === 0 && e.orden === 1 && rq.estado !== 'aprobado');
-    return `<div class="firma ${f ? 'ok' : turno ? 'turno' : ''}">
-      <span class="rol">${e.orden}. ${escapar(e.nombre)}</span>
-      ${f ? `<img src="${f.firma_img}" alt="Firma de ${escapar(f.nombre)}">` : `<div class="vacia">${turno ? 'Pendiente' : '—'}</div>`}
-      ${f ? `<b>${escapar(f.nombre)}</b><small>${escapar(f.cargo || '')}</small><small>${fechaHora(f.firmado_en)}</small>${f.obs ? `<small>«${escapar(f.obs)}»</small>` : ''}` : ''}
+    const turno = !f && ((rq.estado === 'en_firma' && e.orden === rq.etapa + 1) || (rq.etapa === 0 && e.orden === 1));
+    return `<div class="xl-firma ${turno ? 'turno' : ''}">
+      <div class="zona">${f ? `<img src="${f.firma_img}" alt="Firma de ${escapar(f.nombre)}">` : `<span class="pend">${turno ? 'Pendiente de firma' : ''}</span>`}</div>
+      <div class="quien">${f ? `<b>${escapar(f.nombre)}</b>${escapar(f.cargo || '')}<br>${fechaHora(f.firmado_en)}${f.obs ? `<br>«${escapar(f.obs)}»` : ''}` : ''}</div>
+      <div class="rol">${escapar(e.nombre)}</div>
     </div>`;
   }).join('');
+  if ($('cRevJjc')) pintarCabeceraDerecha();
 }
 $('btnFirmarTurno').addEventListener('click', () => abrirFirma('turno'));
 $('btnObservar').addEventListener('click', () => { $('oMotivo').value = ''; $('oFallo').textContent = ''; $('veloObs').classList.add('abierto'); $('oMotivo').focus(); });
