@@ -84,3 +84,54 @@ function aviso(texto, tipo = 'ok') {
 }
 
 const escapar = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+/* ════ Catálogo SAP guardado en el equipo (búsqueda instantánea) ════
+   Se descarga una vez y se vuelve a bajar solo cuando Almacén carga una matriz nueva. */
+let _catalogo = null;
+function _bd() {
+  return new Promise((ok, mal) => {
+    const r = indexedDB.open('req-jjc', 1);
+    r.onupgradeneeded = () => r.result.createObjectStore('kv');
+    r.onsuccess = () => ok(r.result); r.onerror = () => mal(r.error);
+  });
+}
+async function _bdLeer(k) {
+  try { const db = await _bd(); return await new Promise(ok => { const q = db.transaction('kv').objectStore('kv').get(k); q.onsuccess = () => ok(q.result); q.onerror = () => ok(null); }); }
+  catch { return null; }
+}
+async function _bdGuardar(k, v) {
+  try { const db = await _bd(); await new Promise(ok => { const t = db.transaction('kv', 'readwrite'); t.objectStore('kv').put(v, k); t.oncomplete = ok; t.onerror = ok; }); }
+  catch { /* sin almacenamiento local: se usa solo en memoria */ }
+}
+const normTxt = s => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+function catalogoLocal() {
+  if (_catalogo) return _catalogo;
+  _catalogo = (async () => {
+    const { data: ver, error } = await sb.rpc('catalogo_version');
+    if (error) throw error;
+    let g = await _bdLeer('catalogo');
+    if (!g || g.ver !== ver) {
+      const { data: txt, error: e2 } = await sb.rpc('catalogo_compacto');
+      if (e2) throw e2;
+      g = { ver, txt: txt || '' };
+      _bdGuardar('catalogo', g);
+    }
+    return (g.txt ? g.txt.split('\n') : []).map(l => {
+      const [codigo, descripcion, unidad] = l.split('\t');
+      return { codigo, descripcion, unidad, n: normTxt(descripcion) };
+    });
+  })();
+  _catalogo.catch(() => { _catalogo = null; });
+  return _catalogo;
+}
+/* Busca por inicio de código o por palabras (en cualquier orden; acepta * como comodín) */
+function buscarEnCatalogo(lista, texto, max = 40) {
+  const t = normTxt(texto).replace(/[*%]/g, ' ').trim();
+  if (!t) return { res: [], total: 0 };
+  if (/^\d+$/.test(t)) { const r = lista.filter(x => x.codigo.startsWith(t)); return { res: r.slice(0, max), total: r.length }; }
+  const pal = t.split(/\s+/).filter(Boolean);
+  const r = lista.filter(x => pal.every(p => x.n.includes(p)));
+  const p0 = pal[0];
+  r.sort((a, b) => (b.n.startsWith(p0) - a.n.startsWith(p0)) || (a.n < b.n ? -1 : a.n > b.n ? 1 : 0));
+  return { res: r.slice(0, max), total: r.length };
+}

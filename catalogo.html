@@ -97,7 +97,7 @@ const CATS = { '1': 'Materiales', '2': 'Repuestos', '3': 'EPP', '4': 'Petróleo'
 const catNombre = d => CATS[d] || `Otros (${d}…)`;
 const num = n => Number(n || 0).toLocaleString('es-PE');
 const fechaHora = f => f ? new Date(f).toLocaleString('es-PE', { dateStyle: 'medium', timeStyle: 'short' }) : '';
-let yo, editor = false, filas = [], archivoNombre = '', busqueda = 0;
+let yo, editor = false, filas = [], archivoNombre = '', busqueda = 0, catLista = null;
 
 /* ═════ Búsqueda (en el servidor: son más de 60 mil códigos) ═════ */
 function resaltar(t, palabras) {
@@ -108,6 +108,17 @@ function resaltar(t, palabras) {
 async function buscar() {
   const id = ++busqueda;
   const q = $('q').value.trim(), cat = $('fCat').value, tipo = $('fTipo').value;
+  if (catLista && !tipo && q.replace(/[*%\s]/g, '').length >= 2) {      // búsqueda instantánea en el equipo
+    const base = cat ? catLista.filter(x => x.codigo.startsWith(cat)) : catLista;
+    const { res, total } = buscarEnCatalogo(base, q, 100);
+    const palabras = /^\d+$/.test(q) ? [] : normTxt(q).replace(/[*%]/g, ' ').split(/\s+/).filter(Boolean);
+    $('contador').textContent = total ? `${num(total)} código${total === 1 ? '' : 's'}${total > 100 ? ' · mostrando los primeros 100, escribe más para afinar' : ''}` : '';
+    $('cuerpo').innerHTML = res.map(r => `<tr>
+      <td class="cod">${resaltar(r.codigo, /^\d+$/.test(q) ? [q] : [])}<button class="copiar" data-c="${escapar(r.codigo)}" title="Copiar código">Copiar</button><br><span class="cat">${escapar(catNombre(r.codigo[0]))}</span></td>
+      <td>${resaltar(r.descripcion, palabras)}</td><td>${escapar(r.unidad)}</td><td class="col-tipo"></td><td class="col-grupo"></td></tr>`).join('')
+      || '<tr><td colspan="5" class="vacio">Ningún código coincide.</td></tr>';
+    return;
+  }
   let c = sb.from('catalogo_sap').select('codigo,descripcion,unidad,tipo_material,grupo,activo', { count: 'exact' });
   let palabras = [];
   if (/^\d+$/.test(q)) c = c.like('codigo', q + '%');
@@ -128,7 +139,7 @@ async function buscar() {
     || `<tr><td colspan="5" class="vacio">${q || cat || tipo ? 'Ningún código coincide.' : 'El catálogo está vacío.' + (editor ? ' Usa «Cargar matriz».' : '')}</td></tr>`;
 }
 let espera;
-$('q').addEventListener('input', () => { clearTimeout(espera); espera = setTimeout(buscar, 250); });
+$('q').addEventListener('input', () => { clearTimeout(espera); espera = setTimeout(buscar, catLista ? 40 : 250); });
 $('fCat').addEventListener('change', buscar);
 $('fTipo').addEventListener('change', buscar);
 $('cuerpo').addEventListener('click', async e => {
@@ -215,7 +226,7 @@ $('cIr').addEventListener('click', async () => {
     if (error) throw error;
     $('cEstado').innerHTML = `✅ Listo: <b>${num(nuevas)}</b> nuevos · <b>${num(cambiadas)}</b> actualizados · <b>${num(fin.retiradas)}</b> ya no están en la matriz.`;
     aviso('Catálogo cargado');
-    infoCarga(); llenarTipos(); buscar();
+    infoCarga(); llenarTipos(); catLista = null; _catalogo = null; catalogoLocal().then(l => { catLista = l; }).catch(() => {}); buscar();
   } catch (e) {
     $('cFallo').textContent = 'Se detuvo la carga: ' + mensajeError(e) + '. Vuelve a intentarlo; lo ya cargado se conserva.';
   }
@@ -235,6 +246,7 @@ async function llenarTipos() {
   $('quienRol').textContent = ROLES[yo.rol] + (yo.es_admin ? ' · Administrador' : '');
   $('btnCargar').hidden = !editor;
   llenarTipos(); infoCarga(); buscar();
+  catalogoLocal().then(l => { catLista = l; }).catch(() => {});
 })();
 </script>
 </body>

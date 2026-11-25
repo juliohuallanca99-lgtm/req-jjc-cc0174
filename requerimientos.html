@@ -443,6 +443,7 @@ $('eItems').addEventListener('click', e => {
 $('btnItem').addEventListener('click', () => { items.push(itemVacio()); pintarItems(); $('eItems').querySelector('tr:last-child .buscarSap')?.focus(); });
 
 /* ── Buscador SAP (autocompletar) ── */
+let catLista = null;   // catálogo en el equipo: se baja en segundo plano la primera vez
 let acCaja = null, acSel = -1, acRes = [], acTimer, acFila = null, acInput = null;
 // la lista flota sobre la página (la tabla tiene desplazamiento y la recortaba)
 function ubicarAc() {
@@ -458,12 +459,20 @@ addEventListener('scroll', ubicarAc, true); addEventListener('resize', ubicarAc)
 function cerrarAc() { acCaja?.remove(); acCaja = null; acSel = -1; }
 async function buscarSap(input) {
   const q = input.value.trim(); acFila = input.closest('tr');
-  if (q.length < 2) { cerrarAc(); return; }
+  if (q.replace(/[*%\s]/g, '').length < 2) { cerrarAc(); return; }
+  let data, count;
+  if (catLista) ({ res: data, total: count } = buscarEnCatalogo(catLista, q, 40));   // instantáneo, en el equipo
+  else ({ data, count } = await buscarServidor(q));
+  if (document.activeElement !== input) return;
+  mostrarAc(input, data, count);
+}
+async function buscarServidor(q) {
   let c = sb.from('catalogo_sap').select('codigo,descripcion,unidad', { count: 'exact' }).eq('activo', true);
   if (/^\d+$/.test(q)) c = c.like('codigo', q + '%');
-  else q.split(/\s+/).filter(Boolean).slice(0, 5).forEach(p => { c = c.ilike('descripcion', `%${p.replace(/[%_,()]/g, '')}%`); });
-  const { data, count } = await c.order('descripcion').limit(40);
-  if (document.activeElement !== input) return;
+  else q.replace(/[*%]/g, ' ').split(/\s+/).filter(Boolean).slice(0, 5).forEach(p => { c = c.ilike('descripcion', `%${p.replace(/[%_,()]/g, '')}%`); });
+  return await c.order('descripcion').limit(40);
+}
+function mostrarAc(input, data, count) {
   cerrarAc();
   acRes = data || []; acSel = acRes.length ? 0 : -1;
   acCaja = document.createElement('div'); acCaja.className = 'ac-lista';
@@ -486,7 +495,7 @@ async function elegirSap(r) {
 }
 $('eItems').addEventListener('input', e => {
   if (!e.target.classList.contains('buscarSap')) return;
-  clearTimeout(acTimer); acTimer = setTimeout(() => buscarSap(e.target), 220);
+  clearTimeout(acTimer); acTimer = setTimeout(() => buscarSap(e.target), catLista ? 40 : 250);
 });
 $('eItems').addEventListener('keydown', e => {
   if (!acCaja || !e.target.classList.contains('buscarSap')) return;
@@ -686,6 +695,7 @@ $('btnConfirmarFirma').addEventListener('click', async () => {
   etapas = e.data || []; proyectos = p.data || [];
   (pf.data || []).forEach(x => perfiles.set(x.id, x));
   const qs = new URLSearchParams(location.search);
+  catalogoLocal().then(l => { catLista = l; }).catch(() => {});
   if (qs.has('nuevo')) verRq(null);
   else if (qs.get('id')) verRq(qs.get('id'));
   else verLista();
